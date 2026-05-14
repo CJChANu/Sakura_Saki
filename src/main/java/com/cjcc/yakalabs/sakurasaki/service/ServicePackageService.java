@@ -6,9 +6,7 @@ import com.cjcc.yakalabs.sakurasaki.repository.SalonServiceRepository;
 import com.cjcc.yakalabs.sakurasaki.repository.ServicePackageRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ServicePackageService {
@@ -24,7 +22,7 @@ public class ServicePackageService {
     public ServicePackage create(String name, String description, double discountPercent, List<Long> serviceIds) {
         ServicePackage pkg = new ServicePackage(name, description, discountPercent);
         List<SalonService> services = serviceRepo.findAllById(serviceIds);
-        pkg.setServices(services);
+        pkg.setServices(new HashSet<>(services));
         return packageRepo.save(pkg);
     }
 
@@ -47,7 +45,7 @@ public class ServicePackageService {
         if (description != null) pkg.setDescription(description);
         pkg.setDiscountPercent(discountPercent);
         if (serviceIds != null) {
-            pkg.setServices(serviceRepo.findAllById(serviceIds));
+            pkg.setServices(new HashSet<>(serviceRepo.findAllById(serviceIds)));
         }
         return packageRepo.save(pkg);
     }

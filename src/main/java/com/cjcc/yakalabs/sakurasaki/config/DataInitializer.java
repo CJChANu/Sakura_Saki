@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Seeds the database with sample data for testing.
@@ -192,7 +194,7 @@ public class DataInitializer implements CommandLineRunner {
         // ---- Sample Packages ----
         if (packageRepo.count() == 0 && services.size() >= 3) {
             ServicePackage bridal = new ServicePackage("Bridal Bliss", "Complete bridal preparation package", 15.0);
-            List<SalonService> bridalSvcs = new ArrayList<>();
+            Set<SalonService> bridalSvcs = new HashSet<>();
             bridalSvcs.add(services.get(0));
             bridalSvcs.add(services.get(2));
             if (services.size() > 5) bridalSvcs.add(services.get(5));
@@ -200,7 +202,7 @@ public class DataInitializer implements CommandLineRunner {
             packageRepo.save(bridal);
 
             ServicePackage pamper = new ServicePackage("Pamper Day", "Full day pampering experience", 10.0);
-            List<SalonService> pamperSvcs = new ArrayList<>();
+            Set<SalonService> pamperSvcs = new HashSet<>();
             pamperSvcs.add(services.get(2));
             pamperSvcs.add(services.get(3));
             pamperSvcs.add(services.get(4));

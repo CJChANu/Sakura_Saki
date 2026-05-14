@@ -12,6 +12,7 @@ on:
       - main
       - develop
       - feature/it25103881-admin-dashboard
+      - test_develop
 
 jobs:
   qodana:
