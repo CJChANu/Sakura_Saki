@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services — Sakura Saki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+    <style>
+        body{margin:0;font-family:var(--font-body);color:var(--on-surface);background:var(--surface);}
+        .public-topnav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(255,255,255,.6);backdrop-filter:blur(24px);border-bottom:.5px solid rgba(214,194,196,.12);}
+        .public-topnav .brand{font-family:var(--font-headline);font-size:1.15rem;font-weight:700;color:var(--primary);text-decoration:none;}
+        .public-topnav .nav-links{display:flex;gap:2rem;align-items:center;}
+        .public-topnav .nav-links a{font-family:var(--font-label);font-size:.8rem;font-weight:500;color:var(--on-surface-variant);text-decoration:none;transition:color .3s;}
+        .public-topnav .nav-links a:hover{color:var(--primary);}
+        .page-hero{padding:7rem 2rem 3rem;text-align:center;background:linear-gradient(135deg,#ffe4ea,#fff5f7,#fce7f3);}
+        .page-hero h1{font-family:var(--font-headline);font-size:2.5rem;font-weight:700;letter-spacing:-.02em;margin:0 0 .75rem;}
+        .page-hero p{color:var(--outline);font-size:1rem;max-width:500px;margin:0 auto 2rem;}
+        .container{max-width:1100px;margin:0 auto;padding:3rem 2rem;}
+        .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+        .svc-card{background:rgba(255,255,255,.7);backdrop-filter:blur(16px);border-radius:var(--radius-lg);padding:2rem;border:.5px solid rgba(214,194,196,.12);transition:all .4s cubic-bezier(.4,0,.2,1);}
+        .svc-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px -10px rgba(134,78,90,.12);}
+        .svc-card .cat{font-family:var(--font-label);font-size:.6rem;text-transform:uppercase;letter-spacing:.15em;color:var(--primary);margin-bottom:.5rem;}
+        .svc-card h3{font-family:var(--font-headline);font-size:1.1rem;margin:0 0 .5rem;}
+        .svc-card .desc{font-size:.85rem;color:var(--outline);line-height:1.6;margin-bottom:1rem;}
+        .svc-card .meta{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--on-surface-variant);}
+        .svc-card .price{font-family:var(--font-headline);font-weight:700;color:var(--primary);font-size:1.1rem;}
+        .pkg-section{margin-top:3rem;}
+        .pkg-card{background:linear-gradient(135deg,var(--primary-container),#fff5f7);border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem;}
+        .pkg-card h3{font-family:var(--font-headline);font-size:1.15rem;margin:0 0 .5rem;}
+        .pkg-card .desc{font-size:.85rem;color:var(--on-primary-container);margin-bottom:1rem;}
+        .pkg-card .meta{font-size:.85rem;color:var(--on-primary-container);}
+        .site-footer{text-align:center;padding:2rem;border-top:1px solid rgba(255,183,197,.2);}
+        .site-footer span{font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;}
+        @media(max-width:768px){.svc-grid{grid-template-columns:1fr;}.public-topnav{padding:.75rem 1.5rem;}}
+    </style>
+</head>
+<body style="display:flex;flex-direction:column;min-height:100vh;">
+<canvas id="sakura-canvas"></canvas>
+<main style="flex:1;">
+<nav class="public-topnav">
+    <a th:href="@{/}" class="brand">🌸 Sakura Saki</a>
+    <div class="nav-links">
+        <a th:href="@{/services}" style="color:var(--primary);font-weight:600;">Services</a>
+        <a th:href="@{/staff}">Our Team</a>
+        <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn-sakura btn-sakura-primary" style="padding:.5rem 1.25rem;">Sign In</a>
+        <a th:if="${isLoggedIn}" th:href="@{/profile}" class="btn-sakura btn-sakura-outline" style="padding:.5rem 1.25rem;display:flex;align-items:center;gap:.25rem;">
+            <span class="material-symbols-outlined" style="font-size:1.1rem;">person</span> <span th:text="${username}">Profile</span>
+        </a>
+    </div>
+</nav>
+
+<div class="page-hero">
+    <span style="font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:var(--primary);">Our Offerings</span>
+    <h1>Service Catalog</h1>
+    <p>Discover our curated selection of premium beauty and wellness treatments.</p>
+    <div class="search-pill" style="display:inline-flex;margin:0 auto;">
+        <span class="material-symbols-outlined" style="color:var(--outline);">search</span>
+        <input type="text" id="serviceSearch" placeholder="Search services..." onkeyup="filterServices()">
+    </div>
+</div>
+
+<div class="container">
+    <div class="svc-grid" id="serviceGrid">
+        <div class="svc-card" th:each="s : ${services}" th:data-name="${s.name}" th:data-cat="${s.category}">
+            <div class="cat" th:text="${s.category ?: 'General'}">Category</div>
+            <h3 th:text="${s.name}">Service</h3>
+            <p class="desc" th:text="${s.description}">Description</p>
+            <div class="meta">
+                <span th:text="'⏱ ' + ${s.durationMinutes} + ' min'">30 min</span>
+                <span class="price" th:text="'Rs.' + ${#numbers.formatDecimal(s.price,1,2)}">Rs.1500.00</span>
+            </div>
+            <a th:href="@{'/services/' + ${s.id}}" class="btn-sakura btn-sakura-outline btn-sakura-sm" style="margin-top:1rem;width:100%;justify-content:center;">View Details</a>
+        </div>
+    </div>
+
+    <div class="pkg-section" th:if="${packages != null && !packages.isEmpty()}">
+        <span style="font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:var(--primary);">Bundles</span>
+        <h2 style="font-family:var(--font-headline);font-size:1.75rem;margin:.25rem 0 1.5rem;">Service Packages</h2>
+        <div class="pkg-card" th:each="p : ${packages}">
+            <h3 th:text="${p.name}">Package</h3>
+            <p class="desc" th:text="${p.description}">Description</p>
+            <div class="meta">
+                <span th:text="${p.services.size()} + ' services · ' + ${p.getTotalDuration()} + ' min total'">Details</span>
+                <span style="font-family:var(--font-headline);font-weight:700;font-size:1.1rem;">
+                    <span style="text-decoration:line-through;color:var(--outline);font-size:.85rem;" th:text="'Rs.' + ${#numbers.formatDecimal(p.getTotalPrice(),1,2)}">Total</span>
+                    <span style="color:var(--primary);margin-left:.5rem;" th:text="'Rs.' + ${#numbers.formatDecimal(p.getDiscountedPrice(),1,2)}">Discounted</span>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+
+<footer class="site-footer" style="text-align:center;padding:2rem;background:var(--surface-container-low);">
+    <span style="font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;">© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span>
+</footer>
+<script th:src="@{/js/sakura-petals.js}"></script>
+<script>
+function filterServices(){const q=document.getElementById('serviceSearch').value.toLowerCase();document.querySelectorAll('#serviceGrid .svc-card').forEach(c=>{const n=c.dataset.name.toLowerCase();const cat=(c.dataset.cat||'').toLowerCase();c.style.display=(n.includes(q)||cat.includes(q))?'':'none';});}
+</script>
+</body>
+</html>

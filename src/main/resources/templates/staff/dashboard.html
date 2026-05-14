@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard — Sakura Saki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+    <style>
+        .staff-header {
+            background: linear-gradient(135deg, var(--primary-container), #fff5f7);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .staff-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .staff-info h1 {
+            margin: 0 0 0.25rem 0;
+            font-family: var(--font-headline);
+            font-size: 1.75rem;
+        }
+        .staff-info p {
+            margin: 0;
+            color: var(--outline);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body style="display:flex;flex-direction:column;min-height:100vh;">
+
+<nav class="admin-topnav">
+    <a href="#" class="brand">🌸 Sakura Saki Staff</a>
+    <div class="user-menu">
+        <span class="material-symbols-outlined">person</span>
+        <span th:text="${username}">Staff User</span>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn-sakura btn-sakura-outline" style="padding:.25rem .75rem;font-size:.75rem;margin-left:1rem;">Logout</button>
+        </form>
+    </div>
+</nav>
+
+<main style="flex:1;padding:2rem;">
+    <div th:if="${staff != null}" class="staff-header">
+        <div class="staff-avatar" th:text="${#strings.substring(staff.firstName,0,1)}">S</div>
+        <div class="staff-info">
+            <h1 th:text="'Welcome, ' + ${staff.firstName} + ' ' + ${staff.lastName}">Welcome, Staff</h1>
+            <p th:text="${staff.specialization}">Specialization</p>
+        </div>
+    </div>
+    <div th:if="${staff == null}" class="staff-header">
+        <div class="staff-info">
+            <h1>Staff Dashboard Overview</h1>
+            <p>Viewing all staff appointments (Admin Mode)</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">My Appointments</h2>
+        </div>
+        
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th th:if="${staff == null}">Staff Member</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="appt : ${appointments != null ? appointments : allStaffAppointments}">
+                    <td>
+                        <div th:text="${#temporals.format(appt.appointmentDate, 'MMM dd, yyyy')}">Date</div>
+                        <div style="font-size:0.75rem;color:var(--outline);" th:text="${appt.appointmentTime}">Time</div>
+                    </td>
+                    <td>
+                        <div th:text="${appt.customer.firstName + ' ' + appt.customer.lastName}">Customer Name</div>
+                        <div style="font-size:0.75rem;color:var(--outline);" th:text="${appt.customer.phone}">Phone</div>
+                    </td>
+                    <td th:text="${appt.service.name}">Service</td>
+                    <td th:if="${staff == null}" th:text="${appt.staff.firstName + ' ' + appt.staff.lastName}">Staff</td>
+                    <td>
+                        <span th:class="'status-badge status-' + ${#strings.toLowerCase(appt.status)}" th:text="${appt.status}">STATUS</span>
+                    </td>
+                </tr>
+                <tr th:if="${(appointments == null or appointments.isEmpty()) and (allStaffAppointments == null or allStaffAppointments.isEmpty())}">
+                    <td colspan="5" style="text-align:center;padding:2rem;color:var(--outline);">No appointments scheduled yet.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer class="site-footer" style="text-align:center;padding:2rem;background:var(--surface-container-low);">
+    <span style="font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;">© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span>
+</footer>
+
+</body>
+</html>
