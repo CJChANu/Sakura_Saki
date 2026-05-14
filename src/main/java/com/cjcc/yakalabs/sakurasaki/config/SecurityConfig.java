@@ -8,16 +8,39 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // CustomUserDetailsService is auto-detected via @Service — no need for a @Bean here.
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Role-based redirect after login:
+     *   ADMIN  → /admin/dashboard
+     *   STAFF  → /staff/dashboard
+     *   USER   → / (homepage)
+     */
+    @Bean
+    public AuthenticationSuccessHandler successHandler() {
+        return (request, response, authentication) -> {
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            boolean isStaff = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_STAFF"));
+
+            if (isAdmin) {
+                response.sendRedirect("/admin/dashboard");
+            } else if (isStaff) {
+                response.sendRedirect("/staff/dashboard");
+            } else {
+                response.sendRedirect("/");
+            }
+        };
     }
 
     @Bean
@@ -26,13 +49,17 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/services", "/services/**", "/staff", "/reviews/**").permitAll()
+                        .requestMatchers("/api/staff/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/staff/dashboard/**").hasAnyRole("STAFF", "ADMIN")
+                        .requestMatchers("/profile/**", "/booking/**", "/my-appointments/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/do-login")
-                        .defaultSuccessUrl("/admin/dashboard", true)
+                        .successHandler(successHandler())
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
