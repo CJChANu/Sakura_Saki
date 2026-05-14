@@ -1,8 +1,8 @@
 package com.cjcc.yakalabs.sakurasaki.model;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * ServicePackage groups multiple SalonServices together with a discount.
@@ -32,7 +32,7 @@ public class ServicePackage {
         joinColumns = @JoinColumn(name = "package_id"),
         inverseJoinColumns = @JoinColumn(name = "service_id")
     )
-    private List<SalonService> services = new ArrayList<>();
+    private Set<SalonService> services = new HashSet<>();
 
     public ServicePackage() {}
 
@@ -82,6 +82,6 @@ public class ServicePackage {
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
 
-    public List<SalonService> getServices() { return services; }
-    public void setServices(List<SalonService> services) { this.services = services; }
+    public Set<SalonService> getServices() { return services; }
+    public void setServices(Set<SalonService> services) { this.services = services; }
 }
