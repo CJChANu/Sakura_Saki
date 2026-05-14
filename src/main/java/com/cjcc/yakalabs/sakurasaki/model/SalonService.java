@@ -4,86 +4,70 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "salon_services")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "service_type", discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue("GENERAL")
 public class SalonService {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "service_id", unique = true, length = 50)
-    private String serviceId;
+    @Column(nullable = false)
+    private String name;
 
-    @Column(name = "service_name")
-    private String serviceName;
-
-    private String category;
-    private int duration;
-    private double price;
-
-    @Column(columnDefinition = "TEXT")
     private String description;
 
-    private boolean available = true;
+    @Column(nullable = false)
+    private double price;
 
-    public SalonService() {}
+    @Column(nullable = false)
+    private int durationMinutes;
 
-    public SalonService(String serviceId, String serviceName, String category, int duration,
-                        double price, String description, boolean available) {
-        this.serviceId = serviceId;
-        this.serviceName = serviceName;
-        this.category = category;
-        this.duration = duration;
-        this.price = price;
-        this.description = description;
-        this.available = available;
+    private String category; // Hair, Skin, Nails, Bridal, Spa
+
+    private String imageUrl;
+
+    private boolean active = true;
+
+    public SalonService() {
     }
 
-    // --- Database-specific ID ---
+    public SalonService(String name, String description, double price, int durationMinutes) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.durationMinutes = durationMinutes;
+    }
+
+    public SalonService(String name, String description, double price, int durationMinutes, String category) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.durationMinutes = durationMinutes;
+        this.category = category;
+    }
+
+    // --- Getters and Setters ---
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    // --- Service branch fields ---
-    public String getServiceId() { return serviceId; }
-    public void setServiceId(String serviceId) { this.serviceId = serviceId; }
-
-    public String getServiceName() { return serviceName; }
-    public void setServiceName(String serviceName) { this.serviceName = serviceName; }
-
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
-
-    public int getDuration() { return duration; }
-    public void setDuration(int duration) { this.duration = duration; }
-
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public boolean isAvailable() { return available; }
-    public void setAvailable(boolean available) { this.available = available; }
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
 
-    // --- develop branch Compatibility Getters/Setters ---
-    public String getName() { return serviceName; }
-    public void setName(String name) { this.serviceName = name; }
+    public int getDurationMinutes() { return durationMinutes; }
+    public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
 
-    public int getDurationMinutes() { return duration; }
-    public void setDurationMinutes(int durationMinutes) { this.duration = durationMinutes; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public boolean isActive() { return available; }
-    public void setActive(boolean active) { this.available = active; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    // --- Utility Methods ---
-    public String getCategoryDetails() {
-        return "General salon service";
-    }
-
-    public String toFileString() {
-        return serviceId + "|" + serviceName + "|" + category + "|" + duration + "|" +
-                price + "|" + description + "|" + available;
-    }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }

@@ -2,9 +2,9 @@ name: Sakura Saki CI/CD
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "test_develop" ]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "test_develop" ]
 
 jobs:
   build:
@@ -32,7 +32,7 @@ jobs:
     name: Trigger Render Deployment
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/test_develop'
 
     steps:
       - name: Trigger Deploy Hook

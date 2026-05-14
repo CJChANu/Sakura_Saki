@@ -1,88 +1,87 @@
 package com.cjcc.yakalabs.sakurasaki.model;
 
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * ServicePackage groups multiple SalonServices together with a discount.
+ * Demonstrates composition (has-a list of services) and abstraction
+ * (computed methods for total price and discounted price).
+ */
+@Entity
+@Table(name = "service_packages")
 public class ServicePackage {
-    private String packageId;
-    private String packageName;
-    private String includedServices;
-    private double totalPrice;
-    private double discount;
-    private double finalPrice;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
     private String description;
 
-    public ServicePackage() {
-    }
+    private double discountPercent; // e.g., 10.0 for 10%
 
-    public ServicePackage(String packageId, String packageName, String includedServices,
-                          double totalPrice, double discount, String description) {
-        this.packageId = packageId;
-        this.packageName = packageName;
-        this.includedServices = includedServices;
-        this.totalPrice = totalPrice;
-        this.discount = discount;
-        this.finalPrice = totalPrice - discount;
+    private boolean active = true;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "package_services",
+        joinColumns = @JoinColumn(name = "package_id"),
+        inverseJoinColumns = @JoinColumn(name = "service_id")
+    )
+    private List<SalonService> services = new ArrayList<>();
+
+    public ServicePackage() {}
+
+    public ServicePackage(String name, String description, double discountPercent) {
+        this.name = name;
         this.description = description;
+        this.discountPercent = discountPercent;
     }
 
-    public String getPackageId() {
-        return packageId;
-    }
+    // --- Computed methods (Abstraction) ---
 
-    public void setPackageId(String packageId) {
-        this.packageId = packageId;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    }
-
-    public String getIncludedServices() {
-        return includedServices;
-    }
-
-    public void setIncludedServices(String includedServices) {
-        this.includedServices = includedServices;
-    }
-
+    /**
+     * Calculate total price by summing all service prices.
+     */
     public double getTotalPrice() {
-        return totalPrice;
+        return services.stream().mapToDouble(SalonService::getPrice).sum();
     }
 
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-        this.finalPrice = this.totalPrice - this.discount;
+    /**
+     * Calculate discounted price.
+     */
+    public double getDiscountedPrice() {
+        return getTotalPrice() * (1 - discountPercent / 100.0);
     }
 
-    public double getDiscount() {
-        return discount;
+    /**
+     * Calculate total duration by summing all service durations.
+     */
+    public int getTotalDuration() {
+        return services.stream().mapToInt(SalonService::getDurationMinutes).sum();
     }
 
-    public void setDiscount(double discount) {
-        this.discount = discount;
-        this.finalPrice = this.totalPrice - this.discount;
-    }
+    // --- Getters and Setters ---
 
-    public double getFinalPrice() {
-        return finalPrice;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setFinalPrice(double finalPrice) {
-        this.finalPrice = finalPrice;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public double getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(double discountPercent) { this.discountPercent = discountPercent; }
 
-    public String toFileString() {
-        return packageId + "|" + packageName + "|" + includedServices + "|" +
-                totalPrice + "|" + discount + "|" + finalPrice + "|" + description;
-    }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+
+    public List<SalonService> getServices() { return services; }
+    public void setServices(List<SalonService> services) { this.services = services; }
 }

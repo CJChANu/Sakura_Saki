@@ -1,46 +1,130 @@
 package com.cjcc.yakalabs.sakurasaki.service;
 
-import com.cjcc.yakalabs.sakurasaki.model.Appointment;
+import com.cjcc.yakalabs.sakurasaki.model.*;
+import com.cjcc.yakalabs.sakurasaki.repository.*;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
-public interface AppointmentService {
+@Service
+public class AppointmentService {
 
-    // ── CREATE
-    void saveAppointment(Appointment appointment);
+    private final AppointmentRepository appointmentRepo;
+    private final CustomerRepository customerRepo;
+    private final SalonServiceRepository serviceRepo;
+    private final StaffRepository staffRepo;
 
-    // ── READ
-    /** Return all appointments in the system (admin view). */
-    List<Appointment> getAllAppointments();
+    public AppointmentService(AppointmentRepository appointmentRepo,
+                              CustomerRepository customerRepo,
+                              SalonServiceRepository serviceRepo,
+                              StaffRepository staffRepo) {
+        this.appointmentRepo = appointmentRepo;
+        this.customerRepo = customerRepo;
+        this.serviceRepo = serviceRepo;
+        this.staffRepo = staffRepo;
+    }
 
-    /** Return a single appointment by its primary key. */
-    Appointment getAppointmentById(Long id);
+    /**
+     * Create a new appointment with double-booking prevention.
+     */
+    public Appointment createAppointment(Long customerId, Long serviceId, Long staffId,
+                                         LocalDate date, LocalTime time, String notes) {
+        Customer customer = customerRepo.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        SalonService service = serviceRepo.findById(serviceId)
+                .orElseThrow(() -> new RuntimeException("Service not found"));
+        Staff staff = staffRepo.findById(staffId)
+                .orElseThrow(() -> new RuntimeException("Staff not found"));
 
-    /** Return all appointments for a specific customer. */
-    List<Appointment> getAppointmentsByUserId(String userId);
+        // Double-booking prevention: check for time overlap
+        if (!isStaffAvailable(staffId, date, time, service.getDurationMinutes())) {
+            throw new RuntimeException("This staff member is already booked during that time slot. Please choose a different time or staff member.");
+        }
 
-    /** Return all appointments assigned to a staff member. */
-    List<Appointment> getAppointmentsByStaffId(String staffId);
+        Appointment appointment = new Appointment(customer, service, staff, date, time);
+        appointment.setNotes(notes);
+        return appointmentRepo.save(appointment);
+    }
 
-    /** Return all appointments linked to a specific service. */
-    List<Appointment> getAppointmentsByServiceId(String serviceId);
+    /**
+     * Check if a staff member is available at the given date/time for the given duration.
+     * Uses overlap detection: new appointment [startTime, endTime) must not overlap
+     * with any existing appointment's [existingStart, existingEnd).
+     */
+    public boolean isStaffAvailable(Long staffId, LocalDate date, LocalTime startTime, int durationMinutes) {
+        LocalTime endTime = startTime.plusMinutes(durationMinutes);
 
-    /** Return all appointments linked to a specific package. */
-    List<Appointment> getAppointmentsByPackageId(String packageId);
+        // Get all non-cancelled appointments for this staff on this date
+        List<Appointment> existing = appointmentRepo.findByStaffIdAndAppointmentDate(staffId, date);
 
-    /** Return all appointments with a given status. */
-    List<Appointment> getAppointmentsByStatus(String status);
+        for (Appointment a : existing) {
+            if ("CANCELLED".equals(a.getStatus())) continue;
 
-    /** Return all appointments scheduled on a specific date. */
-    List<Appointment> getAppointmentsByDate(LocalDate date);
+            LocalTime existingStart = a.getAppointmentTime();
+            LocalTime existingEnd = existingStart.plusMinutes(a.getService().getDurationMinutes());
 
-    // ── UPDATE
-    /** Validate and update an existing appointment. */
-    void updateAppointment(Appointment appointment);
+            // Overlap check: two intervals overlap if start1 < end2 AND start2 < end1
+            if (startTime.isBefore(existingEnd) && existingStart.isBefore(endTime)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-    /** Quick-update only the status field. */
-    void updateStatus(Long id, String status);
+    public Optional<Appointment> findById(Long id) {
+        return appointmentRepo.findById(id);
+    }
 
-    // ── DELETE
-    void deleteAppointment(Long id);
+    public List<Appointment> findAll() {
+        return appointmentRepo.findAll();
+    }
+
+    public List<Appointment> findByCustomer(Long customerId) {
+        return appointmentRepo.findByCustomerIdOrderByAppointmentDateDesc(customerId);
+    }
+
+    public List<Appointment> findByStaff(Long staffId) {
+        return appointmentRepo.findByStaffId(staffId);
+    }
+
+    public List<Appointment> findByDate(LocalDate date) {
+        return appointmentRepo.findByAppointmentDate(date);
+    }
+
+    public List<Appointment> findByStatus(String status) {
+        return appointmentRepo.findByStatus(status);
+    }
+
+    /**
+     * Reschedule an appointment with conflict checking.
+     */
+    public Appointment reschedule(Long id, LocalDate newDate, LocalTime newTime) {
+        Appointment a = appointmentRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        if (!isStaffAvailable(a.getStaff().getId(), newDate, newTime, a.getService().getDurationMinutes())) {
+            throw new RuntimeException("Staff member is not available at the new time. Please choose another time.");
+        }
+
+        a.setAppointmentDate(newDate);
+        a.setAppointmentTime(newTime);
+        return appointmentRepo.save(a);
+    }
+
+    /**
+     * Change appointment status: SCHEDULED → COMPLETED or CANCELLED.
+     */
+    public Appointment changeStatus(Long id, String newStatus) {
+        Appointment a = appointmentRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        a.setStatus(newStatus);
+        return appointmentRepo.save(a);
+    }
+
+    public void cancelAppointment(Long id) {
+        changeStatus(id, "CANCELLED");
+    }
 }

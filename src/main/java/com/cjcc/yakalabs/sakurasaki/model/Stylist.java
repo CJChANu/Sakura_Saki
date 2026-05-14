@@ -1,18 +1,25 @@
 package com.cjcc.yakalabs.sakurasaki.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
+/**
+ * Stylist — a type of Staff specializing in hair and beauty.
+ * Demonstrates polymorphism by overriding getStaffType().
+ */
 @Entity
-@DiscriminatorValue("Stylist")
+@DiscriminatorValue("STYLIST")
 public class Stylist extends Staff {
 
-    public Stylist() { super(); }
+    private String certificationLevel; // Junior, Senior, Master
 
-    public Stylist(String staffId, String name, String phone,
-                   String email, String workingDays, String timeSlot) {
-        super(staffId, name, phone, email, workingDays, timeSlot);
-    }
+    public Stylist() {}
 
     @Override
-    public String getRole() { return "Stylist"; }
+    public String getStaffType() {
+        return "Stylist";
+    }
+
+    public String getCertificationLevel() { return certificationLevel; }
+    public void setCertificationLevel(String certificationLevel) { this.certificationLevel = certificationLevel; }
 }

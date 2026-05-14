@@ -8,137 +8,106 @@ import java.time.LocalTime;
 @Table(name = "appointments")
 public class Appointment {
 
-    // ── Primary Key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long appointmentId;
+    private Long id;
 
-    // ── Foreign IDs from other Members
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
-    /** Member 1 — Customer / User ID */
-    @Column(name = "user_id", nullable = false, length = 50)
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "service_id", nullable = false)
+    private SalonService service;
 
-    /** Member 2 — Staff ID */
-    @Column(name = "staff_id", nullable = false, length = 50)
-    private String staffId;
+    @ManyToOne
+    @JoinColumn(name = "staff_id")
+    private Staff staff;
 
-    /**
-     * Member 3 — SalonService ID
-     * Nullable: customer books EITHER a service OR a package, not both.
-     */
-    @Column(name = "service_id", length = 50)
-    private String serviceId;
-
-    /**
-     * Member 3 — ServicePackage ID
-     * Nullable: customer books EITHER a service OR a package, not both.
-     */
-    @Column(name = "package_id", length = 50)
-    private String packageId;
-
-    // ── Appointment Details
-
-    @Column(name = "appointment_date", nullable = false)
+    @Column(nullable = false)
     private LocalDate appointmentDate;
 
-    @Column(name = "appointment_time", nullable = false)
+    @Column(nullable = false)
     private LocalTime appointmentTime;
 
-    /**
-     * Duration in minutes — pulled from the linked SalonService or
-     * calculated by Member 3's ServicePackage at booking time.
-     */
-    @Column(name = "duration_minutes", nullable = false)
-    private int durationMinutes;
+    @Column(nullable = false)
+    private String status = "SCHEDULED"; // SCHEDULED, COMPLETED, CANCELLED
 
-    /**
-     * Lifecycle status:
-     * PENDING → CONFIRMED → COMPLETED
-     *         ↘ CANCELLED
-     */
-    @Column(name = "status", nullable = false, length = 20)
-    private String status;
-
-    /** Total charged amount (LKR). Copied from service/package price at booking time. */
-    @Column(name = "total_amount", nullable = false)
-    private double totalAmount;
-
-    @Column(name = "notes", length = 500)
     private String notes;
 
-    @Column(name = "created_date", nullable = false,
-            columnDefinition = "DATE DEFAULT (CURRENT_DATE)")
-    private LocalDate createdDate;
-
-    // ── Constructors ──────────────────────────────────────────────────────
-
-    public Appointment() {}
-
-    public Appointment(String userId, String staffId,
-                       String serviceId, String packageId,
-                       LocalDate appointmentDate, LocalTime appointmentTime,
-                       int durationMinutes, double totalAmount, String notes) {
-        this.userId          = userId;
-        this.staffId         = staffId;
-        this.serviceId       = serviceId;
-        this.packageId       = packageId;
-        this.appointmentDate = appointmentDate;
-        this.appointmentTime = appointmentTime;
-        this.durationMinutes = durationMinutes;
-        this.totalAmount     = totalAmount;
-        this.notes           = notes;
-        this.status          = "PENDING";
-        this.createdDate     = LocalDate.now();
+    public Appointment() {
     }
 
-    //  Getters & Setters
+    public Appointment(Customer customer, SalonService service, Staff staff,
+                       LocalDate appointmentDate, LocalTime appointmentTime) {
+        this.customer = customer;
+        this.service = service;
+        this.staff = staff;
+        this.appointmentDate = appointmentDate;
+        this.appointmentTime = appointmentTime;
+    }
 
-    public Long getAppointmentId()                           { return appointmentId; }
-    public void setAppointmentId(Long appointmentId)         { this.appointmentId = appointmentId; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getUserId()                                { return userId; }
-    public void setUserId(String userId)                     { this.userId = userId; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getStaffId()                               { return staffId; }
-    public void setStaffId(String staffId)                   { this.staffId = staffId; }
+    public Customer getCustomer() {
+        return customer;
+    }
 
-    public String getServiceId()                             { return serviceId; }
-    public void setServiceId(String serviceId)               { this.serviceId = serviceId; }
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 
-    public String getPackageId()                             { return packageId; }
-    public void setPackageId(String packageId)               { this.packageId = packageId; }
+    public SalonService getService() {
+        return service;
+    }
 
-    public LocalDate getAppointmentDate()                    { return appointmentDate; }
-    public void setAppointmentDate(LocalDate appointmentDate){ this.appointmentDate = appointmentDate; }
+    public void setService(SalonService service) {
+        this.service = service;
+    }
 
-    public LocalTime getAppointmentTime()                    { return appointmentTime; }
-    public void setAppointmentTime(LocalTime appointmentTime){ this.appointmentTime = appointmentTime; }
+    public Staff getStaff() {
+        return staff;
+    }
 
-    public int getDurationMinutes()                          { return durationMinutes; }
-    public void setDurationMinutes(int durationMinutes)      { this.durationMinutes = durationMinutes; }
+    public void setStaff(Staff staff) {
+        this.staff = staff;
+    }
 
-    public String getStatus()                                { return status; }
-    public void setStatus(String status)                     { this.status = status; }
+    public LocalDate getAppointmentDate() {
+        return appointmentDate;
+    }
 
-    public double getTotalAmount()                           { return totalAmount; }
-    public void setTotalAmount(double totalAmount)           { this.totalAmount = totalAmount; }
+    public void setAppointmentDate(LocalDate appointmentDate) {
+        this.appointmentDate = appointmentDate;
+    }
 
-    public String getNotes()                                 { return notes; }
-    public void setNotes(String notes)                       { this.notes = notes; }
+    public LocalTime getAppointmentTime() {
+        return appointmentTime;
+    }
 
-    public LocalDate getCreatedDate()                        { return createdDate; }
-    public void setCreatedDate(LocalDate createdDate)        { this.createdDate = createdDate; }
+    public void setAppointmentTime(LocalTime appointmentTime) {
+        this.appointmentTime = appointmentTime;
+    }
 
-    @Override
-    public String toString() {
-        return "Appointment{id=" + appointmentId +
-                ", user='" + userId + "'" +
-                ", staff='" + staffId + "'" +
-                ", date=" + appointmentDate +
-                ", time=" + appointmentTime +
-                ", status='" + status + "'" +
-                ", total=" + totalAmount + "}";
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

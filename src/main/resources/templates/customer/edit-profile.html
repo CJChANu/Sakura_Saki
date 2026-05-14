@@ -1,99 +1,42 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile — Sakura Saki</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link th:href="@{/css/admin-style.css}" rel="stylesheet">
 </head>
-<body style="display:flex;flex-direction:column;min-height:100vh;">
+<body class="admin-body">
 <canvas id="sakura-canvas"></canvas>
-
-<!-- Top Navigation -->
-<nav style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(255,255,255,.6);backdrop-filter:blur(24px);border-bottom:.5px solid rgba(214,194,196,.12);">
-    <a href="/" style="font-family:var(--font-headline);font-size:1.15rem;font-weight:700;color:var(--primary);text-decoration:none;">🌸 Sakura Saki</a>
-    <div style="display:flex;gap:2rem;align-items:center;">
-        <a th:href="@{/profile}" style="font-family:var(--font-label);font-size:.8rem;font-weight:500;letter-spacing:.03em;color:var(--on-surface-variant);text-decoration:none;">← Back to Profile</a>
-    </div>
-</nav>
-
-<main style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;margin-top:4rem;">
-<div class="auth-container" style="min-height:auto;">
-    <div class="auth-card" style="max-width:500px;">
-        <div class="auth-brand">
-            <h1>🌸 Edit Profile</h1>
-            <p>Update your information</p>
-        </div>
-
-        <!-- Error/Success Alerts -->
-        <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
-        <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
-
-        <form th:action="@{/profile/edit}" method="post">
-            <!-- Username (read-only) -->
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input id="username" type="text" class="input-recessed" th:value="${user.username}" disabled
-                       style="opacity:.6;cursor:not-allowed;">
-                <div style="font-size:0.7rem;color:var(--outline);margin-top:0.25rem;">Username cannot be changed.</div>
+<aside class="admin-sidebar">
+    <div class="sidebar-brand"><h1>🌸 Sakura Saki</h1><p>Beauty & Wellness</p></div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/profile}" class="active"><span class="material-symbols-outlined">person</span> Profile</a>
+        <a th:href="@{/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/staff}"><span class="material-symbols-outlined">badge</span> Our Team</a>
+        <a th:href="@{/booking}"><span class="material-symbols-outlined">calendar_add_on</span> Book Now</a>
+        <a th:href="@{/my-appointments}"><span class="material-symbols-outlined">event_note</span> My Bookings</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+    </nav>
+</aside>
+<main class="admin-main">
+    <header class="page-header"><div><span class="kicker">Account</span><h2>Edit Profile</h2></div></header>
+    <div class="content-card glass-pane clay-lift" style="max-width:550px;">
+        <form th:action="@{/profile/update}" method="post">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+                <div class="form-group"><label>First Name</label><input name="firstName" type="text" class="input-recessed" th:value="${customer?.firstName}" required></div>
+                <div class="form-group"><label>Last Name</label><input name="lastName" type="text" class="input-recessed" th:value="${customer?.lastName}" required></div>
             </div>
-
-            <!-- Email (read-only) -->
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input id="email" type="email" class="input-recessed" th:value="${user.email}" disabled
-                       style="opacity:.6;cursor:not-allowed;">
-                <div style="font-size:0.7rem;color:var(--outline);margin-top:0.25rem;">Email cannot be changed.</div>
+            <div class="form-group" style="margin-bottom:1.25rem;"><label>Phone</label><input name="phone" type="tel" class="input-recessed" th:value="${customer?.phone}" placeholder="07X XXXX XXX"></div>
+            <div style="display:flex;gap:1rem;">
+                <button type="submit" class="btn-sakura btn-sakura-primary"><span class="material-symbols-outlined" style="font-size:1rem;">save</span> Save Changes</button>
+                <a th:href="@{/profile}" class="btn-sakura btn-sakura-outline">Cancel</a>
             </div>
-
-            <!-- First Name & Last Name -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                <div class="form-group">
-                    <label for="firstName">First Name</label>
-                    <input id="firstName" name="firstName" type="text" class="input-recessed"
-                           th:value="${user.firstName}" placeholder="First name" required>
-                </div>
-                <div class="form-group">
-                    <label for="lastName">Last Name</label>
-                    <input id="lastName" name="lastName" type="text" class="input-recessed"
-                           th:value="${user.lastName}" placeholder="Last name" required>
-                </div>
-            </div>
-
-            <!-- Phone -->
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input id="phone" name="phone" type="tel" class="input-recessed"
-                       th:value="${user.phone}" placeholder="07XXXXXXXX" pattern="[0-9]{10}" maxlength="10" minlength="10" title="Please enter exactly 10 digits (e.g., 0771234567)" required>
-            </div>
-
-            <!-- New Password (optional) -->
-            <div class="form-group">
-                <label for="newPassword">New Password (optional)</label>
-                <input id="newPassword" name="newPassword" type="password" class="input-recessed"
-                       placeholder="Leave blank to keep current password">
-                <div style="font-size:0.7rem;color:var(--outline);margin-top:0.25rem;">If changing: 8+ chars, uppercase, lowercase, digit, and special char (@#$%^&+=!).</div>
-            </div>
-
-            <!-- Submit -->
-            <button class="btn-sakura btn-sakura-primary" type="submit" style="width:100%;justify-content:center;margin-top:.5rem;">
-                <span class="material-symbols-outlined" style="font-size:1rem;">save</span> Save Changes
-            </button>
         </form>
-
-        <p style="text-align:center;margin-top:1.5rem;">
-            <a th:href="@{/profile}" style="font-size:.8rem;color:var(--outline);text-decoration:none;">← Cancel and go back</a>
-        </p>
     </div>
-</div>
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
 </main>
-
-<footer style="text-align:center;padding:2rem;background:var(--surface-container-low);">
-    <span style="font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;">© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span>
-</footer>
-
 <script th:src="@{/js/sakura-petals.js}"></script>
 </body>
 </html>
