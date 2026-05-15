@@ -1,5 +1,4 @@
-package com.example.beautysalonbookingsystem.model;
-
+package com.cjcc.yakalabs.sakurasaki.model;
 
 public class NailService extends SalonService {
     private String nailStyle;
