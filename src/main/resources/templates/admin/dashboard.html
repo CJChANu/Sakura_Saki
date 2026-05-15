@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Sakura Saki Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+</head>
+<body class="admin-body">
+<canvas id="sakura-canvas"></canvas>
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="admin-sidebar">
+    <div class="sidebar-brand">
+        <h1>🌸 Admin Portal</h1>
+        <p>Sakura Saki Management</p>
+    </div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/admin/dashboard}" class="active">
+            <span class="material-symbols-outlined">dashboard</span> Overview
+        </a>
+        <a th:href="@{/admin/reports}">
+            <span class="material-symbols-outlined">analytics</span> Reports
+        </a>
+        <a th:href="@{/admin/users}">
+            <span class="material-symbols-outlined">group</span> Users
+        </a>
+        <a th:href="@{/admin/manage}">
+            <span class="material-symbols-outlined">shield_person</span> Admins
+        </a>
+        <a th:href="@{/logout}">
+            <span class="material-symbols-outlined">logout</span> Logout
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="sidebar-profile">
+            <div class="avatar" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">AD</div>
+            <div class="info">
+                <span class="name" th:text="${username}">admin</span>
+                <span class="role">Administrator</span>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="admin-main">
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div>
+            <span class="kicker">Dashboard Overview</span>
+            <h2>Welcome back, <span th:text="${username}">Admin</span>.</h2>
+        </div>
+        <div class="header-actions">
+            <form th:action="@{/admin/users}" method="get" class="search-pill">
+                <span class="material-symbols-outlined" style="color: var(--outline);">search</span>
+                <input type="text" name="search" placeholder="Search users...">
+            </form>
+        </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card glass-pane clay-lift">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">group</span>
+            </div>
+            <div class="stat-label">Total Customers</div>
+            <div class="stat-value" th:text="${summary.totalCustomers}">0</div>
+        </div>
+        <div class="stat-card glass-pane clay-lift">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">content_cut</span>
+            </div>
+            <div class="stat-label">Salon Services</div>
+            <div class="stat-value" th:text="${summary.totalServices}">0</div>
+        </div>
+        <div class="stat-card glass-pane clay-lift">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">badge</span>
+            </div>
+            <div class="stat-label">Total Staff</div>
+            <div class="stat-value" th:text="${summary.totalStaff}">0</div>
+        </div>
+        <div class="stat-card glass-pane clay-lift highlight">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">calendar_today</span>
+            </div>
+            <div class="stat-label">Today's Appointments</div>
+            <div class="stat-value" th:text="${summary.todayAppointments}">0</div>
+        </div>
+    </div>
+
+    <!-- Two-column grid: Chart + Quick Stats -->
+    <div class="grid-2" style="margin-bottom: 2rem;">
+
+        <!-- Appointment Trends Chart -->
+        <div class="content-card glass-pane clay-lift">
+            <h3>Appointment Trends</h3>
+            <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Quick Navigation Cards -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="content-card glass-pane clay-lift" style="flex: 1;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div class="stat-label">Quick Actions</div>
+                        <h3 style="margin-bottom: 0;">Manage your salon</h3>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap;">
+                    <a th:href="@{/admin/users}" class="btn-sakura btn-sakura-outline btn-sakura-sm">
+                        <span class="material-symbols-outlined" style="font-size: 1rem;">group</span> Users
+                    </a>
+                    <a th:href="@{/admin/manage}" class="btn-sakura btn-sakura-outline btn-sakura-sm">
+                        <span class="material-symbols-outlined" style="font-size: 1rem;">shield_person</span> Admins
+                    </a>
+                    <a th:href="@{/admin/reports}" class="btn-sakura btn-sakura-outline btn-sakura-sm">
+                        <span class="material-symbols-outlined" style="font-size: 1rem;">analytics</span> Reports
+                    </a>
+                </div>
+            </div>
+            <div class="content-card clay-lift" style="flex: 1; background: var(--primary-container);">
+                <div class="stat-label" style="opacity: 0.7;">System Status</div>
+                <h3 style="color: var(--on-primary-container);">All systems online</h3>
+                <div style="display: flex; gap: 2rem; margin-top: 1rem;">
+                    <div>
+                        <span style="font-family: var(--font-headline); font-size: 1.75rem; font-weight: 700; color: var(--on-primary-container);" th:text="${summary.totalCustomers + summary.totalStaff}">0</span>
+                        <span style="display: block; font-size: 0.625rem; opacity: 0.7; text-transform: uppercase;">Total People</span>
+                    </div>
+                    <div>
+                        <span style="font-family: var(--font-headline); font-size: 1.75rem; font-weight: 700; color: var(--on-primary-container);" th:text="${summary.totalServices}">0</span>
+                        <span style="display: block; font-size: 0.625rem; opacity: 0.7; text-transform: uppercase;">Active Services</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="admin-footer">
+        <span>© 2024 Sakura Saki Beauty. All rights reserved.</span>
+        <div style="display: flex; gap: 2rem;">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Contact</a>
+        </div>
+    </footer>
+</main>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    // Load appointment trends for the last 7 days
+    (async function() {
+        const today = new Date();
+        const weekAgo = new Date();
+        weekAgo.setDate(today.getDate() - 7);
+
+        const fmt = d => d.toISOString().split('T')[0];
+        try {
+            const res = await fetch(`/admin/reports/appointments?from=${fmt(weekAgo)}&to=${fmt(today)}`);
+            const json = await res.json();
+
+            const labels = Object.keys(json.data).map(d => {
+                const parts = d.split('-');
+                return parts[2] + '/' + parts[1];
+            });
+            const values = Object.values(json.data);
+
+            new Chart(document.getElementById('trendChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Appointments',
+                        data: values,
+                        borderColor: '#864e5a',
+                        backgroundColor: 'rgba(255, 183, 197, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#864e5a',
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, font: { family: 'Manrope', size: 11 } },
+                            grid: { color: 'rgba(0,0,0,0.04)' }
+                        },
+                        x: {
+                            ticks: { font: { family: 'Manrope', size: 11 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        } catch(e) {
+            console.log('Could not load trend chart:', e);
+        }
+    })();
+</script>
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>
