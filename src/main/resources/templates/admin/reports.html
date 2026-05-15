@@ -18,21 +18,16 @@
         <p>Sakura Saki Management</p>
     </div>
     <nav class="sidebar-nav">
-        <a th:href="@{/admin/dashboard}">
-            <span class="material-symbols-outlined">dashboard</span> Overview
-        </a>
-        <a th:href="@{/admin/reports}" class="active">
-            <span class="material-symbols-outlined">analytics</span> Reports
-        </a>
-        <a th:href="@{/admin/users}">
-            <span class="material-symbols-outlined">group</span> Users
-        </a>
-        <a th:href="@{/admin/manage}">
-            <span class="material-symbols-outlined">shield_person</span> Admins
-        </a>
-        <a th:href="@{/logout}">
-            <span class="material-symbols-outlined">logout</span> Logout
-        </a>
+        <a th:href="@{/admin/dashboard}"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+        <a th:href="@{/admin/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/admin/packages}"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
+        <a th:href="@{/admin/staff}"><span class="material-symbols-outlined">badge</span> Staff</a>
+        <a th:href="@{/admin/appointments}"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
+        <a th:href="@{/admin/reviews}"><span class="material-symbols-outlined">reviews</span> Reviews</a>
+        <a th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span> Users</a>
+        <a th:href="@{/admin/manage}"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
+        <a th:href="@{/admin/reports}" class="active"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
     </nav>
     <div class="sidebar-footer">
         <div class="sidebar-profile">
@@ -119,14 +114,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="admin-footer">
-        <span>© 2024 Sakura Saki Beauty. All rights reserved.</span>
-        <div style="display: flex; gap: 2rem;">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">Contact</a>
-        </div>
-    </footer>
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
 </main>
 
 <!-- Chart.js -->

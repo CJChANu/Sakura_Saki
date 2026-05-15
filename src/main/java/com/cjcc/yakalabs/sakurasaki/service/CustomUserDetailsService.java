@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Supports login via username OR email.
+ */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -19,9 +22,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+        // Try username first, then email
+        User user = userRepository.findByUsername(usernameOrEmail)
+                .or(() -> userRepository.findByEmail(usernameOrEmail))
+                .orElseThrow(() -> new UsernameNotFoundException("No account found with: " + usernameOrEmail));
+
+        if (!user.isEnabled()) {
+            throw new UsernameNotFoundException("Account is disabled. Contact support.");
+        }
 
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());
 

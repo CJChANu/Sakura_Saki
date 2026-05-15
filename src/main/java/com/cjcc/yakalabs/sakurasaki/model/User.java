@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "role_type")
+@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("USER")
 public class User {
 
     @Id
@@ -23,15 +24,18 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String role;
+    private String role; // ROLE_USER, ROLE_ADMIN, ROLE_STAFF
 
     @Column(nullable = false)
     private boolean enabled = true;
 
+    private String firstName;
+    private String lastName;
+    private String phone;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public User() {
-    }
+    public User() {}
 
     public User(String username, String password, String email, String role, boolean enabled) {
         this.username = username;
@@ -41,59 +45,41 @@ public class User {
         this.enabled = enabled;
     }
 
-    public Long getId() {
-        return id;
-    }
+    // --- Getters and Setters ---
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getUsername() {
-        return username;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-    public String getEmail() {
-        return email;
-    }
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
 
-    public String getRole() {
-        return role;
-    }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public String getFullName() {
+        String fn = (firstName != null) ? firstName : "";
+        String ln = (lastName != null) ? lastName : "";
+        return (fn + " " + ln).trim();
     }
 }

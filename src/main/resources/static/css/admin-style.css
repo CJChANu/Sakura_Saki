@@ -568,7 +568,7 @@ body:not(.admin-body) {
     top: 0; left: 0;
     width: 100%; height: 100%;
     pointer-events: none;
-    z-index: 0;
+    z-index: 5;
 }
 
 /* ---------- Responsive ---------- */
@@ -615,12 +615,11 @@ body:not(.admin-body) {
     padding: 3rem;
     position: relative;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: none;
-    box-shadow: 0 40px 60px -15px rgba(26, 28, 28, 0.1),
-                inset 2px 2px 0px rgba(255, 255, 255, 0.8);
+    border: 0.5px solid rgba(214, 194, 196, 0.15);
+    box-shadow: 0 40px 60px -15px rgba(26, 28, 28, 0.08);
 }
 
 .auth-card h2 {
