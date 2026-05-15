@@ -1,8 +1,8 @@
-package com.example.beautysalonbookingsystem.controller;
+package com.cjcc.yakalabs.sakurasaki.controller;
 
 
-import com.example.beautysalonbookingsystem.model.ServicePackage;
-import com.example.beautysalonbookingsystem.service.ServiceManagementService;
+import com.cjcc.yakalabs.sakurasaki.model.ServicePackage;
+import com.cjcc.yakalabs.sakurasaki.service.ServiceManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

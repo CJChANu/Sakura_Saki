@@ -1,8 +1,8 @@
-package com.example.beautysalonbookingsystem.service;
+package com.cjcc.yakalabs.sakurasaki.service;
 
 
-import com.example.beautysalonbookingsystem.model.SalonService;
-import com.example.beautysalonbookingsystem.model.ServicePackage;
+import com.cjcc.yakalabs.sakurasaki.model.SalonService;
+import com.cjcc.yakalabs.sakurasaki.model.ServicePackage;
 
 import java.util.List;
 
