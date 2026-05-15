@@ -1,9 +1,12 @@
 package com.cjcc.yakalabs.sakurasaki.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "role_type")
 public class User {
 
     @Id
@@ -24,6 +27,8 @@ public class User {
 
     @Column(nullable = false)
     private boolean enabled = true;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public User() {
     }
@@ -82,5 +87,13 @@ public class User {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
