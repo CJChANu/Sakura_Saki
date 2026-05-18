@@ -1,4 +1,4 @@
-package com.cjcc.yakalabs.sakurasaki.model;
+package com.cjcc.yakalabs.sakurasaki.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
