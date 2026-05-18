@@ -87,9 +87,9 @@ public class AppointmentDTO {
      *
      * @return  A new Appointment populated from this DTO
      */
-    public com.cjcc.yakalabs.sakurasaki.model.Appointment toNewEntity() {
-        com.cjcc.yakalabs.sakurasaki.model.Appointment a =
-                new com.cjcc.yakalabs.sakurasaki.model.Appointment();
+    public com.cjcc.yakalabs.sakurasaki.entity.Appointment toNewEntity() {
+        com.cjcc.yakalabs.sakurasaki.entity.Appointment a =
+                new com.cjcc.yakalabs.sakurasaki.entity.Appointment();
         a.setUserId(this.userId);
         a.setStaffId(this.staffId);
         a.setServiceId(this.serviceId != null && !this.serviceId.isBlank()
@@ -110,8 +110,8 @@ public class AppointmentDTO {
      *
      * @return  An Appointment with its ID set — ready for service.updateAppointment()
      */
-    public com.cjcc.yakalabs.sakurasaki.model.Appointment toExistingEntity(
-            com.cjcc.yakalabs.sakurasaki.model.Appointment existing) {
+    public com.cjcc.yakalabs.sakurasaki.entity.Appointment toExistingEntity(
+            com.cjcc.yakalabs.sakurasaki.entity.Appointment existing) {
         existing.setUserId(this.userId);
         existing.setStaffId(this.staffId);
         existing.setServiceId(this.serviceId != null && !this.serviceId.isBlank()
@@ -134,7 +134,7 @@ public class AppointmentDTO {
      * @return        DTO ready to bind to the Thymeleaf edit form
      */
     public static AppointmentDTO fromEntity(
-            com.cjcc.yakalabs.sakurasaki.model.Appointment entity) {
+            com.cjcc.yakalabs.sakurasaki.entity.Appointment entity) {
         AppointmentDTO dto = new AppointmentDTO();
         dto.setAppointmentId(entity.getAppointmentId());
         dto.setUserId(entity.getUserId());
