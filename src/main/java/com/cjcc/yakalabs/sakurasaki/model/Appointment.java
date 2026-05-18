@@ -4,21 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/**
- * ════════════════════════════════════════════════════════════
- *  Member 4 — Appointment.java
- *  JPA Entity + File I/O Model
- *
- *  Database table : appointments
- *  Flat file       : appointments.txt  (pipe-delimited)
- *
- *  ID dependencies:
- *    userId    ← Member 1  (Customer / User module)
- *    staffId   ← Member 2  (Staff module)
- *    serviceId ← Member 3  (SalonService — ServiceManagementServiceImpl)
- *    packageId ← Member 3  (ServicePackage — ServiceManagementServiceImpl)
- * ════════════════════════════════════════════════════════════
- */
+
 @Entity
 @Table(name = "appointments")
 public class Appointment {
