@@ -1,6 +1,6 @@
 package com.cjcc.yakalabs.sakurasaki.validator;
 
-import com.cjcc.yakalabs.sakurasaki.model.Appointment;
+import com.cjcc.yakalabs.sakurasaki.entity.Appointment;
 import com.cjcc.yakalabs.sakurasaki.repository.AppointmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
