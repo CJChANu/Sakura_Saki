@@ -19,6 +19,8 @@ target/
 *.iml
 *.ipr
 
+qodana.yaml
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -31,3 +33,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Git ###
+Git
+
+### postman ###
+postman
+.postman
+sakura_saki_admin_api.postman_collection.json
+
+### others ###
+scratch
