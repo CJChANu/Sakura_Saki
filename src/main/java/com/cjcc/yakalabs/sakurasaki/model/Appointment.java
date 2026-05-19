@@ -1,92 +1,8 @@
 package com.cjcc.yakalabs.sakurasaki.model;
 
-public class Appointment {
-
-    private String appointmentId;
-    private String customerId;
-    private String serviceId;
-    private String staffId;
-    private String date;
-    private String time;
-    private String status;
-
-    public Appointment() {
-    }
-
-    public Appointment(String appointmentId, String customerId, String serviceId,
-                       String staffId, String date, String time, String status) {
-        this.appointmentId = appointmentId;
-        this.customerId = customerId;
-        this.serviceId = serviceId;
-        this.staffId = staffId;
-        this.date = date;
-        this.time = time;
-        this.status = status;
-    }
-
-    public String toFileString() {
-        return appointmentId + "|" + customerId + "|" + serviceId + "|" + staffId + "|" +
-                date + "|" + time + "|" + status;
-    }
-
-    public String getAppointmentId() {
-        return appointmentId;
-    }
-
-    public void setAppointmentId(String appointmentId) {
-        this.appointmentId = appointmentId;
-    }
-
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
-    public String getServiceId() {
-        return serviceId;
-    }
-
-    public void setServiceId(String serviceId) {
-        this.serviceId = serviceId;
-    }
-
-    public String getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(String staffId) {
-        this.staffId = staffId;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-
 
 @Entity
 @Table(name = "appointments")
@@ -95,7 +11,7 @@ public class Appointment {
     // ── Primary Key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "appointment_id")
+    @Column(name = "id")
     private Long appointmentId;
 
     // ── Foreign IDs from other Members
@@ -175,52 +91,6 @@ public class Appointment {
         this.notes           = notes;
         this.status          = "PENDING";
         this.createdDate     = LocalDate.now();
-    }
-
-    // ── File I/O helpers
-    /**
-     * Serialise to pipe-delimited line for appointments.txt
-     *
-     * Format:
-     * appointmentId | userId | staffId | serviceId | packageId |
-     * appointmentDate | appointmentTime | durationMinutes |
-     * status | totalAmount | notes | createdDate
-     */
-    public String toFileString() {
-        return appointmentId                              + "|" +
-                userId                                     + "|" +
-                staffId                                    + "|" +
-                (serviceId  != null ? serviceId  : "null") + "|" +
-                (packageId  != null ? packageId  : "null") + "|" +
-                appointmentDate                            + "|" +
-                appointmentTime                            + "|" +
-                durationMinutes                            + "|" +
-                status                                     + "|" +
-                totalAmount                                + "|" +
-                (notes != null ? notes.replace("|", " ") : "") + "|" +
-                createdDate;
-    }
-
-    /**
-     * Deserialise a pipe-delimited line from appointments.txt
-     * back into an Appointment object.
-     */
-    public static Appointment fromFileString(String line) {
-        String[] p = line.split("\\|", -1);
-        Appointment a = new Appointment();
-        a.appointmentId   = Long.parseLong(p[0]);
-        a.userId          = p[1];
-        a.staffId         = p[2];
-        a.serviceId       = "null".equals(p[3]) ? null : p[3];
-        a.packageId       = "null".equals(p[4]) ? null : p[4];
-        a.appointmentDate = LocalDate.parse(p[5]);
-        a.appointmentTime = LocalTime.parse(p[6]);
-        a.durationMinutes = Integer.parseInt(p[7]);
-        a.status          = p[8];
-        a.totalAmount     = Double.parseDouble(p[9]);
-        a.notes           = p[10];
-        a.createdDate     = LocalDate.parse(p[11]);
-        return a;
     }
 
     //  Getters & Setters

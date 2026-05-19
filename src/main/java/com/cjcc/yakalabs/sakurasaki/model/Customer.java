@@ -17,7 +17,7 @@ public class Customer extends User {
     private String address;
 
     @Column(name = "loyalty_points")
-    private int loyaltyPoints = 0;
+    private Integer loyaltyPoints = 0;
 
     public Customer() {
     }
@@ -32,11 +32,11 @@ public class Customer extends User {
         this.address = address;
     }
 
-    public int getLoyaltyPoints() {
+    public Integer getLoyaltyPoints() {
         return loyaltyPoints;
     }
 
-    public void setLoyaltyPoints(int loyaltyPoints) {
+    public void setLoyaltyPoints(Integer loyaltyPoints) {
         this.loyaltyPoints = loyaltyPoints;
     }
 }

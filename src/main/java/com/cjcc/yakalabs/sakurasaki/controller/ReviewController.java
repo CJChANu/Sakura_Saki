@@ -20,28 +20,29 @@ public class ReviewController {
     private AppointmentService appointmentService;
 
     @GetMapping("/submit")
-    public String showSubmitReviewForm(@RequestParam(required = false) String appointmentId, Model model) {
-        model.addAttribute("completedAppointments", appointmentService.getCompletedAppointments());
-        if (appointmentId != null && !appointmentId.isBlank()) {
-            Appointment appointment = appointmentService.getAppointmentById(appointmentId);
-            model.addAttribute("selectedAppointment", appointment);
+    public String showSubmitReviewForm(@RequestParam(required = false) Long appointmentId, Model model) {
+        model.addAttribute("completedAppointments", appointmentService.getAppointmentsByStatus("COMPLETED"));
+        if (appointmentId != null) {
+            try {
+                Appointment appointment = appointmentService.getAppointmentById(appointmentId);
+                model.addAttribute("selectedAppointment", appointment);
+            } catch (NumberFormatException ignored) {}
         }
         return "submit-review";
     }
 
     @PostMapping("/save")
-    public String saveReview(@RequestParam String reviewId,
-                             @RequestParam String appointmentId,
-                             @RequestParam String customerId,
-                             @RequestParam String serviceId,
-                             @RequestParam String staffId,
+    public String saveReview(@RequestParam Long appointmentId,
+                             @RequestParam Long customerId,
+                             @RequestParam(required = false) Long serviceId,
+                             @RequestParam(required = false) Long staffId,
                              @RequestParam String reviewType,
                              @RequestParam int rating,
                              @RequestParam String comment,
                              Model model) {
 
         boolean success = reviewService.saveReview(
-                reviewId, appointmentId, customerId, serviceId, staffId, reviewType, rating, comment
+                appointmentId, customerId, serviceId, staffId, reviewType, rating, comment
         );
 
         if (success) {
@@ -56,22 +57,22 @@ public class ReviewController {
     }
 
     @GetMapping("/my")
-    public String myReviews(@RequestParam String customerId, Model model) {
+    public String myReviews(@RequestParam Long customerId, Model model) {
         model.addAttribute("reviews", reviewService.getReviewsByCustomer(customerId));
         model.addAttribute("customerId", customerId);
         return "my-reviews";
     }
 
     @GetMapping("/edit/{reviewId}")
-    public String editReviewForm(@PathVariable String reviewId, Model model) {
+    public String editReviewForm(@PathVariable Long reviewId, Model model) {
         Review review = reviewService.getReviewById(reviewId);
         model.addAttribute("review", review);
         return "edit-review";
     }
 
     @PostMapping("/update")
-    public String updateReview(@RequestParam String reviewId,
-                               @RequestParam String customerId,
+    public String updateReview(@RequestParam Long reviewId,
+                               @RequestParam Long customerId,
                                @RequestParam int rating,
                                @RequestParam String comment) {
         reviewService.updateReview(reviewId, customerId, rating, comment);
@@ -79,21 +80,21 @@ public class ReviewController {
     }
 
     @GetMapping("/delete/{reviewId}")
-    public String deleteReview(@PathVariable String reviewId,
-                               @RequestParam String customerId) {
+    public String deleteReview(@PathVariable Long reviewId,
+                               @RequestParam Long customerId) {
         reviewService.deleteReview(reviewId, customerId);
         return "redirect:/reviews/my?customerId=" + customerId;
     }
 
     @GetMapping("/service/{serviceId}")
-    public String viewApprovedServiceReviews(@PathVariable String serviceId, Model model) {
+    public String viewApprovedServiceReviews(@PathVariable Long serviceId, Model model) {
         model.addAttribute("reviews", reviewService.getApprovedServiceReviews(serviceId));
         model.addAttribute("serviceId", serviceId);
         return "service-reviews";
     }
 
     @GetMapping("/staff/{staffId}")
-    public String viewApprovedStaffReviews(@PathVariable String staffId, Model model) {
+    public String viewApprovedStaffReviews(@PathVariable Long staffId, Model model) {
         model.addAttribute("reviews", reviewService.getApprovedStaffReviews(staffId));
         model.addAttribute("staffId", staffId);
         return "staff-reviews";
@@ -114,19 +115,20 @@ public class ReviewController {
     }
 
     @GetMapping("/admin/edit/{reviewId}")
-    public String adminEditReviewForm(@PathVariable String reviewId, Model model) {
+    public String adminEditReviewForm(@PathVariable Long reviewId, Model model) {
         Review review = reviewService.getReviewById(reviewId);
         model.addAttribute("review", review);
         return "admin-edit-review";
     }
 
     @PostMapping("/admin/update")
-    public String adminUpdateReview(@RequestParam String reviewId,
+    public String adminUpdateReview(@RequestParam Long reviewId,
                                     @RequestParam int rating,
                                     @RequestParam String comment) {
         reviewService.adminUpdateReview(reviewId, rating, comment);
         return "redirect:/reviews/admin";
     }
+    
     @GetMapping("/admin/analytics")
     public String adminAnalytics(Model model) {
         var allReviews = reviewService.getAllReviews();
@@ -159,26 +161,27 @@ public class ReviewController {
 
         return "review-analytics";
     }
+    
     @GetMapping("/approve/{reviewId}")
-    public String approveReview(@PathVariable String reviewId) {
+    public String approveReview(@PathVariable Long reviewId) {
         reviewService.approveReview(reviewId);
         return "redirect:/reviews/admin";
     }
 
     @GetMapping("/reject/{reviewId}")
-    public String rejectReview(@PathVariable String reviewId) {
+    public String rejectReview(@PathVariable Long reviewId) {
         reviewService.rejectReview(reviewId);
         return "redirect:/reviews/admin";
     }
 
     @GetMapping("/hide/{reviewId}")
-    public String hideReview(@PathVariable String reviewId) {
+    public String hideReview(@PathVariable Long reviewId) {
         reviewService.hideReview(reviewId);
         return "redirect:/reviews/admin";
     }
 
     @GetMapping("/unhide/{reviewId}")
-    public String unhideReview(@PathVariable String reviewId) {
+    public String unhideReview(@PathVariable Long reviewId) {
         reviewService.unhideReview(reviewId);
         return "redirect:/reviews/admin";
     }

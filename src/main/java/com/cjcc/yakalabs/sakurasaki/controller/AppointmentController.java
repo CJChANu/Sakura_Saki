@@ -1,14 +1,5 @@
 package com.cjcc.yakalabs.sakurasaki.controller;
 
-import com.cjcc.yakalabs.sakurasaki.model.Appointment;
-import com.cjcc.yakalabs.sakurasaki.service.AppointmentService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-@Controller
-@RequestMapping("/appointments")
 import com.cjcc.yakalabs.sakurasaki.dto.AppointmentDTO;
 import com.cjcc.yakalabs.sakurasaki.model.Appointment;
 import com.cjcc.yakalabs.sakurasaki.service.AppointmentService;
@@ -22,35 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 @RestController
 @RequestMapping("/api/appointments")
 public class AppointmentController {
 
     @Autowired
     private AppointmentService appointmentService;
-
-    @GetMapping
-    public String viewAllAppointments(Model model) {
-        model.addAttribute("appointments", appointmentService.getAllAppointments());
-        model.addAttribute("pageTitle", "All Appointments");
-        return "appointments-list";
-    }
-
-    @GetMapping("/completed")
-    public String viewCompletedAppointments(Model model) {
-        model.addAttribute("appointments", appointmentService.getCompletedAppointments());
-        model.addAttribute("pageTitle", "Completed Appointments");
-        return "appointments-list";
-    }
-
-    @GetMapping("/{appointmentId}")
-    public String viewAppointmentById(@PathVariable String appointmentId, Model model) {
-        Appointment appointment = appointmentService.getAppointmentById(appointmentId);
-        model.addAttribute("appointment", appointment);
-        return "appointment-details";
-    }
-}
 
     @GetMapping
     public ResponseEntity<List<Appointment>> getAllAppointments(
@@ -73,11 +41,6 @@ public class AppointmentController {
         return ResponseEntity.ok(appointments);
     }
 
-    // ═════════════════════════════════════════════════════════════════════
-    //  GET ONE — GET /api/appointments/{id}
-    //  Postman: GET http://localhost:8080/api/appointments/1
-    // ═════════════════════════════════════════════════════════════════════
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getAppointmentById(@PathVariable Long id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
@@ -88,7 +51,6 @@ public class AppointmentController {
         return ResponseEntity.ok(appointment);
     }
 
-
     @GetMapping("/my/{userId}")
     public ResponseEntity<List<Appointment>> getMyAppointments(
             @PathVariable String userId) {
@@ -96,12 +58,9 @@ public class AppointmentController {
                 appointmentService.getAppointmentsByUserId(userId));
     }
 
-
-
     @PostMapping
     public ResponseEntity<?> createAppointment(
             @RequestBody AppointmentDTO dto) {
-
         try {
             Appointment appointment = dto.toNewEntity();
             appointmentService.saveAppointment(appointment);
@@ -114,13 +73,10 @@ public class AppointmentController {
         }
     }
 
-
-
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAppointment(
             @PathVariable Long id,
             @RequestBody AppointmentDTO dto) {
-
         try {
             Appointment existing = appointmentService.getAppointmentById(id);
             if (existing == null) {
@@ -141,13 +97,10 @@ public class AppointmentController {
         }
     }
 
-
-
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
             @RequestBody Map<String, String> body) {
-
         String status = body.get("status");
 
         if (status == null || status.isBlank()) {
@@ -178,7 +131,6 @@ public class AppointmentController {
         return ResponseEntity.ok(response);
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAppointment(@PathVariable Long id) {
         Appointment existing = appointmentService.getAppointmentById(id);
@@ -195,8 +147,6 @@ public class AppointmentController {
         response.put("deletedId", id);
         return ResponseEntity.ok(response);
     }
-
-
 
     private Map<String, Object> success(String message, Object data) {
         Map<String, Object> response = new HashMap<>();

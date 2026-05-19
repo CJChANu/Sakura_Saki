@@ -1,301 +1,186 @@
 package com.cjcc.yakalabs.sakurasaki.service;
 
+import com.cjcc.yakalabs.sakurasaki.model.Appointment;
+import com.cjcc.yakalabs.sakurasaki.model.Customer;
 import com.cjcc.yakalabs.sakurasaki.model.Review;
-import com.cjcc.yakalabs.sakurasaki.model.ServiceReview;
-import com.cjcc.yakalabs.sakurasaki.model.StaffReview;
-import com.cjcc.yakalabs.sakurasaki.util.ReviewFileHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.cjcc.yakalabs.sakurasaki.model.SalonService;
+import com.cjcc.yakalabs.sakurasaki.model.User;
+import com.cjcc.yakalabs.sakurasaki.repository.AppointmentRepository;
+import com.cjcc.yakalabs.sakurasaki.repository.CustomerRepository;
+import com.cjcc.yakalabs.sakurasaki.repository.ReviewRepository;
+import com.cjcc.yakalabs.sakurasaki.repository.SalonServiceRepository;
+import com.cjcc.yakalabs.sakurasaki.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReviewService {
 
-    @Autowired
-    private ReviewFileHandler reviewFileHandler;
+    private final ReviewRepository reviewRepository;
+    private final CustomerRepository customerRepository;
+    private final SalonServiceRepository serviceRepository;
+    private final UserRepository userRepository;
+    private final AppointmentRepository appointmentRepository;
 
-    private static final String APPOINTMENT_FILE = "src/main/resources/data/appointments.txt";
+    public ReviewService(ReviewRepository reviewRepository,
+                         CustomerRepository customerRepository,
+                         SalonServiceRepository serviceRepository,
+                         UserRepository userRepository,
+                         AppointmentRepository appointmentRepository) {
+        this.reviewRepository = reviewRepository;
+        this.customerRepository = customerRepository;
+        this.serviceRepository = serviceRepository;
+        this.userRepository = userRepository;
+        this.appointmentRepository = appointmentRepository;
+    }
 
     public List<Review> getAllReviews() {
-        return reviewFileHandler.readAllReviews();
+        return reviewRepository.findAll();
     }
 
     public List<Review> getApprovedReviews() {
-        List<Review> approved = new ArrayList<>();
-        for (Review review : getAllReviews()) {
-            if ("APPROVED".equalsIgnoreCase(review.getStatus())) {
-                approved.add(review);
-            }
-        }
-        return approved;
+        return reviewRepository.findByStatus("APPROVED");
     }
 
     public List<Review> getPendingReviews() {
-        List<Review> pending = new ArrayList<>();
-        for (Review review : getAllReviews()) {
-            if ("PENDING".equalsIgnoreCase(review.getStatus())) {
-                pending.add(review);
-            }
-        }
-        return pending;
+        return reviewRepository.findByStatus("PENDING");
     }
 
     public List<Review> getRejectedReviews() {
-        List<Review> rejected = new ArrayList<>();
-        for (Review review : getAllReviews()) {
-            if ("REJECTED".equalsIgnoreCase(review.getStatus())) {
-                rejected.add(review);
-            }
-        }
-        return rejected;
+        return reviewRepository.findByStatus("REJECTED");
     }
 
     public List<Review> getHiddenReviews() {
-        List<Review> hidden = new ArrayList<>();
-        for (Review review : getAllReviews()) {
-            if ("HIDDEN".equalsIgnoreCase(review.getStatus())) {
-                hidden.add(review);
-            }
-        }
-        return hidden;
+        return reviewRepository.findByStatus("HIDDEN");
     }
 
-    public List<Review> getReviewsByCustomer(String customerId) {
-        List<Review> customerReviews = new ArrayList<>();
-        for (Review review : getAllReviews()) {
-            if (review.getCustomerId().equalsIgnoreCase(customerId)) {
-                customerReviews.add(review);
-            }
-        }
-        return customerReviews;
+    public List<Review> getReviewsByCustomer(Long customerId) {
+        return reviewRepository.findByCustomer_Id(customerId);
     }
 
-    public Review getReviewById(String reviewId) {
-        for (Review review : getAllReviews()) {
-            if (review.getReviewId().equalsIgnoreCase(reviewId)) {
-                return review;
-            }
-        }
-        return null;
+    public Review getReviewById(Long reviewId) {
+        return reviewRepository.findById(reviewId).orElse(null);
     }
 
-    public List<Review> getApprovedServiceReviews(String serviceId) {
-        List<Review> serviceReviews = new ArrayList<>();
-        for (Review review : getApprovedReviews()) {
-            if ("SERVICE".equalsIgnoreCase(review.getReviewType())
-                    && review.getServiceId().equalsIgnoreCase(serviceId)) {
-                serviceReviews.add(review);
-            }
-        }
-        return serviceReviews;
+    public List<Review> getApprovedServiceReviews(Long serviceId) {
+        return reviewRepository.findByReviewTypeAndService_IdAndStatus("SERVICE", serviceId, "APPROVED");
     }
 
-    public List<Review> getApprovedStaffReviews(String staffId) {
-        List<Review> staffReviews = new ArrayList<>();
-        for (Review review : getApprovedReviews()) {
-            if ("STAFF".equalsIgnoreCase(review.getReviewType())
-                    && review.getStaffId().equalsIgnoreCase(staffId)) {
-                staffReviews.add(review);
-            }
-        }
-        return staffReviews;
+    public List<Review> getApprovedStaffReviews(Long staffId) {
+        return reviewRepository.findByReviewTypeAndStaff_IdAndStatus("STAFF", staffId, "APPROVED");
     }
 
-    public boolean saveReview(String reviewId, String appointmentId, String customerId, String serviceId,
-                              String staffId, String reviewType, int rating, String comment) {
+    public boolean saveReview(Long appointmentId, Long customerId, Long serviceId,
+                              Long staffId, String reviewType, int rating, String comment) {
 
-        String date = LocalDate.now().toString();
-
-        Review review;
-        if ("SERVICE".equalsIgnoreCase(reviewType)) {
-            review = new ServiceReview(
-                    reviewId, appointmentId, customerId, serviceId, staffId,
-                    rating, comment, "PENDING", date
-            );
-        } else {
-            review = new StaffReview(
-                    reviewId, appointmentId, customerId, serviceId, staffId,
-                    rating, comment, "PENDING", date
-            );
+        if (hasReviewForAppointment(appointmentId)) {
+            return false;
+        }
+        if (!isAppointmentCompleted(appointmentId)) {
+            return false;
         }
 
-        reviewFileHandler.appendReview(review);
+        Customer customer = customerRepository.findById(customerId).orElse(null);
+        Appointment appointment = appointmentRepository.findById(appointmentId).orElse(null);
+        SalonService service = (serviceId != null) ? serviceRepository.findById(serviceId).orElse(null) : null;
+        User staff = (staffId != null) ? userRepository.findById(staffId).orElse(null) : null;
+
+        if (customer == null || appointment == null) {
+            return false;
+        }
+
+        Review review = new Review(customer, appointment, service, staff, reviewType, rating, comment);
+        reviewRepository.save(review);
         return true;
     }
 
-    public boolean updateReview(String reviewId, String customerId, int rating, String comment) {
-        List<Review> reviews = getAllReviews();
-        boolean updated = false;
-
-        for (Review review : reviews) {
-            if (review.getReviewId().equalsIgnoreCase(reviewId)
-                    && review.getCustomerId().equalsIgnoreCase(customerId)) {
+    public boolean updateReview(Long reviewId, Long customerId, int rating, String comment) {
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+        if (optionalReview.isPresent()) {
+            Review review = optionalReview.get();
+            if (review.getCustomer().getId().equals(customerId)) {
                 review.setRating(rating);
                 review.setComment(comment);
-                review.setStatus("PENDING"); // edited review must be approved again
-                updated = true;
-                break;
-            }
-        }
-
-        if (updated) {
-            reviewFileHandler.writeAllReviews(reviews);
-        }
-
-        return updated;
-    }
-
-    public boolean adminUpdateReview(String reviewId, int rating, String comment) {
-        List<Review> reviews = getAllReviews();
-        boolean updated = false;
-
-        for (Review review : reviews) {
-            if (review.getReviewId().equalsIgnoreCase(reviewId)) {
-                review.setRating(rating);
-                review.setComment(comment);
-                // Admin editing does not reset the status to pending, mostly fixing typos or inappropriate words but keeping it safe
-                updated = true;
-                break;
-            }
-        }
-
-        if (updated) {
-            reviewFileHandler.writeAllReviews(reviews);
-        }
-
-        return updated;
-    }
-
-    public boolean deleteReview(String reviewId, String customerId) {
-        List<Review> reviews = getAllReviews();
-
-        boolean removed = reviews.removeIf(review ->
-                review.getReviewId().equalsIgnoreCase(reviewId)
-                        && review.getCustomerId().equalsIgnoreCase(customerId));
-
-        if (removed) {
-            reviewFileHandler.writeAllReviews(reviews);
-        }
-
-        return removed;
-    }
-
-    public boolean approveReview(String reviewId) {
-        return updateStatus(reviewId, "APPROVED");
-    }
-
-    public boolean rejectReview(String reviewId) {
-        return updateStatus(reviewId, "REJECTED");
-    }
-
-    public boolean hideReview(String reviewId) {
-        return updateStatus(reviewId, "HIDDEN");
-    }
-
-    public boolean unhideReview(String reviewId) {
-        return updateStatus(reviewId, "APPROVED");
-    }
-
-    private boolean updateStatus(String reviewId, String status) {
-        List<Review> reviews = getAllReviews();
-        boolean updated = false;
-
-        for (Review review : reviews) {
-            if (review.getReviewId().equalsIgnoreCase(reviewId)) {
-                review.setStatus(status);
-                updated = true;
-                break;
-            }
-        }
-
-        if (updated) {
-            reviewFileHandler.writeAllReviews(reviews);
-        }
-
-        return updated;
-    }
-
-    public boolean hasReviewForAppointment(String appointmentId) {
-        for (Review review : getAllReviews()) {
-            if (review.getAppointmentId().equalsIgnoreCase(appointmentId)) {
+                review.setStatus("PENDING"); // Edited review must be approved again
+                reviewRepository.save(review);
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isAppointmentCompleted(String appointmentId) {
-        Path path = Paths.get(APPOINTMENT_FILE);
-
-        try {
-            if (!Files.exists(path)) {
-                return false;
-            }
-
-            List<String> lines = Files.readAllLines(path);
-
-            for (String line : lines) {
-                if (line == null || line.trim().isEmpty()) {
-                    continue;
-                }
-
-                String[] parts = line.split("\\|");
-
-                // Expected format:
-                // A001|C001|SV001|ST001|2026-03-15|10:00|COMPLETED
-                if (parts.length >= 7) {
-                    String fileAppointmentId = parts[0];
-                    String status = parts[6];
-
-                    if (fileAppointmentId.equalsIgnoreCase(appointmentId)
-                            && "COMPLETED".equalsIgnoreCase(status)) {
-                        return true;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public boolean adminUpdateReview(Long reviewId, int rating, String comment) {
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+        if (optionalReview.isPresent()) {
+            Review review = optionalReview.get();
+            review.setRating(rating);
+            review.setComment(comment);
+            // Admin editing does not reset the status to pending
+            reviewRepository.save(review);
+            return true;
         }
-
         return false;
     }
 
-    private String generateNextReviewId() {
-        List<Review> reviews = getAllReviews();
-        int max = 0;
-
-        for (Review review : reviews) {
-            try {
-                String numericPart = review.getReviewId().replace("R", "");
-                int current = Integer.parseInt(numericPart);
-                if (current > max) {
-                    max = current;
-                }
-            } catch (NumberFormatException ignored) {
+    public boolean deleteReview(Long reviewId, Long customerId) {
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+        if (optionalReview.isPresent()) {
+            Review review = optionalReview.get();
+            if (review.getCustomer().getId().equals(customerId)) {
+                reviewRepository.delete(review);
+                return true;
             }
         }
+        return false;
+    }
 
-        return String.format("R%03d", max + 1);
+    public boolean approveReview(Long reviewId) {
+        return updateStatus(reviewId, "APPROVED");
+    }
+
+    public boolean rejectReview(Long reviewId) {
+        return updateStatus(reviewId, "REJECTED");
+    }
+
+    public boolean hideReview(Long reviewId) {
+        return updateStatus(reviewId, "HIDDEN");
+    }
+
+    public boolean unhideReview(Long reviewId) {
+        return updateStatus(reviewId, "APPROVED");
+    }
+
+    private boolean updateStatus(Long reviewId, String status) {
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+        if (optionalReview.isPresent()) {
+            Review review = optionalReview.get();
+            review.setStatus(status);
+            reviewRepository.save(review);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasReviewForAppointment(Long appointmentId) {
+        return reviewRepository.existsByAppointment_AppointmentId(appointmentId);
+    }
+
+    public boolean isAppointmentCompleted(Long appointmentId) {
+        Optional<Appointment> appointment = appointmentRepository.findById(appointmentId);
+        return appointment.isPresent() && "COMPLETED".equalsIgnoreCase(appointment.get().getStatus());
     }
 
     public double getAverageApprovedRating() {
         List<Review> approvedReviews = getApprovedReviews();
-
         if (approvedReviews.isEmpty()) {
             return 0.0;
         }
-
         int total = 0;
         for (Review review : approvedReviews) {
             total += review.getRating();
         }
-
         return (double) total / approvedReviews.size();
     }
 }
