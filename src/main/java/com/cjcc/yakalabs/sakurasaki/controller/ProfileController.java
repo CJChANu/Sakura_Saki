@@ -1,6 +1,7 @@
 package com.cjcc.yakalabs.sakurasaki.controller;
 
 import com.cjcc.yakalabs.sakurasaki.model.Customer;
+import com.cjcc.yakalabs.sakurasaki.model.Staff;
 import com.cjcc.yakalabs.sakurasaki.model.User;
 import com.cjcc.yakalabs.sakurasaki.repository.UserRepository;
 import com.cjcc.yakalabs.sakurasaki.service.CustomerService;
@@ -29,11 +30,19 @@ public class ProfileController {
     public String viewProfile(Authentication auth, Model model) {
         User user = userRepo.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        Customer customer = customerService.findByEmail(user.getEmail()).orElse(null);
 
         model.addAttribute("user", user);
-        model.addAttribute("customer", customer);
         model.addAttribute("username", auth.getName());
+
+        // Staff users get a staff-specific profile page
+        if (user instanceof Staff staffMember) {
+            model.addAttribute("staff", staffMember);
+            return "staff/profile";
+        }
+
+        // Customer users
+        Customer customer = customerService.findByEmail(user.getEmail()).orElse(null);
+        model.addAttribute("customer", customer);
         return "customer/profile";
     }
 
@@ -41,8 +50,13 @@ public class ProfileController {
     public String editProfileForm(Authentication auth, Model model) {
         User user = userRepo.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        Customer customer = customerService.findByEmail(user.getEmail()).orElse(null);
 
+        // Staff profiles are managed by admin — redirect back
+        if (user instanceof Staff) {
+            return "redirect:/profile";
+        }
+
+        Customer customer = customerService.findByEmail(user.getEmail()).orElse(null);
         model.addAttribute("user", user);
         model.addAttribute("customer", customer);
         model.addAttribute("username", auth.getName());
