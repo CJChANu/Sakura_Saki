@@ -147,8 +147,8 @@
             </div>
             <p style="flex:1;font-style:italic;" th:text="${'&quot;' + r.comment + '&quot;'}">"Great!"</p>
             <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(0,0,0,0.05);padding-top:1rem;margin-top:auto;">
-                <div style="font-size:.875rem;font-weight:600;color:var(--on-surface);" th:text="${r.customer.firstName + ' ' + r.customer.lastName}">Name</div>
-                <div style="font-size:.75rem;color:var(--outline);" th:text="${r.service.name}">Service</div>
+                <div style="font-size:.875rem;font-weight:600;color:var(--on-surface);" th:text="${r.customer != null ? r.customer.firstName + ' ' + r.customer.lastName : 'Valued Client'}">Name</div>
+                <div style="font-size:.75rem;color:var(--outline);" th:text="${r.service != null ? r.service.name : 'Salon Treatment'}">Service</div>
             </div>
         </div>
     </div>
