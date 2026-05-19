@@ -1,8 +1,7 @@
-package com.cjcc.yakalabs.sakurasaki.services;
+package com.cjcc.yakalabs.sakurasaki.service;
 
 import com.cjcc.yakalabs.sakurasaki.model.Staff;
 import com.cjcc.yakalabs.sakurasaki.repository.StaffRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -10,8 +9,11 @@ import java.util.Optional;
 @Service
 public class StaffService {
 
-    @Autowired
-    private StaffRepository staffRepository;
+    private final StaffRepository staffRepository;
+
+    public StaffService(StaffRepository staffRepository) {
+        this.staffRepository = staffRepository;
+    }
 
     public List<Staff> getAllStaff() {
         return staffRepository.findAll();

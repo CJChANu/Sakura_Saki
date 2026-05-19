@@ -1,7 +1,7 @@
 package com.cjcc.yakalabs.sakurasaki.controller;
 
 import com.cjcc.yakalabs.sakurasaki.dto.AppointmentDTO;
-import com.cjcc.yakalabs.sakurasaki.entity.Appointment;
+import com.cjcc.yakalabs.sakurasaki.model.Appointment;
 import com.cjcc.yakalabs.sakurasaki.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

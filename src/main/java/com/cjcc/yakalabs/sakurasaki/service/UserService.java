@@ -105,4 +105,111 @@ public class UserService {
             userRepository.save(user);
         });
     }
-}
+
+    // ---- Customer-specific methods (Member 1 — Customer & Authentication Module) ----
+
+    /**
+     * Find a user by username.
+     */
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+    }
+
+    /**
+     * Find a user by ID.
+     */
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+    }
+
+    /**
+     * List all customers (users with ROLE_USER).
+     */
+    public List<User> findAllCustomers() {
+        return userRepository.findByRole("ROLE_USER");
+    }
+
+    /**
+     * Search customers by username keyword.
+     */
+    public List<User> searchCustomers(String keyword) {
+        return userRepository.findByUsernameContainingIgnoreCase(keyword);
+    }
+
+    /**
+     * Update a customer's profile (name, phone, email change with validation).
+     * OOP: Encapsulation — only exposes controlled update, not raw field access.
+     */
+    public User updateProfile(String username, String firstName, String lastName,
+                               String phone, String newPassword) {
+        User user = findByUsername(username);
+
+        // First name validation
+        if (firstName != null && !firstName.isBlank()) {
+            user.setFirstName(firstName);
+        }
+
+        // Last name validation
+        if (lastName != null && !lastName.isBlank()) {
+            user.setLastName(lastName);
+        }
+
+        // Phone validation
+        if (phone != null && !phone.isBlank()) {
+            String cleanPhone = phone.replaceAll("[\\s-]", "");
+            if (!PHONE_PATTERN.matcher(cleanPhone).matches()) {
+                throw new RuntimeException("Please enter a valid phone number.");
+            }
+            user.setPhone(cleanPhone);
+        }
+
+        // Password update (optional — only if provided)
+        if (newPassword != null && !newPassword.isBlank()) {
+            if (!PASSWORD_PATTERN.matcher(newPassword).matches()) {
+                throw new RuntimeException("Password must be at least 8 characters with uppercase, lowercase, digit, and special character (@#$%^&+=!).");
+            }
+            user.setPassword(passwordEncoder.encode(newPassword));
+        }
+
+        return userRepository.save(user);
+    }
+
+    /**
+     * Deactivate a user account (soft delete).
+     */
+    public void deactivateUser(Long id) {
+        User user = findById(id);
+        user.setEnabled(false);
+        userRepository.save(user);
+    }
+
+    /**
+     * Activate a user account.
+     */
+    public void activateUser(Long id) {
+        User user = findById(id);
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
+
+    /**
+     * Toggle user enabled/disabled status.
+     */
+    public void toggleEnabled(Long id) {
+        User user = findById(id);
+        user.setEnabled(!user.isEnabled());
+        userRepository.save(user);
+    }
+
+    /**
+     * Permanently delete a user account.
+     */
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found with ID: " + id);
+        }
+        userRepository.deleteById(id);
+    }
+}

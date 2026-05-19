@@ -1,6 +1,6 @@
 package com.cjcc.yakalabs.sakurasaki.repository;
 
-import com.cjcc.yakalabs.sakurasaki.entity.Appointment;
+import com.cjcc.yakalabs.sakurasaki.model.Appointment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +13,25 @@ import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+
+    // ── Dashboard / Report queries
+
+    /** Count appointments on a specific date (used by DashboardService) */
+    long countByAppointmentDate(LocalDate date);
+
+    /** Appointments per day within a date range (used by ReportService) */
+    @Query("SELECT a.appointmentDate, COUNT(a) FROM Appointment a " +
+           "WHERE a.appointmentDate BETWEEN :from AND :to " +
+           "GROUP BY a.appointmentDate ORDER BY a.appointmentDate")
+    List<Object[]> countAppointmentsPerDay(@Param("from") LocalDate from,
+                                           @Param("to") LocalDate to);
+
+    /** Most booked services within a date range (used by ReportService) */
+    @Query("SELECT a.serviceId, COUNT(a) FROM Appointment a " +
+           "WHERE a.appointmentDate BETWEEN :from AND :to AND a.serviceId IS NOT NULL " +
+           "GROUP BY a.serviceId ORDER BY COUNT(a) DESC")
+    List<Object[]> countByServiceBetween(@Param("from") LocalDate from,
+                                         @Param("to") LocalDate to);
 
     // ── Filter by cross-member IDs
 
