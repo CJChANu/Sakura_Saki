@@ -1,14 +1,15 @@
 server:
   port: 8080
+#  port: ${PORT:8080}
 
 spring:
   application:
     name: SakuraSaki
 
   datasource:
-    url: jdbc:mysql://localhost:3306/sakura_saki?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Colombo
-    username: root
-    password: #0507cjchanu
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/sakura_saki?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Colombo}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:#0507cjchanu}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
