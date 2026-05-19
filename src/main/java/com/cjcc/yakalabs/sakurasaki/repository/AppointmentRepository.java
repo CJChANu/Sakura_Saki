@@ -1,6 +1,6 @@
 package com.cjcc.yakalabs.sakurasaki.repository;
 
-import com.cjcc.yakalabs.sakurasaki.entity.Appointment;
+import com.cjcc.yakalabs.sakurasaki.model.Appointment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

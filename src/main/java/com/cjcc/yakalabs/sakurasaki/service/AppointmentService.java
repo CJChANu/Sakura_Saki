@@ -1,6 +1,6 @@
 package com.cjcc.yakalabs.sakurasaki.service;
 
-import com.cjcc.yakalabs.sakurasaki.entity.Appointment;
+import com.cjcc.yakalabs.sakurasaki.model.Appointment;
 
 import java.time.LocalDate;
 import java.util.List;
