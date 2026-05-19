@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDate;
+
 @Controller
 @RequestMapping("/staff")
 public class StaffDashboardController {
@@ -34,7 +36,13 @@ public class StaffDashboardController {
         // Find the Staff entity for this user (Staff extends User, same ID)
         if (user instanceof Staff staffMember) {
             model.addAttribute("staff", staffMember);
-            model.addAttribute("appointments", appointmentService.findByStaff(staffMember.getId()));
+            var appointments = appointmentService.findByStaff(staffMember.getId());
+            model.addAttribute("appointments", appointments);
+            // Count today's appointments
+            long todayCount = appointments.stream()
+                    .filter(a -> a.getAppointmentDate().equals(LocalDate.now()))
+                    .count();
+            model.addAttribute("todayCount", todayCount);
         } else {
             // Admin viewing staff dashboard — show all staff appointments
             model.addAttribute("allStaffAppointments", appointmentService.findAll());

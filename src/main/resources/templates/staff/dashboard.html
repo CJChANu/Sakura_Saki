@@ -7,74 +7,70 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link th:href="@{/css/admin-style.css}" rel="stylesheet">
-    <style>
-        .staff-header {
-            background: linear-gradient(135deg, var(--primary-container), #fff5f7);
-            padding: 2rem;
-            border-radius: var(--radius-lg);
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        .staff-avatar {
-            width: 80px;
-            height: 80px;
-            background: var(--primary);
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-        }
-        .staff-info h1 {
-            margin: 0 0 0.25rem 0;
-            font-family: var(--font-headline);
-            font-size: 1.75rem;
-        }
-        .staff-info p {
-            margin: 0;
-            color: var(--outline);
-            font-size: 0.9rem;
-        }
-    </style>
 </head>
-<body style="display:flex;flex-direction:column;min-height:100vh;">
+<body class="admin-body">
+<canvas id="sakura-canvas"></canvas>
 
-<nav class="admin-topnav">
-    <a href="#" class="brand">🌸 Sakura Saki Staff</a>
-    <div class="user-menu">
-        <span class="material-symbols-outlined">person</span>
-        <span th:text="${username}">Staff User</span>
-        <form th:action="@{/logout}" method="post" style="display:inline;">
-            <button type="submit" class="btn-sakura btn-sakura-outline" style="padding:.25rem .75rem;font-size:.75rem;margin-left:1rem;">Logout</button>
-        </form>
+<!-- ========== SIDEBAR ========== -->
+<aside class="admin-sidebar">
+    <div class="sidebar-brand">
+        <h1>🌸 Staff Portal</h1>
+        <p>Sakura Saki</p>
     </div>
-</nav>
-
-<main style="flex:1;padding:2rem;">
-    <div th:if="${staff != null}" class="staff-header">
-        <div class="staff-avatar" th:text="${#strings.substring(staff.firstName,0,1)}">S</div>
-        <div class="staff-info">
-            <h1 th:text="'Welcome, ' + ${staff.firstName} + ' ' + ${staff.lastName}">Welcome, Staff</h1>
-            <p th:text="${staff.specialization}">Specialization</p>
+    <nav class="sidebar-nav">
+        <a th:href="@{/staff/dashboard}" class="active"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+        <a th:href="@{/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/profile}"><span class="material-symbols-outlined">person</span> Profile</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="sidebar-profile">
+            <div class="avatar" th:text="${staff != null ? #strings.toUpperCase(#strings.substring(staff.firstName, 0, 1)) + #strings.toUpperCase(#strings.substring(staff.lastName, 0, 1)) : 'ST'}">ST</div>
+            <div class="info">
+                <span class="name" th:text="${username}">staff</span>
+                <span class="role">Staff Member</span>
+            </div>
         </div>
     </div>
-    <div th:if="${staff == null}" class="staff-header">
-        <div class="staff-info">
-            <h1>Staff Dashboard Overview</h1>
-            <p>Viewing all staff appointments (Admin Mode)</p>
+</aside>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="admin-main">
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div>
+            <span class="kicker">Staff Dashboard</span>
+            <h2>Welcome back, <span th:text="${staff != null ? staff.firstName : username}">Staff</span>.</h2>
+        </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card glass-pane clay-lift">
+            <div class="stat-icon"><span class="material-symbols-outlined">calendar_today</span></div>
+            <div class="stat-label">Today's Appointments</div>
+            <div class="stat-value" th:text="${todayCount != null ? todayCount : 0}">0</div>
+        </div>
+        <div class="stat-card glass-pane clay-lift">
+            <div class="stat-icon"><span class="material-symbols-outlined">event_note</span></div>
+            <div class="stat-label">Total Appointments</div>
+            <div class="stat-value" th:text="${(appointments != null ? appointments.size() : (allStaffAppointments != null ? allStaffAppointments.size() : 0))}">0</div>
+        </div>
+        <div class="stat-card glass-pane clay-lift highlight" th:if="${staff != null}">
+            <div class="stat-icon"><span class="material-symbols-outlined">star</span></div>
+            <div class="stat-label">Specialization</div>
+            <div class="stat-value" style="font-size:1rem;" th:text="${staff.specialization ?: 'General'}">General</div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">My Appointments</h2>
-        </div>
-        
-        <table class="data-table">
+    <!-- Appointments Table -->
+    <div class="content-card glass-pane clay-lift" style="margin-top:2rem;">
+        <h3 style="margin-bottom:1.5rem;">
+            <span th:if="${staff != null}">My Appointments</span>
+            <span th:if="${staff == null}">All Staff Appointments (Admin View)</span>
+        </h3>
+        <table class="sakura-table">
             <thead>
                 <tr>
                     <th>Date & Time</th>
@@ -97,20 +93,26 @@
                     <td th:text="${appt.service.name}">Service</td>
                     <td th:if="${staff == null}" th:text="${appt.staff.firstName + ' ' + appt.staff.lastName}">Staff</td>
                     <td>
-                        <span th:class="'status-badge status-' + ${#strings.toLowerCase(appt.status)}" th:text="${appt.status}">STATUS</span>
+                        <span class="badge-pill badge-active" th:if="${appt.status.toString() == 'CONFIRMED'}" th:text="${appt.status}">CONFIRMED</span>
+                        <span class="badge-pill" style="background:#fef9c3;color:#854d0e;" th:if="${appt.status.toString() == 'PENDING'}" th:text="${appt.status}">PENDING</span>
+                        <span class="badge-pill badge-inactive" th:if="${appt.status.toString() == 'CANCELLED'}" th:text="${appt.status}">CANCELLED</span>
+                        <span class="badge-pill" style="background:#dbeafe;color:#1e40af;" th:if="${appt.status.toString() == 'COMPLETED'}" th:text="${appt.status}">COMPLETED</span>
                     </td>
                 </tr>
                 <tr th:if="${(appointments == null or appointments.isEmpty()) and (allStaffAppointments == null or allStaffAppointments.isEmpty())}">
-                    <td colspan="5" style="text-align:center;padding:2rem;color:var(--outline);">No appointments scheduled yet.</td>
+                    <td colspan="5" style="text-align:center;padding:3rem;color:var(--outline);">
+                        <span class="material-symbols-outlined" style="font-size:3rem;display:block;margin-bottom:0.5rem;opacity:0.3;">event_busy</span>
+                        No appointments scheduled yet.
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
+
+    <!-- Footer -->
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS</span></footer>
 </main>
 
-<footer class="site-footer" style="text-align:center;padding:2rem;background:var(--surface-container-low);">
-    <span style="font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;">© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span>
-</footer>
-
+<script th:src="@{/js/sakura-petals.js}"></script>
 </body>
 </html>
