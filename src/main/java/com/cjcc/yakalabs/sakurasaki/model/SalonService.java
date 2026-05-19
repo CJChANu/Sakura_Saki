@@ -1,21 +1,39 @@
 package com.cjcc.yakalabs.sakurasaki.model;
 
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "salon_services")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "service_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("GENERAL")
 public class SalonService {
-    private String serviceId;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String serviceName;
+
+    @Column(nullable = false)
     private String category;
+
+    @Column(nullable = false)
     private int duration;
+
+    @Column(nullable = false)
     private double price;
+
     private String description;
-    private boolean available;
 
-    public SalonService() {
-    }
+    @Column(nullable = false)
+    private boolean available = true;
 
-    public SalonService(String serviceId, String serviceName, String category, int duration,
+    public SalonService() {}
+
+    public SalonService(String serviceName, String category, int duration,
                         double price, String description, boolean available) {
-        this.serviceId = serviceId;
         this.serviceName = serviceName;
         this.category = category;
         this.duration = duration;
@@ -24,68 +42,30 @@ public class SalonService {
         this.available = available;
     }
 
-    public String getServiceId() {
-        return serviceId;
-    }
+    // --- Getters and Setters ---
 
-    public void setServiceId(String serviceId) {
-        this.serviceId = serviceId;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getServiceName() {
-        return serviceName;
-    }
+    public String getServiceName() { return serviceName; }
+    public void setServiceName(String serviceName) { this.serviceName = serviceName; }
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public String getCategory() {
-        return category;
-    }
+    public int getDuration() { return duration; }
+    public void setDuration(int duration) { this.duration = duration; }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
 
-    public int getDuration() {
-        return duration;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isAvailable() {
-        return available;
-    }
-
-    public void setAvailable(boolean available) {
-        this.available = available;
-    }
+    public boolean isAvailable() { return available; }
+    public void setAvailable(boolean available) { this.available = available; }
 
     public String getCategoryDetails() {
         return "General salon service";
-    }
-
-    public String toFileString() {
-        return serviceId + "|" + serviceName + "|" + category + "|" + duration + "|" +
-                price + "|" + description + "|" + available;
     }
 }
