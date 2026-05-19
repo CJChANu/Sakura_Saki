@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile — Sakura Saki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+</head>
+<body style="display:flex;flex-direction:column;min-height:100vh;">
+<canvas id="sakura-canvas"></canvas>
+
+<!-- Top Navigation -->
+<nav class="public-topnav" style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(255,255,255,.6);backdrop-filter:blur(24px);border-bottom:.5px solid rgba(214,194,196,.12);">
+    <a href="/" style="font-family:var(--font-headline);font-size:1.15rem;font-weight:700;color:var(--primary);text-decoration:none;">🌸 Sakura Saki</a>
+    <div style="display:flex;gap:2rem;align-items:center;">
+        <a th:href="@{/}" style="font-family:var(--font-label);font-size:.8rem;font-weight:500;letter-spacing:.03em;color:var(--on-surface-variant);text-decoration:none;">Home</a>
+        <a th:if="${isAdmin}" th:href="@{/admin/dashboard}" style="font-family:var(--font-label);font-size:.8rem;font-weight:500;letter-spacing:.03em;color:var(--on-surface-variant);text-decoration:none;">Admin Panel</a>
+        <a th:href="@{/logout}" class="btn-sakura btn-sakura-outline" style="padding:.5rem 1.25rem;">
+            <span class="material-symbols-outlined" style="font-size:1rem;">logout</span> Logout
+        </a>
+    </div>
+</nav>
+
+<main style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;margin-top:4rem;">
+<div style="width:100%;max-width:700px;">
+
+    <!-- Success/Error Messages -->
+    <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
+
+    <!-- Profile Card -->
+    <div class="content-card glass-pane clay-lift" style="padding:2.5rem;">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:2.5rem;">
+            <div style="width:5rem;height:5rem;border-radius:50%;background:var(--primary-container);display:flex;align-items:center;justify-content:center;font-family:var(--font-headline);font-size:2rem;font-weight:700;color:var(--on-primary-container);"
+                 th:text="${#strings.toUpperCase(#strings.substring(user.username, 0, 2))}">US</div>
+            <div>
+                <h2 style="font-family:var(--font-headline);font-size:1.75rem;font-weight:700;margin:0;color:var(--on-surface);"
+                    th:text="${user.fullName}">Full Name</h2>
+                <p style="font-size:.85rem;color:var(--outline);margin:.25rem 0 0;">
+                    @<span th:text="${user.username}">username</span>
+                </p>
+                <span class="badge-pill badge-active" th:if="${user.enabled}" style="margin-top:.5rem;">Active</span>
+                <span class="badge-pill badge-inactive" th:if="${!user.enabled}" style="margin-top:.5rem;">Disabled</span>
+            </div>
+        </div>
+
+        <!-- Profile Details -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+            <div>
+                <div style="font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;color:var(--outline);margin-bottom:.4rem;">
+                    <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">mail</span> Email
+                </div>
+                <div style="font-size:.95rem;font-weight:500;color:var(--on-surface);" th:text="${user.email}">user@email.com</div>
+            </div>
+            <div>
+                <div style="font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;color:var(--outline);margin-bottom:.4rem;">
+                    <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">phone</span> Phone
+                </div>
+                <div style="font-size:.95rem;font-weight:500;color:var(--on-surface);" th:text="${user.phone != null ? user.phone : 'Not set'}">+1234567890</div>
+            </div>
+            <div>
+                <div style="font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;color:var(--outline);margin-bottom:.4rem;">
+                    <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">person</span> First Name
+                </div>
+                <div style="font-size:.95rem;font-weight:500;color:var(--on-surface);" th:text="${user.firstName != null ? user.firstName : 'Not set'}">First</div>
+            </div>
+            <div>
+                <div style="font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;color:var(--outline);margin-bottom:.4rem;">
+                    <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">person</span> Last Name
+                </div>
+                <div style="font-size:.95rem;font-weight:500;color:var(--on-surface);" th:text="${user.lastName != null ? user.lastName : 'Not set'}">Last</div>
+            </div>
+            <div>
+                <div style="font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;color:var(--outline);margin-bottom:.4rem;">
+                    <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">shield_person</span> Role
+                </div>
+                <span class="badge-pill badge-admin" th:if="${user.role == 'ROLE_ADMIN'}">Admin</span>
+                <span class="badge-pill badge-user" th:if="${user.role == 'ROLE_USER'}">Customer</span>
+                <span class="badge-pill" th:if="${user.role == 'ROLE_STAFF'}" style="background:var(--secondary-container);color:var(--on-surface-variant);">Staff</span>
+            </div>
+            <div>
+                <div style="font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;color:var(--outline);margin-bottom:.4rem;">
+                    <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">calendar_month</span> Member Since
+                </div>
+                <div style="font-size:.95rem;font-weight:500;color:var(--on-surface);" th:text="${#temporals.format(user.createdAt, 'dd MMM yyyy')}">01 Jan 2024</div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex;gap:1rem;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--outline-variant);">
+            <a th:href="@{/profile/edit}" class="btn-sakura btn-sakura-primary" style="justify-content:center;">
+                <span class="material-symbols-outlined" style="font-size:1rem;">edit</span> Edit Profile
+            </a>
+            <a th:href="@{/}" class="btn-sakura btn-sakura-outline">
+                <span class="material-symbols-outlined" style="font-size:1rem;">home</span> Back to Home
+            </a>
+        </div>
+    </div>
+
+</div>
+</main>
+
+<footer style="text-align:center;padding:2rem;background:var(--surface-container-low);">
+    <span style="font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;">© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span>
+</footer>
+
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>

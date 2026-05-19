@@ -127,4 +127,66 @@ public class AdminController {
         }
         return "redirect:/admin/manage";
     }
-}
+
+    // ===== Customer Management (Member 1 — Customer & Authentication Module) =====
+
+    /**
+     * List all customers with optional search.
+     */
+    @GetMapping("/customers")
+    public String customers(@RequestParam(required = false) String search,
+                            Authentication auth, Model model) {
+        List<User> customers;
+        if (search != null && !search.isBlank()) {
+            customers = userService.searchCustomers(search);
+        } else {
+            customers = userService.findAllCustomers();
+        }
+        model.addAttribute("username", auth.getName());
+        model.addAttribute("customers", customers);
+        model.addAttribute("search", search);
+        return "admin/customer-list";
+    }
+
+    /**
+     * Deactivate a customer account (soft delete).
+     */
+    @PostMapping("/customers/{id}/deactivate")
+    public String deactivateCustomer(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.deactivateUser(id);
+            redirectAttributes.addFlashAttribute("success", "Customer deactivated successfully.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/customers";
+    }
+
+    /**
+     * Activate a customer account.
+     */
+    @PostMapping("/customers/{id}/activate")
+    public String activateCustomer(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.activateUser(id);
+            redirectAttributes.addFlashAttribute("success", "Customer activated successfully.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/customers";
+    }
+
+    /**
+     * Permanently delete a customer account.
+     */
+    @PostMapping("/customers/{id}/delete")
+    public String deleteCustomer(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.deleteUser(id);
+            redirectAttributes.addFlashAttribute("success", "Customer deleted permanently.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/customers";
+    }
+}
