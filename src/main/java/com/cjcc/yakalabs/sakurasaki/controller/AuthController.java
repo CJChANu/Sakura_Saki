@@ -37,6 +37,10 @@ public class AuthController {
             Model model
     ) {
         try {
+            // Validate phone: exactly 10 digits
+            if (phone == null || !phone.matches("\\d{10}")) {
+                throw new RuntimeException("Phone number must be exactly 10 digits.");
+            }
             userService.registerCustomer(username, password, email, firstName, lastName, phone);
             model.addAttribute("success", "Registration successful! Please sign in.");
             return "auth/login";

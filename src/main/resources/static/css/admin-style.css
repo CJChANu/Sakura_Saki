@@ -212,7 +212,9 @@ body:not(.admin-body) {
     margin: 0 auto;
     overflow-y: auto;
     position: relative;
-    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* ---------- Page Header ---------- */
@@ -528,14 +530,10 @@ body:not(.admin-body) {
 
 /* ---------- Footer ---------- */
 .admin-footer {
-    margin-top: 4rem;
-    padding: 3rem 0;
+    margin-top: auto;
+    padding: 2rem 0;
     border-top: 1px solid rgba(255, 183, 197, 0.2);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+    text-align: center;
 }
 
 .admin-footer span {
@@ -560,6 +558,22 @@ body:not(.admin-body) {
 .admin-footer a:hover {
     color: var(--primary);
     opacity: 1;
+}
+
+/* ---------- Site Footer (public pages) ---------- */
+.site-footer {
+    text-align: center;
+    padding: 2rem;
+    background: var(--surface-container-low);
+    border-top: 1px solid rgba(255, 183, 197, 0.2);
+}
+
+.site-footer span {
+    font-family: var(--font-label);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
 }
 
 /* ---------- Sakura Petals Canvas ---------- */
@@ -598,7 +612,7 @@ body:not(.admin-body) {
 
 /* ---------- Auth Pages ---------- */
 .auth-container {
-    min-height: 100vh;
+    min-height: auto;
     display: flex;
     align-items: center;
     justify-content: center;

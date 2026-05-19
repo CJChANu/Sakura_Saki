@@ -41,7 +41,7 @@
             </div>
             <div class="form-group">
                 <label for="phone">Phone</label>
-                <input id="phone" name="phone" th:value="${prevPhone}" type="tel" class="input-recessed" placeholder="07X XXXX XXX" required>
+                <input id="phone" name="phone" th:value="${prevPhone}" type="tel" class="input-recessed" placeholder="07X XXXX XXX" pattern="[0-9]{10}" minlength="10" maxlength="10" title="Phone number must be exactly 10 digits" required>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
