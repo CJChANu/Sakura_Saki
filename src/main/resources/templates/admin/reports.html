@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports — Sakura Saki Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+</head>
+<body class="admin-body">
+<canvas id="sakura-canvas"></canvas>
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="admin-sidebar">
+    <div class="sidebar-brand">
+        <h1>🌸 Admin Portal</h1>
+        <p>Sakura Saki Management</p>
+    </div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/admin/dashboard}"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+        <a th:href="@{/admin/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/admin/packages}"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
+        <a th:href="@{/admin/staff}"><span class="material-symbols-outlined">badge</span> Staff</a>
+        <a th:href="@{/admin/appointments}"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
+        <a th:href="@{/admin/reviews}"><span class="material-symbols-outlined">reviews</span> Reviews</a>
+        <a th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span> Users</a>
+        <a th:href="@{/admin/customers}"><span class="material-symbols-outlined">person_search</span> Customers</a>
+        <a th:href="@{/admin/manage}"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
+        <a th:href="@{/admin/reports}" class="active"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="sidebar-profile">
+            <div class="avatar" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">AD</div>
+            <div class="info">
+                <span class="name" th:text="${username}">admin</span>
+                <span class="role">Administrator</span>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="admin-main">
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div>
+            <span class="kicker">Analytical Reports</span>
+            <h2>Salon Performance</h2>
+        </div>
+    </header>
+
+    <!-- Quick Stats Row -->
+    <div class="stats-grid" style="margin-bottom: 2.5rem;">
+        <div class="stat-card glass-pane clay-lift">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">group</span>
+            </div>
+            <div class="stat-label">Total Customers</div>
+            <div class="stat-value" th:text="${summary.totalCustomers}">0</div>
+        </div>
+        <div class="stat-card glass-pane clay-lift">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">content_cut</span>
+            </div>
+            <div class="stat-label">Salon Services</div>
+            <div class="stat-value" th:text="${summary.totalServices}">0</div>
+        </div>
+        <div class="stat-card glass-pane clay-lift">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">badge</span>
+            </div>
+            <div class="stat-label">Total Staff</div>
+            <div class="stat-value" th:text="${summary.totalStaff}">0</div>
+        </div>
+        <div class="stat-card glass-pane clay-lift highlight">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">calendar_today</span>
+            </div>
+            <div class="stat-label">Today's Appointments</div>
+            <div class="stat-value" th:text="${summary.todayAppointments}">0</div>
+        </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="grid-2">
+
+        <!-- Appointments Per Day -->
+        <div class="content-card glass-pane clay-lift">
+            <h3>Appointments Per Day</h3>
+            <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;">
+                <input type="date" id="appFrom" class="input-recessed" style="width: auto; padding: 0.5rem 1rem; font-size: 0.75rem;">
+                <input type="date" id="appTo" class="input-recessed" style="width: auto; padding: 0.5rem 1rem; font-size: 0.75rem;">
+                <button onclick="loadAppointmentReport()" class="btn-sakura btn-sakura-primary btn-sakura-sm">Update</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="appointmentsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Most Booked Services -->
+        <div class="content-card glass-pane clay-lift">
+            <h3>Most Booked Services</h3>
+            <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;">
+                <input type="date" id="svcFrom" class="input-recessed" style="width: auto; padding: 0.5rem 1rem; font-size: 0.75rem;">
+                <input type="date" id="svcTo" class="input-recessed" style="width: auto; padding: 0.5rem 1rem; font-size: 0.75rem;">
+                <button onclick="loadServiceReport()" class="btn-sakura btn-sakura-primary btn-sakura-sm">Update</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="servicesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
+</main>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let appointmentsChart;
+    let servicesChart;
+
+    async function loadAppointmentReport() {
+        const from = document.getElementById('appFrom').value;
+        const to = document.getElementById('appTo').value;
+        if (!from || !to) return;
+
+        try {
+            const response = await fetch(`/admin/reports/appointments?from=${from}&to=${to}`);
+            const result = await response.json();
+
+            const labels = Object.keys(result.data).map(d => {
+                const p = d.split('-');
+                return p[2] + '/' + p[1];
+            });
+            const values = Object.values(result.data);
+
+            if (appointmentsChart) appointmentsChart.destroy();
+            appointmentsChart = new Chart(document.getElementById('appointmentsChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Appointments',
+                        data: values,
+                        borderColor: '#864e5a',
+                        backgroundColor: 'rgba(255, 183, 197, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#864e5a',
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Manrope', size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+                        x: { ticks: { font: { family: 'Manrope', size: 11 } }, grid: { display: false } }
+                    }
+                }
+            });
+        } catch(e) { console.log('Error loading appointment report:', e); }
+    }
+
+    async function loadServiceReport() {
+        const from = document.getElementById('svcFrom').value;
+        const to = document.getElementById('svcTo').value;
+        if (!from || !to) return;
+
+        try {
+            const response = await fetch(`/admin/reports/services?from=${from}&to=${to}`);
+            const result = await response.json();
+
+            const labels = Object.keys(result.data);
+            const values = Object.values(result.data);
+
+            const colors = ['#864e5a', '#ffb7c5', '#f8d8db', '#d6c2c4', '#70585b', '#ffd9df', '#fbb3c1'];
+
+            if (servicesChart) servicesChart.destroy();
+            servicesChart = new Chart(document.getElementById('servicesChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: { family: 'Manrope', size: 11 }, padding: 16, usePointStyle: true }
+                        }
+                    }
+                }
+            });
+        } catch(e) { console.log('Error loading service report:', e); }
+    }
+
+    // Auto-load with last 30 days
+    window.addEventListener('DOMContentLoaded', () => {
+        const today = new Date();
+        const monthAgo = new Date();
+        monthAgo.setMonth(today.getMonth() - 1);
+
+        const fmt = d => d.toISOString().split('T')[0];
+
+        document.getElementById('appFrom').value = fmt(monthAgo);
+        document.getElementById('appTo').value = fmt(today);
+        document.getElementById('svcFrom').value = fmt(monthAgo);
+        document.getElementById('svcTo').value = fmt(today);
+
+        loadAppointmentReport();
+        loadServiceReport();
+    });
+</script>
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>

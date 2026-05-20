@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments — Sakura Saki Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+    <style>
+        .appt-amount { font-weight: 700; color: #9d174d; }
+        .status-badge { padding:.25rem .75rem; border-radius:20px; font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+        .badge-scheduled { background:#dbeafe;color:#1d4ed8; }
+        .badge-completed { background:#dcfce7;color:#166534; }
+        .badge-cancelled { background:#fee2e2;color:#991b1b; }
+        .action-form { display:inline; }
+        .summary-row { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+        .summary-chip { background:#fff1f2; color:#9d174d; border-radius:50px; padding:.4rem 1rem; font-size:.75rem; font-weight:700; display:flex; align-items:center; gap:.4rem; }
+    </style>
+</head>
+<body class="admin-body">
+<canvas id="sakura-canvas"></canvas>
+<aside class="admin-sidebar">
+    <div class="sidebar-brand"><h1>🌸 Sakura Saki</h1><p>Admin Panel</p></div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/admin/dashboard}"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+        <a th:href="@{/admin/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/admin/packages}"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
+        <a th:href="@{/admin/staff}"><span class="material-symbols-outlined">badge</span> Staff</a>
+        <a th:href="@{/admin/appointments}" class="active"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
+        <a th:href="@{/admin/reviews}"><span class="material-symbols-outlined">reviews</span> Reviews</a>
+        <a th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span> Users</a>
+        <a th:href="@{/admin/customers}"><span class="material-symbols-outlined">person_search</span> Customers</a>
+        <a th:href="@{/admin/manage}"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
+        <a th:href="@{/admin/reports}"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+    </nav>
+</aside>
+<main class="admin-main">
+    <header class="page-header">
+        <div><span class="kicker">Schedule</span><h2>Appointments</h2></div>
+        <div class="header-actions" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <form th:action="@{/admin/appointments}" method="get" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <input name="date" type="date" class="input-recessed" th:value="${filterDate}" style="width:160px;" placeholder="Filter by date">
+                <select name="status" class="input-recessed" style="width:150px;">
+                    <option value="">All Statuses</option>
+                    <option value="SCHEDULED" th:selected="${filterStatus == 'SCHEDULED'}">Scheduled</option>
+                    <option value="COMPLETED" th:selected="${filterStatus == 'COMPLETED'}">Completed</option>
+                    <option value="CANCELLED" th:selected="${filterStatus == 'CANCELLED'}">Cancelled</option>
+                </select>
+                <button type="submit" class="btn-sakura btn-sakura-outline"><span class="material-symbols-outlined" style="font-size:1rem;">filter_alt</span> Filter</button>
+                <a th:href="@{/admin/appointments}" class="btn-sakura btn-sakura-outline" style="color:#64748b;">Clear</a>
+            </form>
+        </div>
+    </header>
+
+    <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
+
+    <!-- Summary Chips -->
+    <div class="summary-row">
+        <div class="summary-chip"><span class="material-symbols-outlined" style="font-size:1rem;">calendar_today</span> <span th:text="${appointments.size()}">0</span> Appointments</div>
+        <div class="summary-chip"><span class="material-symbols-outlined" style="font-size:1rem;">check_circle</span> <span th:text="${#lists.size(appointments.?[status == 'SCHEDULED'])}">0</span> Scheduled</div>
+        <div class="summary-chip" style="background:#dcfce7;color:#166534;"><span class="material-symbols-outlined" style="font-size:1rem;">done_all</span> <span th:text="${#lists.size(appointments.?[status == 'COMPLETED'])}">0</span> Completed</div>
+        <div class="summary-chip" style="background:#fee2e2;color:#991b1b;"><span class="material-symbols-outlined" style="font-size:1rem;">cancel</span> <span th:text="${#lists.size(appointments.?[status == 'CANCELLED'])}">0</span> Cancelled</div>
+    </div>
+
+    <div class="content-card glass-pane clay-lift">
+        <div style="overflow-x:auto;">
+            <table class="sakura-table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Staff</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Duration</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${appointments}">
+                    <td style="color:#94a3b8;font-size:.75rem;" th:text="${a.id}">1</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:.5rem;">
+                            <div style="width:2rem;height:2rem;border-radius:50%;background:#fff1f2;color:#9d174d;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;"
+                                 th:text="${a.customer != null ? #strings.substring(a.customer.firstName,0,1) + #strings.substring(a.customer.lastName,0,1) : '??'}">CU</div>
+                            <span th:text="${a.customer != null ? a.customer.firstName + ' ' + a.customer.lastName : 'N/A'}" style="font-weight:600;font-size:.85rem;">Customer</span>
+                        </div>
+                    </td>
+                    <td th:text="${a.service != null ? a.service.name : 'N/A'}" style="font-size:.85rem;">Service</td>
+                    <td th:text="${a.staff != null ? a.staff.firstName + ' ' + a.staff.lastName : '—'}" style="font-size:.85rem;">Staff</td>
+                    <td th:text="${a.appointmentDate}" style="font-size:.85rem;">Date</td>
+                    <td th:text="${a.appointmentTime}" style="font-size:.85rem;">Time</td>
+                    <td th:text="${a.service != null ? a.service.durationMinutes + ' min' : '—'}" style="font-size:.8rem;color:#64748b;">60 min</td>
+                    <td class="appt-amount" th:text="${a.service != null ? 'Rs. ' + #numbers.formatDecimal(a.service.price,1,2) : '—'}">Rs. 0.00</td>
+                    <td>
+                        <span class="status-badge badge-scheduled" th:if="${a.status == 'SCHEDULED'}">Scheduled</span>
+                        <span class="status-badge badge-completed" th:if="${a.status == 'COMPLETED'}">Completed</span>
+                        <span class="status-badge badge-cancelled" th:if="${a.status == 'CANCELLED'}">Cancelled</span>
+                    </td>
+                    <td style="text-align:right;">
+                        <div style="display:flex;gap:.4rem;justify-content:flex-end;flex-wrap:wrap;">
+                            <!-- Complete -->
+                            <form th:if="${a.status == 'SCHEDULED'}"
+                                  th:action="@{'/admin/appointments/' + ${a.id} + '/status'}" method="post" class="action-form">
+                                <input type="hidden" name="status" value="COMPLETED">
+                                <button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm"
+                                        style="color:#065f46;border-color:#d1fae5;" title="Mark as Completed">
+                                    <span class="material-symbols-outlined" style="font-size:.85rem;">check_circle</span>
+                                </button>
+                            </form>
+                            <!-- Cancel -->
+                            <form th:if="${a.status == 'SCHEDULED'}"
+                                  th:action="@{'/admin/appointments/' + ${a.id} + '/status'}" method="post" class="action-form">
+                                <input type="hidden" name="status" value="CANCELLED">
+                                <button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm"
+                                        style="color:#b45309;border-color:#fde68a;" title="Cancel Appointment"
+                                        onclick="return confirm('Cancel this appointment?');">
+                                    <span class="material-symbols-outlined" style="font-size:.85rem;">event_busy</span>
+                                </button>
+                            </form>
+                            <!-- Restore -->
+                            <form th:if="${a.status == 'CANCELLED'}"
+                                  th:action="@{'/admin/appointments/' + ${a.id} + '/status'}" method="post" class="action-form">
+                                <input type="hidden" name="status" value="SCHEDULED">
+                                <button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm"
+                                        style="color:#1d4ed8;border-color:#dbeafe;" title="Restore">
+                                    <span class="material-symbols-outlined" style="font-size:.85rem;">restore</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(appointments)}">
+                    <td colspan="10" style="text-align:center;padding:3rem;color:#94a3b8;">
+                        <span class="material-symbols-outlined" style="font-size:3rem;opacity:.3;display:block;margin-bottom:.5rem;">calendar_off</span>
+                        No appointments found for the selected filters.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS</span></footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>

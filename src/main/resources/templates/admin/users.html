@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management — Sakura Saki Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+</head>
+<body class="admin-body">
+<canvas id="sakura-canvas"></canvas>
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="admin-sidebar">
+    <div class="sidebar-brand">
+        <h1>🌸 Admin Portal</h1>
+        <p>Sakura Saki Management</p>
+    </div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/admin/dashboard}"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+        <a th:href="@{/admin/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/admin/packages}"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
+        <a th:href="@{/admin/staff}"><span class="material-symbols-outlined">badge</span> Staff</a>
+        <a th:href="@{/admin/appointments}"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
+        <a th:href="@{/admin/reviews}"><span class="material-symbols-outlined">reviews</span> Reviews</a>
+        <a th:href="@{/admin/users}" class="active"><span class="material-symbols-outlined">group</span> Users</a>
+        <a th:href="@{/admin/customers}"><span class="material-symbols-outlined">person_search</span> Customers</a>
+        <a th:href="@{/admin/manage}"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
+        <a th:href="@{/admin/reports}"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="sidebar-profile">
+            <div class="avatar" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">AD</div>
+            <div class="info">
+                <span class="name" th:text="${username}">admin</span>
+                <span class="role">Administrator</span>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="admin-main">
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div>
+            <span class="kicker">User Management</span>
+            <h2>All Users</h2>
+        </div>
+        <div class="header-actions">
+            <form th:action="@{/admin/users}" method="get" class="search-pill">
+                <span class="material-symbols-outlined" style="color: var(--outline);">search</span>
+                <input type="text" name="search" th:value="${search}" placeholder="Search by username...">
+            </form>
+        </div>
+    </header>
+
+    <!-- Success / Error -->
+    <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
+    <div th:if="${error}"   class="sakura-alert sakura-alert-error"   th:text="${error}"></div>
+
+    <!-- Users Table -->
+    <div class="content-card glass-pane clay-lift">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="margin-bottom: 0;">
+                <span th:text="${#lists.size(users)}">0</span> users found
+            </h3>
+            <a th:if="${search != null && !search.isEmpty()}" th:href="@{/admin/users}" class="btn-sakura btn-sakura-outline btn-sakura-sm">
+                <span class="material-symbols-outlined" style="font-size: 1rem;">close</span> Clear Search
+            </a>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="sakura-table">
+                <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${users}">
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div class="initials-avatar" style="background: var(--secondary-container); color: var(--on-secondary-container);"
+                                 th:text="${#strings.toUpperCase(#strings.substring(u.username, 0, 2))}">US</div>
+                            <div>
+                                <div style="font-weight: 600;" th:text="${u.username}">username</div>
+                                <div style="font-size: 0.7rem; color: var(--outline);">ID: <span th:text="${u.id}">1</span></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td th:text="${u.email}">user@mail.com</td>
+                    <td>
+                        <span class="badge-pill badge-admin" th:if="${u.role == 'ROLE_ADMIN'}">Admin</span>
+                        <span class="badge-pill badge-user" th:if="${u.role != 'ROLE_ADMIN'}">User</span>
+                    </td>
+                    <td>
+                        <span class="badge-pill badge-active" th:if="${u.enabled}">Active</span>
+                        <span class="badge-pill badge-inactive" th:if="${!u.enabled}">Disabled</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                            <form th:action="@{'/admin/users/' + ${u.id} + '/make-admin'}" method="post" style="display: inline;"
+                                  th:if="${u.role != 'ROLE_ADMIN'}">
+                                <button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm"
+                                        title="Promote to Admin">
+                                    <span class="material-symbols-outlined" style="font-size: 0.9rem;">shield_person</span>
+                                    Promote
+                                </button>
+                            </form>
+                            <form th:action="@{'/admin/users/' + ${u.id} + '/toggle-enabled'}" method="post" style="display: inline;">
+                                <button type="submit" class="btn-sakura btn-sakura-sm"
+                                        th:classappend="${u.enabled} ? 'btn-sakura-danger' : 'btn-sakura-primary'"
+                                        th:text="${u.enabled} ? 'Disable' : 'Enable'">Toggle</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(users)}" style="text-align: center; padding: 3rem; color: var(--outline);">
+            <span class="material-symbols-outlined" style="font-size: 3rem; opacity: 0.3;">person_off</span>
+            <p style="margin-top: 1rem;">No users found.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
+</main>
+
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>

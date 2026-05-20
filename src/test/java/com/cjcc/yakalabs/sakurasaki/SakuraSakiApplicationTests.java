@@ -9,5 +9,4 @@ class SakuraSakiApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

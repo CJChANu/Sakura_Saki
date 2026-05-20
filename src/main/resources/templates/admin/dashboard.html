@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Dashboard — Sakura Saki Admin')}"></head>
+<body class="bg-surface text-on-surface overflow-x-hidden">
+<th:block th:replace="~{layout/fragments :: sakura-canvas}" />
+
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside th:replace="~{layout/fragments :: admin-sidebar('dashboard')}"></aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-12 relative z-10">
+        <!-- Page Header -->
+        <header class="flex justify-between items-center mb-12">
+            <div>
+                <span class="text-primary font-label text-xs font-extrabold tracking-[0.2em] uppercase block mb-2">Dashboard Overview</span>
+                <h1 class="font-headline text-4xl text-on-surface font-bold">Welcome back, <span th:text="${username}">Admin</span>.</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <form th:action="@{/admin/users}" method="get" class="flex items-center bg-white px-4 py-3 rounded-full shadow-sm border border-surface-container-high">
+                    <span class="material-symbols-outlined text-outline text-sm">search</span>
+                    <input type="text" name="search" placeholder="Search users..." class="bg-transparent border-none focus:ring-0 text-sm w-32 font-medium ml-2"/>
+                </form>
+            </div>
+        </header>
+
+        <!-- KPI Stat Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
+            <div class="glass-pane clay-lift rounded-lg p-6 flex flex-col gap-4">
+                <div class="w-12 h-12 rounded-full bg-primary-container/40 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary">group</span>
+                </div>
+                <div>
+                    <p class="text-xs font-label font-bold uppercase tracking-[0.1em] text-on-surface-variant mb-1">Total Customers</p>
+                    <p class="text-3xl font-headline font-bold text-on-surface" th:text="${summary.totalCustomers}">0</p>
+                </div>
+            </div>
+            <div class="glass-pane clay-lift rounded-lg p-6 flex flex-col gap-4">
+                <div class="w-12 h-12 rounded-full bg-primary-container/40 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary">content_cut</span>
+                </div>
+                <div>
+                    <p class="text-xs font-label font-bold uppercase tracking-[0.1em] text-on-surface-variant mb-1">Active Services</p>
+                    <p class="text-3xl font-headline font-bold text-on-surface" th:text="${summary.totalServices}">0</p>
+                </div>
+            </div>
+            <div class="glass-pane clay-lift rounded-lg p-6 flex flex-col gap-4">
+                <div class="w-12 h-12 rounded-full bg-primary-container/40 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary">badge</span>
+                </div>
+                <div>
+                    <p class="text-xs font-label font-bold uppercase tracking-[0.1em] text-on-surface-variant mb-1">Total Staff</p>
+                    <p class="text-3xl font-headline font-bold text-on-surface" th:text="${summary.totalStaff}">0</p>
+                </div>
+            </div>
+            <div class="glass-pane clay-lift rounded-lg p-6 flex flex-col gap-4 border-2 border-primary-container">
+                <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center">
+                    <span class="material-symbols-outlined text-on-primary-container">calendar_today</span>
+                </div>
+                <div>
+                    <p class="text-xs font-label font-bold uppercase tracking-[0.1em] text-on-surface-variant mb-1">Today's Bookings</p>
+                    <p class="text-3xl font-headline font-bold text-primary" th:text="${summary.todayAppointments}">0</p>
+                </div>
+            </div>
+            <div class="rounded-lg p-6 flex flex-col gap-4" style="background: linear-gradient(135deg, #fbcfe8 0%, #fda4af 100%);">
+                <div class="w-12 h-12 rounded-full bg-white/30 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-rose-800">payments</span>
+                </div>
+                <div>
+                    <p class="text-xs font-label font-bold uppercase tracking-[0.1em] text-rose-800/80 mb-1">Total Revenue</p>
+                    <p class="text-3xl font-headline font-bold text-rose-900" th:text="'Rs. ' + ${#numbers.formatDecimal(summary.totalRevenue,1,'COMMA',0,'POINT')}">Rs. 0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid: Revenue Chart + Right Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 mb-8">
+            <!-- Monthly Revenue Chart -->
+            <div class="bg-white rounded-lg p-8 clay-lift">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-headline text-xl font-bold text-on-surface">Monthly Revenue</h3>
+                    <span class="text-[10px] font-label font-bold uppercase tracking-[0.1em] text-on-surface-variant">Last 6 Months</span>
+                </div>
+                <div class="h-56">
+                    <canvas id="monthlyRevenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Right Stack -->
+            <div class="flex flex-col gap-6">
+                <!-- Top Performer Card -->
+                <div class="rounded-lg p-6 relative overflow-hidden flex justify-between items-center" style="background: linear-gradient(135deg, #fbcfe8 0%, #fda4af 100%);">
+                    <div>
+                        <p class="text-[10px] font-label font-bold uppercase tracking-[0.15em] text-rose-800/70">Top Performer</p>
+                        <h3 class="font-headline text-xl font-bold text-rose-900 mt-1">Yumi Tanaka</h3>
+                        <div class="flex items-center gap-1 text-xs font-semibold text-rose-800 mt-2">
+                            <span class="material-symbols-outlined text-sm">star</span> Client Satisfaction
+                        </div>
+                    </div>
+                    <div class="text-right flex flex-col items-end gap-2">
+                        <div class="w-16 h-16 rounded-full bg-white border-3 border-pink-200 flex items-center justify-center overflow-hidden">
+                            <span class="material-symbols-outlined text-3xl text-rose-800">face_3</span>
+                        </div>
+                        <p class="text-3xl font-extrabold text-rose-900">98%</p>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="bg-white rounded-lg p-6 clay-lift flex flex-col justify-center gap-5">
+                    <p class="text-[10px] font-label font-bold uppercase tracking-[0.15em] text-on-surface-variant">Quick Stats</p>
+                    <div>
+                        <div class="flex justify-between text-sm font-bold">
+                            <span>New Clients</span>
+                            <span class="text-primary">+24%</span>
+                        </div>
+                        <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+                            <div class="bg-primary h-full rounded-full" style="width: 24%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-bold">
+                            <span>Repeat Rate</span>
+                            <span class="text-primary">82%</span>
+                        </div>
+                        <div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+                            <div class="bg-primary h-full rounded-full" style="width: 82%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Grid: Trends + Upcoming -->
+        <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 mb-8">
+            <!-- Appointment Trends -->
+            <div class="bg-white rounded-lg p-8 clay-lift">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-headline text-xl font-bold text-on-surface">Appointment Trends</h3>
+                    <div class="text-right">
+                        <p class="text-3xl font-extrabold text-primary" th:text="${summary.todayAppointments}">0</p>
+                        <p class="text-[10px] font-label font-bold uppercase tracking-[0.1em] text-on-surface-variant">Bookings Today</p>
+                    </div>
+                </div>
+                <div class="h-52">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Upcoming Appointments -->
+            <div class="bg-white rounded-lg p-6 clay-lift flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-headline text-lg font-bold text-on-surface">Upcoming</h3>
+                    <a th:href="@{/admin/appointments}" class="text-[10px] font-label font-bold uppercase tracking-[0.05em] text-primary hover:underline" style="text-decoration:none;">View All</a>
+                </div>
+                <div class="flex flex-col gap-4 flex-1">
+                    <div th:each="appt, iter : ${appointments}" th:if="${iter.index < 4}" class="flex items-center justify-between p-4 bg-surface rounded-lg hover:shadow-sm transition-all duration-200">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center font-bold text-xs"
+                                 th:text="${appt.customer != null ? #strings.toUpperCase(#strings.substring(appt.customer.firstName, 0, 1)) + #strings.toUpperCase(#strings.substring(appt.customer.lastName, 0, 1)) : 'NA'}">MK</div>
+                            <div>
+                                <p class="font-bold text-sm text-on-surface" th:text="${appt.customer != null ? appt.customer.firstName + ' ' + appt.customer.lastName : 'Unknown'}">Client</p>
+                                <p class="text-[11px] text-on-surface-variant" th:text="${appt.service != null ? appt.service.name : 'Service'}">Service</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-sm" th:text="${appt.appointmentTime}">14:30</p>
+                            <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.05em]"
+                                  th:classappend="${appt.status == 'SCHEDULED' ? 'bg-rose-100 text-rose-700' : (appt.status == 'COMPLETED' ? 'bg-green-100 text-green-700' : (appt.status == 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'))}"
+                                  th:text="${appt.status}">Booked</span>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(appointments)}" class="flex-1 flex items-center justify-center text-center text-on-surface-variant text-sm">
+                        No appointments scheduled.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Quick Access — Management Sections -->
+        <div class="mb-12">
+            <h3 class="font-headline text-xl font-bold text-on-surface mb-6">Quick Access</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a th:href="@{/admin/services}" class="glass-pane clay-lift rounded-lg p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300 group" style="text-decoration:none;">
+                    <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-primary-container transition-colors"><span class="material-symbols-outlined text-primary">content_cut</span></div>
+                    <span class="text-sm font-bold text-on-surface">Services</span>
+                    <span class="text-[10px] text-on-surface-variant">Manage salon services</span>
+                </a>
+                <a th:href="@{/admin/packages}" class="glass-pane clay-lift rounded-lg p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300 group" style="text-decoration:none;">
+                    <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-primary-container transition-colors"><span class="material-symbols-outlined text-primary">inventory_2</span></div>
+                    <span class="text-sm font-bold text-on-surface">Packages</span>
+                    <span class="text-[10px] text-on-surface-variant">Service bundles & deals</span>
+                </a>
+                <a th:href="@{/admin/staff}" class="glass-pane clay-lift rounded-lg p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300 group" style="text-decoration:none;">
+                    <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-primary-container transition-colors"><span class="material-symbols-outlined text-primary">badge</span></div>
+                    <span class="text-sm font-bold text-on-surface">Staff</span>
+                    <span class="text-[10px] text-on-surface-variant">Team management</span>
+                </a>
+                <a th:href="@{/admin/appointments}" class="glass-pane clay-lift rounded-lg p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300 group" style="text-decoration:none;">
+                    <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-primary-container transition-colors"><span class="material-symbols-outlined text-primary">calendar_month</span></div>
+                    <span class="text-sm font-bold text-on-surface">Appointments</span>
+                    <span class="text-[10px] text-on-surface-variant">Schedule & bookings</span>
+                </a>
+                <a th:href="@{/admin/reviews}" class="glass-pane clay-lift rounded-lg p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300 group" style="text-decoration:none;">
+                    <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-primary-container transition-colors"><span class="material-symbols-outlined text-primary">reviews</span></div>
+                    <span class="text-sm font-bold text-on-surface">Reviews</span>
+                    <span class="text-[10px] text-on-surface-variant">Client feedback</span>
+                </a>
+                <a th:href="@{/admin/customers}" class="glass-pane clay-lift rounded-lg p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300 group" style="text-decoration:none;">
+                    <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-primary-container transition-colors"><span class="material-symbols-outlined text-primary">group</span></div>
+                    <span class="text-sm font-bold text-on-surface">Clients</span>
+                    <span class="text-[10px] text-on-surface-variant">Customer database</span>
+                </a>
+                <a th:href="@{/admin/reports}" class="glass-pane clay-lift rounded-lg p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300 group" style="text-decoration:none;">
+                    <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-primary-container transition-colors"><span class="material-symbols-outlined text-primary">bar_chart</span></div>
+                    <span class="text-sm font-bold text-on-surface">Reports</span>
+                    <span class="text-[10px] text-on-surface-variant">Analytics & insights</span>
+                </a>
+                <a th:href="@{/admin/manage}" class="glass-pane clay-lift rounded-lg p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300 group" style="text-decoration:none;">
+                    <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-primary-container transition-colors"><span class="material-symbols-outlined text-primary">admin_panel_settings</span></div>
+                    <span class="text-sm font-bold text-on-surface">Admins</span>
+                    <span class="text-[10px] text-on-surface-variant">Admin accounts</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
+    </main>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    // Monthly Revenue Chart (Bar)
+    const revCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
+    new Chart(revCtx, {
+        type: 'bar',
+        data: {
+            labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN'],
+            datasets: [{
+                label: 'Revenue ($)',
+                data: [12000, 18000, 24000, 16000, 21000, 28000],
+                backgroundColor: '#fbcfe8',
+                hoverBackgroundColor: '#9d174d',
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { display: false }, ticks: { font: { family: 'Manrope', size: 10 } } },
+                x: { grid: { display: false }, ticks: { font: { family: 'Manrope', size: 10 } } }
+            }
+        }
+    });
+
+    // Appointment Trends (Line)
+    (async function() {
+        const today = new Date();
+        const weekAgo = new Date();
+        weekAgo.setDate(today.getDate() - 7);
+        const fmt = d => d.toISOString().split('T')[0];
+        try {
+            const res = await fetch(`/admin/reports/appointments?from=${fmt(weekAgo)}&to=${fmt(today)}`);
+            const json = await res.json();
+            const labels = Object.keys(json.data).map(d => { const p = d.split('-'); return p[2] + '/' + p[1]; });
+            const values = Object.values(json.data);
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            const gradient = trendCtx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(253, 164, 175, 0.4)');
+            gradient.addColorStop(1, 'rgba(253, 164, 175, 0)');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Appointments',
+                        data: values,
+                        borderColor: '#9d174d',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#9d174d',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Manrope', size: 10 } }, grid: { color: 'rgba(0,0,0,0.03)' } },
+                        x: { ticks: { font: { family: 'Manrope', size: 10 } }, grid: { display: false } }
+                    }
+                }
+            });
+        } catch(e) {
+            console.log('Could not load trend chart:', e);
+        }
+    })();
+</script>
+<th:block th:replace="~{layout/fragments :: sakura-js}" />
+</body>
+</html>
