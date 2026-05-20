@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Reservation Portal — Sakura Saki</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#864e5a",
+                        "primary-container": "#ffb7c5",
+                        secondary: "#70585b",
+                        "secondary-container": "#f8d8db",
+                        background: "#fdf8f9",
+                        "on-surface": "#1a1c1c"
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        lg: "2rem",
+                        xl: "3rem"
+                    },
+                    fontFamily: {
+                        headline: ["Noto Serif"],
+                        body: ["Manrope"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; background-color: #fdf8f9; }
+        .font-serif { font-family: 'Noto Serif', serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            border: 0.5px solid rgba(214, 194, 196, 0.2);
+        }
+        .step-active {
+            background: #864e5a;
+            color: white;
+            box-shadow: 0 4px 12px rgba(134, 78, 90, 0.2);
+        }
+        .step-inactive {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+        .card-selected {
+            border-color: #864e5a;
+            background-color: #fff1f2;
+            box-shadow: 0 8px 24px rgba(134, 78, 90, 0.08);
+        }
+    </style>
+</head>
+<body class="text-on-surface selection:bg-primary-container selection:text-primary overflow-x-hidden min-h-screen flex flex-col">
+<canvas class="fixed inset-0 pointer-events-none z-[1] opacity-70" id="sakura-canvas"></canvas>
+
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 rounded-b-[2rem] bg-white/60 backdrop-blur-xl border-b border-rose-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)]">
+    <div class="flex justify-between items-center px-8 h-20 max-w-7xl mx-auto w-full">
+        <a th:href="@{/}" class="text-2xl font-serif font-bold text-rose-900 tracking-tight" style="text-decoration:none;">Sakura Saki</a>
+        <div class="hidden md:flex items-center gap-10 font-serif text-slate-800 tracking-tight">
+            <a th:href="@{/}" class="text-slate-500 hover:text-rose-400 transition-colors" style="text-decoration:none;">Home</a>
+            <a th:href="@{/services}" class="text-slate-500 hover:text-rose-400 transition-colors" style="text-decoration:none;">Services</a>
+            <a th:href="@{/profile}" class="text-rose-900 border-b-2 border-rose-400 pb-1" style="text-decoration:none;">Bookings</a>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4">
+                <a th:if="${isAdmin}" th:href="@{/admin/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 hover:scale-105" title="Admin Dashboard">dashboard</a>
+                <a th:href="@{/profile}" class="material-symbols-outlined text-rose-400 transition-all duration-400 hover:scale-105" title="Profile">account_circle</a>
+                <a th:href="@{/logout}" class="material-symbols-outlined text-rose-400 transition-all duration-400 hover:scale-105" title="Logout">logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Portal Container -->
+<main class="flex-1 pt-32 pb-20 max-w-6xl mx-auto px-4 w-full relative z-10">
+    <div class="text-center mb-12 space-y-4">
+        <div>
+            <span class="text-primary font-bold text-xs tracking-[0.2em] uppercase mb-2 block">RESERVATION PORTAL</span>
+            <h1 class="font-headline text-4xl md:text-5xl font-bold text-slate-800">Curate Your Calm</h1>
+        </div>
+        <div class="flex justify-center gap-4">
+            <a th:href="@{/appointments/history}" class="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-primary border border-rose-200 rounded-full font-bold text-xs transition-all flex items-center gap-2" style="text-decoration:none;">
+                <span class="material-symbols-outlined text-sm">history</span> MY APPOINTMENTS
+            </a>
+            <button type="button" onclick="openRescheduleModal()" class="px-5 py-2.5 bg-rose-100 hover:bg-rose-200 text-primary border border-rose-200 rounded-full font-bold text-xs transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">schedule_send</span> RESCHEDULE AN APPOINTMENT
+            </button>
+        </div>
+    </div>
+
+    <!-- Reschedule Banner -->
+    <div id="rescheduleBanner" class="hidden mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl items-center justify-between shadow-sm">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-amber-600">sync_alt</span>
+            <div class="text-left text-xs">
+                <p class="font-bold">RESCHEDULING MODE</p>
+                <p class="mt-0.5">You are rescheduling: <strong id="rescheduleTargetName">Ritual Name</strong>. Choose a new artisan/schedule.</p>
+            </div>
+        </div>
+        <button type="button" onclick="cancelRescheduling()" class="text-xs font-bold text-amber-700 hover:text-amber-950 underline">
+            Cancel Reschedule
+        </button>
+    </div>
+
+    <!-- Booking Form Wrapper -->
+    <form id="bookingForm" th:action="@{/appointments/book}" method="post">
+        <!-- Hidden inputs for final submission -->
+        <input type="hidden" name="appointmentId" id="inputAppointmentId">
+        <input type="hidden" name="selectionId" id="inputSelectionId">
+        <input type="hidden" name="staffId" id="inputStaffId">
+        <input type="hidden" name="date" id="inputDate">
+        <input type="hidden" name="time" id="inputTime">
+
+        <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 items-start">
+            <!-- Left Steps Navigator -->
+            <div class="glass-panel p-6 rounded-xl flex flex-col gap-6 sticky top-36">
+                <!-- Step 1 Indicator -->
+                <div class="flex items-center gap-4 cursor-pointer" onclick="goToStep(1)">
+                    <div id="step1Indicator" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm step-active">1</div>
+                    <div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">STEP 01</p>
+                        <p class="text-sm font-semibold text-slate-700">Service Selection</p>
+                    </div>
+                </div>
+                <!-- Step 2 Indicator -->
+                <div class="flex items-center gap-4 cursor-pointer" onclick="goToStep(2)">
+                    <div id="step2Indicator" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm step-inactive">2</div>
+                    <div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">STEP 02</p>
+                        <p class="text-sm font-semibold text-slate-700">Schedule</p>
+                    </div>
+                </div>
+                <!-- Step 3 Indicator -->
+                <div class="flex items-center gap-4 cursor-pointer" onclick="goToStep(3)">
+                    <div id="step3Indicator" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm step-inactive">3</div>
+                    <div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">STEP 03</p>
+                        <p class="text-sm font-semibold text-slate-700">Artisan</p>
+                    </div>
+                </div>
+
+                <div class="border-t border-rose-100 pt-6 mt-2">
+                    <p class="text-xs italic text-rose-800">"True beauty begins the moment you decide to be yourself."</p>
+                </div>
+            </div>
+
+            <!-- Right Content Panels -->
+            <div class="glass-panel p-8 rounded-xl min-h-[500px] flex flex-col justify-between">
+                
+                <!-- STEP 1 PANEL: SERVICE SELECTION -->
+                <div id="panelStep1" class="space-y-6">
+                    <div>
+                        <h2 class="font-headline text-2xl font-bold text-slate-800">Select Service</h2>
+                        <p class="text-slate-500 text-sm mt-1">What experience are we crafting for you today? <span class="float-right text-xs font-bold text-primary" th:text="${#lists.size(services) + #lists.size(packages)} + ' SERVICES AVAILABLE'"></span></p>
+                    </div>
+
+                    <!-- Services & Packages Combined List -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Packages first if any -->
+                        <div th:each="p : ${packages}" th:attr="data-id='PKG_' + ${p.id}, data-name=${p.name}, data-price=${p.discountedPrice}, data-category='Package'" class="service-card border border-rose-100 rounded-lg p-6 flex flex-col justify-between cursor-pointer hover:border-primary transition-all duration-300 bg-white" onclick="selectService(this)">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <span class="material-symbols-outlined text-primary text-2xl">loyalty</span>
+                                    <div class="w-4 h-4 rounded-full border border-rose-300 flex items-center justify-center check-dot">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-primary hidden"></div>
+                                    </div>
+                                </div>
+                                <h3 class="font-serif text-lg font-bold text-slate-800 mt-4" th:text="${p.name}">Package Name</h3>
+                                <p class="text-xs text-slate-400 mt-1" th:text="${p.description}">Description</p>
+                            </div>
+                            <div class="flex justify-between items-center mt-6">
+                                <span class="text-primary font-bold text-lg" th:text="'Rs.' + ${p.discountedPrice}">Price</span>
+                                <span class="bg-primary/10 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">PACKAGE</span>
+                            </div>
+                        </div>
+
+                        <!-- Services -->
+                        <div th:each="s : ${services}" th:attr="data-id='SVC_' + ${s.id}, data-name=${s.name}, data-price=${s.price}, data-category=${s.category}" class="service-card border border-rose-100 rounded-lg p-6 flex flex-col justify-between cursor-pointer hover:border-primary transition-all duration-300 bg-white" onclick="selectService(this)">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <span class="material-symbols-outlined text-primary text-2xl">spa</span>
+                                    <div class="w-4 h-4 rounded-full border border-rose-300 flex items-center justify-center check-dot">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-primary hidden"></div>
+                                    </div>
+                                </div>
+                                <h3 class="font-serif text-lg font-bold text-slate-800 mt-4" th:text="${s.name}">Service Name</h3>
+                                <p class="text-xs text-slate-400 mt-1" th:text="${s.description}">Description</p>
+                            </div>
+                            <div class="flex justify-between items-center mt-6">
+                                <span class="text-primary font-bold text-lg" th:text="'Rs.' + ${s.price}">Price</span>
+                                <span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider" th:text="${s.category}">Category</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-6 border-t border-rose-100">
+                        <button type="button" onclick="goToStep(2)" class="px-8 py-4 bg-primary text-white font-bold rounded-full text-xs tracking-wider uppercase hover:bg-rose-800 transition-all flex items-center gap-2">
+                            NEXT: CHOOSE SCHEDULE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2 PANEL: TEMPORAL HARMONY -->
+                <div id="panelStep2" class="space-y-6 hidden">
+                    <div>
+                        <h2 class="font-headline text-2xl font-bold text-slate-800">Temporal Harmony</h2>
+                        <p class="text-slate-500 text-sm mt-1">Select preferred date and time slot</p>
+                    </div>
+
+                    <!-- Horizontal Interactive Calendar Slider -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Preferred Date</label>
+                        <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none" id="datePickerList">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Time Slots Chips -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Preferred Time</label>
+                        <div class="flex flex-wrap gap-3" id="timeSlotsContainer">
+                            <button type="button" onclick="selectTime('09:00')" class="time-chip px-5 py-2.5 rounded-full border border-rose-100 text-xs font-bold text-slate-700 bg-white hover:border-primary transition-all">09:00 AM</button>
+                            <button type="button" onclick="selectTime('10:30')" class="time-chip px-5 py-2.5 rounded-full border border-rose-100 text-xs font-bold text-slate-700 bg-white hover:border-primary transition-all">10:30 AM</button>
+                            <button type="button" onclick="selectTime('12:00')" class="time-chip px-5 py-2.5 rounded-full border border-rose-100 text-xs font-bold text-slate-700 bg-white hover:border-primary transition-all">12:00 PM</button>
+                            <button type="button" onclick="selectTime('13:30')" class="time-chip px-5 py-2.5 rounded-full border border-rose-100 text-xs font-bold text-slate-700 bg-white hover:border-primary transition-all">01:30 PM</button>
+                            <button type="button" onclick="selectTime('15:00')" class="time-chip px-5 py-2.5 rounded-full border border-rose-100 text-xs font-bold text-slate-700 bg-white hover:border-primary transition-all">03:00 PM</button>
+                            <button type="button" onclick="selectTime('16:30')" class="time-chip px-5 py-2.5 rounded-full border border-rose-100 text-xs font-bold text-slate-700 bg-white hover:border-primary transition-all">04:30 PM</button>
+                            <button type="button" onclick="selectTime('18:00')" class="time-chip px-5 py-2.5 rounded-full border border-rose-100 text-xs font-bold text-slate-700 bg-white hover:border-primary transition-all">06:00 PM</button>
+                        </div>
+                    </div>
+
+                    <!-- Notes Input -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Special Notes (Optional)</label>
+                        <textarea name="notes" class="w-full bg-white/50 border border-rose-100 rounded-lg p-4 text-sm text-slate-700 outline-none focus:border-primary transition-all" rows="2" placeholder="Any preferences, allergies, or instructions..."></textarea>
+                    </div>
+
+                    <div class="flex justify-between pt-6 border-t border-rose-100">
+                        <button type="button" onclick="goToStep(1)" class="px-6 py-3 border border-rose-200 text-slate-600 font-bold rounded-full text-xs tracking-wider uppercase hover:bg-slate-50 transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">arrow_back</span> BACK
+                        </button>
+                        <button type="button" onclick="goToStep(3)" class="px-8 py-4 bg-primary text-white font-bold rounded-full text-xs tracking-wider uppercase hover:bg-rose-800 transition-all flex items-center gap-2">
+                            NEXT: SELECT STAFF <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3 PANEL: STAFF SELECTION -->
+                <div id="panelStep3" class="space-y-6 hidden">
+                    <div>
+                        <h2 class="font-headline text-2xl font-bold text-slate-800">Select Artisan</h2>
+                        <p class="text-slate-500 text-sm mt-1">Choose the certified professional for your ritual</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div th:each="st : ${staffList}" th:attr="data-name=${st.firstName + ' ' + st.lastName}, data-specialty=${st.specialization}" class="staff-card border border-rose-100 rounded-lg p-6 flex flex-col justify-between cursor-pointer hover:border-primary transition-all duration-300 bg-white" onclick="selectStaff(this)">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary text-2xl">person_3</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-serif text-lg font-bold text-slate-800 staff-name-txt" th:text="${st.firstName + ' ' + st.lastName}">Name</h3>
+                                        <p class="text-xs text-slate-400" th:text="${st.role ?: 'Artisan'}">Role</p>
+                                    </div>
+                                </div>
+                                <div class="w-4 h-4 rounded-full border border-rose-300 flex items-center justify-center check-dot">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-primary hidden"></div>
+                                </div>
+                            </div>
+                            <div class="border-t border-rose-50 pt-4 mt-6 flex justify-between items-center text-xs text-slate-500">
+                                <span>Specialty: <strong th:text="${st.specialization}">Coloring</strong></span>
+                                <span class="bg-rose-50 text-rose-800 px-2 py-0.5 rounded" th:text="${st.workingDays}">Mon-Fri</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="noStaffWarning" class="hidden text-center py-6 text-slate-400 text-xs">
+                        <span class="material-symbols-outlined text-3xl opacity-30 block mb-2">person_off</span>
+                        No artisans available for the selected schedule. Please go back and select a different time.
+                    </div>
+
+                    <div class="flex justify-between pt-6 border-t border-rose-100">
+                        <button type="button" onclick="goToStep(2)" class="px-6 py-3 border border-rose-200 text-slate-600 font-bold rounded-full text-xs tracking-wider uppercase hover:bg-slate-50 transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">arrow_back</span> BACK
+                        </button>
+                        <button type="button" onclick="confirmAndSubmit()" class="px-10 py-4 bg-primary text-white font-bold rounded-full text-xs tracking-wider uppercase hover:bg-rose-800 transition-all shadow-lg flex items-center gap-2">
+                            CONFIRM RITUAL <span class="material-symbols-outlined text-sm">check_circle</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</main>
+
+<!-- Footer -->
+<footer class="bg-stone-50 w-full py-10 border-t border-rose-100 mt-20 relative z-10">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center px-4 gap-4 text-center md:text-left">
+        <div>
+            <div class="text-lg font-serif font-bold text-rose-900">Sakura Saki</div>
+            <p class="text-xs text-slate-400 uppercase tracking-wider mt-1">© 2024 Sakura Saki Beauty. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script th:inline="javascript">
+    // Handle step wizard state
+    let currentStep = 1;
+    let selectedServiceId = "";
+    let selectedServiceName = "";
+    let selectedServicePrice = "";
+    let selectedServiceCategory = "";
+    let selectedStaffId = "";
+    let selectedDate = "";
+    let selectedTimeStr = "";
+
+    async function goToStep(step) {
+        if (step === 2 && !selectedServiceId) {
+            alert("Please select a ritual first.");
+            return;
+        }
+        if (step === 3) {
+            if (!selectedDate) {
+                alert("Please choose a date first.");
+                return;
+            }
+            if (!selectedTimeStr) {
+                alert("Please choose a time slot first.");
+                return;
+            }
+            
+            // Filter staff based on schedule
+            try {
+                const res = await fetch('/api/appointments?date=' + selectedDate);
+                const appts = await res.json();
+                
+                let availableCount = 0;
+                document.querySelectorAll(".staff-card").forEach(c => {
+                    const staffName = c.getAttribute("data-name");
+                    const staffSpec = (c.getAttribute("data-specialty") || "").toLowerCase();
+                    const sCat = (selectedServiceCategory || "").toLowerCase();
+                    
+                    // Check if staff has an appointment at this exact time (allow partial match for 09:00 vs 09:00:00)
+                    const hasConflict = appts.some(a => a.staffId === staffName && a.appointmentTime.startsWith(selectedTimeStr) && (a.status !== 'CANCELLED' && a.status !== 'RESCHEDULED'));
+                    
+                    // Check if staff specializes in the selected service category
+                    let isRelevant = true;
+                    if (sCat !== 'package' && staffSpec && staffSpec !== 'general') {
+                        isRelevant = staffSpec.includes(sCat) || sCat.includes(staffSpec);
+                    }
+                    
+                    if (hasConflict || !isRelevant) {
+                        c.classList.add("hidden");
+                    } else {
+                        c.classList.remove("hidden");
+                        availableCount++;
+                    }
+                });
+                
+                if (availableCount === 0) {
+                    document.getElementById("noStaffWarning").classList.remove("hidden");
+                } else {
+                    document.getElementById("noStaffWarning").classList.add("hidden");
+                }
+                
+                // Deselect staff if they are now hidden
+                if (selectedStaffId) {
+                    const selCard = document.querySelector(`.staff-card[data-name="${selectedStaffId}"]`);
+                    if (selCard && selCard.classList.contains("hidden")) {
+                        selCard.classList.remove("card-selected");
+                        selCard.querySelector(".check-dot div").classList.add("hidden");
+                        selectedStaffId = "";
+                        document.getElementById("inputStaffId").value = "";
+                    }
+                }
+            } catch (e) {
+                console.error("Error fetching appointments:", e);
+            }
+        }
+
+        // Toggle Panels
+        document.getElementById("panelStep1").classList.add("hidden");
+        document.getElementById("panelStep2").classList.add("hidden");
+        document.getElementById("panelStep3").classList.add("hidden");
+        document.getElementById("panelStep" + step).classList.remove("hidden");
+
+        // Update Nav Indicators
+        document.getElementById("step1Indicator").className = "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm " + (step >= 1 ? "step-active" : "step-inactive");
+        document.getElementById("step2Indicator").className = "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm " + (step >= 2 ? "step-active" : "step-inactive");
+        document.getElementById("step3Indicator").className = "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm " + (step >= 3 ? "step-active" : "step-inactive");
+
+        currentStep = step;
+    }
+
+    // Step 1: Select Service Card
+    function selectService(card) {
+        // Clear previous selections
+        document.querySelectorAll(".service-card").forEach(c => {
+            c.classList.remove("card-selected");
+            c.querySelector(".check-dot div").classList.add("hidden");
+        });
+
+        // Apply selected style
+        card.classList.add("card-selected");
+        card.querySelector(".check-dot div").classList.remove("hidden");
+
+        // Save selected attributes
+        selectedServiceId = card.getAttribute("data-id");
+        selectedServiceName = card.getAttribute("data-name");
+        selectedServicePrice = card.getAttribute("data-price");
+        selectedServiceCategory = card.getAttribute("data-category");
+
+        document.getElementById("inputSelectionId").value = selectedServiceId;
+    }
+
+    // Step 2: Select Staff Card
+    function selectStaff(card) {
+        document.querySelectorAll(".staff-card").forEach(c => {
+            c.classList.remove("card-selected");
+            c.querySelector(".check-dot div").classList.add("hidden");
+        });
+
+        card.classList.add("card-selected");
+        card.querySelector(".check-dot div").classList.remove("hidden");
+
+        selectedStaffId = card.getAttribute("data-name");
+        document.getElementById("inputStaffId").value = selectedStaffId;
+    }
+
+    // Step 3: Select Date & Time
+    function populateDateSlider() {
+        const picker = document.getElementById("datePickerList");
+        picker.innerHTML = "";
+        
+        const days = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+        const today = new Date();
+
+        for (let i = 0; i < 14; i++) {
+            const current = new Date();
+            current.setDate(today.getDate() + i);
+
+            const dayName = days[current.getDay()];
+            const dateNum = current.getDate();
+            const dateISO = current.toISOString().split('T')[0];
+
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "flex-shrink-0 flex flex-col items-center justify-center w-14 h-20 rounded-xl border border-rose-100 bg-white text-slate-700 hover:border-primary transition-all duration-300 date-card";
+            btn.setAttribute("data-date", dateISO);
+            btn.onclick = () => selectDate(btn, dateISO);
+            btn.innerHTML = `
+                <span class="text-[10px] text-slate-400 font-bold uppercase">${dayName}</span>
+                <span class="text-lg font-bold mt-1">${dateNum}</span>
+            `;
+            picker.appendChild(btn);
+        }
+    }
+
+    function selectDate(card, dateISO) {
+        document.querySelectorAll(".date-card").forEach(c => {
+            c.classList.remove("card-selected");
+        });
+        card.classList.add("card-selected");
+        selectedDate = dateISO;
+        document.getElementById("inputDate").value = dateISO;
+    }
+
+    function selectTime(timeStr) {
+        document.querySelectorAll(".time-chip").forEach(c => {
+            c.classList.remove("card-selected");
+        });
+        // Find the matching button and highlight it
+        event.currentTarget.classList.add("card-selected");
+        selectedTimeStr = timeStr;
+        document.getElementById("inputTime").value = timeStr;
+    }
+
+    function confirmAndSubmit() {
+        if (!selectedStaffId) {
+            alert("Please choose a practitioner first.");
+            return;
+        }
+        document.getElementById("bookingForm").submit();
+    }
+
+    // Reschedule functions
+    function openRescheduleModal() {
+        document.getElementById('rescheduleModal').classList.remove('hidden');
+        document.getElementById('rescheduleModal').classList.add('flex');
+    }
+
+    // Close Modal
+    function closeRescheduleModal() {
+        document.getElementById('rescheduleModal').classList.add('hidden');
+        document.getElementById('rescheduleModal').classList.remove('flex');
+    }
+
+    // Select appointment to reschedule
+    function selectAppointmentToReschedule(id, type, name, staff) {
+        document.getElementById('inputAppointmentId').value = id;
+        showRescheduleBanner(name);
+
+        // Pre-select service/package card
+        const serviceCard = document.querySelector(`.service-card[data-name="${name}"]`);
+        if (serviceCard) {
+            selectService(serviceCard);
+        }
+
+        // Pre-select staff card
+        const staffCard = document.querySelector(`.staff-card[data-name="${staff}"]`);
+        if (staffCard) {
+            selectStaff(staffCard);
+        }
+
+        closeRescheduleModal();
+        goToStep(2); // Go directly to Step 2 for date & time selection
+    }
+
+    function showRescheduleBanner(name) {
+        document.getElementById('rescheduleTargetName').textContent = name;
+        document.getElementById('rescheduleBanner').classList.remove('hidden');
+        document.getElementById('rescheduleBanner').classList.add('flex');
+    }
+
+    function cancelRescheduling() {
+        document.getElementById('inputAppointmentId').value = "";
+        document.getElementById('rescheduleBanner').classList.remove('flex');
+        document.getElementById('rescheduleBanner').classList.add('hidden');
+
+        selectedServiceId = "";
+        selectedServiceName = "";
+        selectedServicePrice = "";
+        selectedServiceCategory = "";
+        selectedStaffId = "";
+        selectedDate = "";
+        selectedTimeStr = "";
+
+        document.querySelectorAll(".service-card, .staff-card, .date-card, .time-chip").forEach(c => {
+            c.classList.remove("card-selected");
+            const dot = c.querySelector(".check-dot div");
+            if (dot) dot.classList.add("hidden");
+        });
+
+        goToStep(1);
+    }
+
+    function checkPreselectedReschedule() {
+        const rescheduleId = [[${rescheduleId}]];
+        if (rescheduleId) {
+            const selectBtn = document.querySelector(`button[data-reschedule-btn-id="${rescheduleId}"]`);
+            if (selectBtn) {
+                selectBtn.click();
+            }
+        }
+    }
+
+    // Initialize
+    window.addEventListener("DOMContentLoaded", () => {
+        populateDateSlider();
+        // Parse preselected item if any
+        const preselectedItem = [[${selectedItem}]];
+        if (preselectedItem) {
+            const card = document.querySelector(`.service-card[data-id="${preselectedItem}"]`);
+            if (card) {
+                selectService(card);
+            }
+        }
+        // Check if coming from a reschedule action
+        checkPreselectedReschedule();
+    });
+</script>
+
+<!-- Reschedule Modal -->
+<div id="rescheduleModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-rose-100 flex flex-col max-h-[85vh]">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-rose-50 flex justify-between items-center bg-rose-50/50">
+            <h3 class="font-serif text-lg font-bold text-slate-800 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">schedule_send</span>
+                Reschedule an Appointment
+            </h3>
+            <button type="button" onclick="closeRescheduleModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <!-- Modal Content (Scrollable) -->
+        <div class="p-6 overflow-y-auto space-y-4 flex-1">
+            <p class="text-slate-500 text-xs text-left">Select one of your scheduled rituals to reschedule. We will pre-fill the details and let you pick a new date and time.</p>
+            <div class="space-y-3">
+                <!-- Loop over bookings -->
+                <div th:each="b : ${bookings}" th:if="${b.status == 'CONFIRMED' or b.status == 'PENDING'}" 
+                     class="border border-rose-100 rounded-xl p-4 bg-white hover:border-primary hover:bg-rose-50/20 transition-all duration-300 flex justify-between items-center text-left">
+                    <div>
+                        <h4 class="font-serif font-bold text-slate-800 text-sm" th:text="${b.serviceId != null ? b.serviceId : b.packageId}">Service Name</h4>
+                        <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-[11px] text-slate-500">
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">calendar_today</span> <span th:text="${b.appointmentDate}">Date</span></span>
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">schedule</span> <span th:text="${b.appointmentTime}">Time</span></span>
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">person</span> <span th:text="${b.staffId}">Staff</span></span>
+                        </div>
+                    </div>
+                    <button type="button" th:attr="data-reschedule-btn-id=${b.appointmentId}, onclick='selectAppointmentToReschedule(' + ${b.appointmentId} + ', \'' + ${b.serviceId != null ? 'SVC' : 'PKG'} + '\', \'' + ${b.serviceId != null ? b.serviceId : b.packageId} + '\', \'' + ${b.staffId} + '\')'" 
+                            class="px-4 py-2 bg-primary text-white text-[11px] font-bold rounded-full uppercase hover:bg-rose-800 transition-all">
+                        Select
+                    </button>
+                </div>
+                <div th:if="${#lists.isEmpty(bookings.?[status == 'CONFIRMED' || status == 'PENDING'])}" class="text-center py-6 text-slate-400 text-xs">
+                    <span class="material-symbols-outlined text-3xl opacity-30 block mb-2">event_busy</span>
+                    You have no upcoming active appointments to reschedule.
+                </div>
+            </div>
+        </div>
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-rose-50 flex justify-end bg-rose-50/20">
+            <button type="button" onclick="closeRescheduleModal()" class="px-5 py-2 border border-rose-200 text-slate-600 font-bold rounded-full text-xs hover:bg-slate-50 transition-all">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment — Sakura Saki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+</head>
+<body class="admin-body">
+<canvas id="sakura-canvas"></canvas>
+<aside class="admin-sidebar">
+    <div class="sidebar-brand"><h1>🌸 Sakura Saki</h1><p>Beauty & Wellness</p></div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/profile}"><span class="material-symbols-outlined">person</span> Profile</a>
+        <a th:href="@{/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/staff}"><span class="material-symbols-outlined">badge</span> Our Team</a>
+        <a th:href="@{/booking}" class="active"><span class="material-symbols-outlined">calendar_add_on</span> Book Now</a>
+        <a th:href="@{/my-appointments}"><span class="material-symbols-outlined">event_note</span> My Bookings</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="sidebar-profile">
+            <div class="avatar" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">US</div>
+            <div class="info"><span class="name" th:text="${username}">user</span><span class="role">Customer</span></div>
+        </div>
+    </div>
+</aside>
+<main class="admin-main">
+    <header class="page-header"><div><span class="kicker">Schedule</span><h2>Book an Appointment</h2></div></header>
+    <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
+    <div class="content-card glass-pane clay-lift" style="max-width:600px;">
+        <form th:action="@{/booking}" method="post">
+            <div class="form-group" style="margin-bottom:1.25rem;">
+                <label>Service</label>
+                <select name="serviceId" class="input-recessed" required>
+                    <option value="">— Select a service —</option>
+                    <option th:each="s : ${services}" th:value="${s.id}" th:text="${s.name + ' (Rs.' + #numbers.formatDecimal(s.price,1,2) + ' · ' + s.durationMinutes + 'min)'}">Svc</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:1.25rem;">
+                <label>Staff Member</label>
+                <select name="staffId" class="input-recessed" required>
+                    <option value="">— Select staff —</option>
+                    <option th:each="s : ${staffList}" th:value="${s.id}" th:text="${s.firstName + ' ' + s.lastName + ' (' + s.staffType + ')'}">Staff</option>
+                </select>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+                <div class="form-group"><label>Date</label><input name="date" type="date" class="input-recessed" required></div>
+                <div class="form-group"><label>Time</label><input name="time" type="time" class="input-recessed" required></div>
+            </div>
+            <div class="form-group" style="margin-bottom:1.25rem;">
+                <label>Notes (optional)</label>
+                <textarea name="notes" class="input-recessed" rows="3" placeholder="Any special requests..."></textarea>
+            </div>
+            <button type="submit" class="btn-sakura btn-sakura-primary" style="width:100%;justify-content:center;">
+                <span class="material-symbols-outlined" style="font-size:1rem;">calendar_add_on</span> Book Appointment
+            </button>
+        </form>
+    </div>
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
+</main>
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>

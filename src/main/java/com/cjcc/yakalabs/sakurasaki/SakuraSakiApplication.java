@@ -10,4 +10,7 @@ public class SakuraSakiApplication {
         SpringApplication.run(SakuraSakiApplication.class, args);
     }
 
+
+
+
 }

@@ -19,21 +19,16 @@
         <p>Sakura Saki Management</p>
     </div>
     <nav class="sidebar-nav">
-        <a th:href="@{/admin/dashboard}">
-            <span class="material-symbols-outlined">dashboard</span> Overview
-        </a>
-        <a th:href="@{/admin/reports}">
-            <span class="material-symbols-outlined">analytics</span> Reports
-        </a>
-        <a th:href="@{/admin/users}">
-            <span class="material-symbols-outlined">group</span> Users
-        </a>
-        <a th:href="@{/admin/manage}" class="active">
-            <span class="material-symbols-outlined">shield_person</span> Admins
-        </a>
-        <a th:href="@{/logout}">
-            <span class="material-symbols-outlined">logout</span> Logout
-        </a>
+        <a th:href="@{/admin/dashboard}"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+        <a th:href="@{/admin/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/admin/packages}"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
+        <a th:href="@{/admin/staff}"><span class="material-symbols-outlined">badge</span> Staff</a>
+        <a th:href="@{/admin/appointments}"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
+        <a th:href="@{/admin/reviews}"><span class="material-symbols-outlined">reviews</span> Reviews</a>
+        <a th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span> Users</a>
+        <a th:href="@{/admin/manage}" class="active"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
+        <a th:href="@{/admin/reports}"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
     </nav>
     <div class="sidebar-footer">
         <div class="sidebar-profile">
@@ -63,7 +58,8 @@
         </div>
     </header>
 
-    <!-- Error message -->
+    <!-- Success / Error messages -->
+    <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
 
     <!-- Admins Table -->
@@ -76,6 +72,7 @@
                 <tr>
                     <th>Admin</th>
                     <th>Email</th>
+                    <th>Level</th>
                     <th>Status</th>
                     <th style="text-align: right;">Actions</th>
                 </tr>
@@ -96,6 +93,9 @@
                         </div>
                     </td>
                     <td th:text="${a.email}">admin@mail.com</td>
+                    <td>
+                        <span class="badge-pill" style="background:var(--primary-container);color:var(--on-primary-container);" th:text="${a.adminLevel ?: 'ADMIN'}">ADMIN</span>
+                    </td>
                     <td>
                         <span class="badge-pill badge-active" th:if="${a.enabled}">Active</span>
                         <span class="badge-pill badge-inactive" th:if="${!a.enabled}">Disabled</span>
@@ -151,12 +151,7 @@
 
     <!-- Footer -->
     <footer class="admin-footer">
-        <span>© 2024 Sakura Saki Beauty. All rights reserved.</span>
-        <div style="display: flex; gap: 2rem;">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">Contact</a>
-        </div>
+        <span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span>
     </footer>
 </main>
 
@@ -177,6 +172,14 @@
                     <div class="form-group" style="margin-bottom: 1.25rem;">
                         <label style="font-family: var(--font-label); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--on-surface-variant); margin-bottom: 0.4rem; display: block;">Email</label>
                         <input name="email" type="email" class="input-recessed" placeholder="admin@sakurasaki.com" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label style="font-family: var(--font-label); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--on-surface-variant); margin-bottom: 0.4rem; display: block;">Admin Level</label>
+                        <select name="adminLevel" class="input-recessed" required>
+                            <option value="ADMIN">Admin</option>
+                            <option value="MANAGER">Manager</option>
+                            <option value="CEO">CEO</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label style="font-family: var(--font-label); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--on-surface-variant); margin-bottom: 0.4rem; display: block;">Password</label>
@@ -210,9 +213,17 @@
                             <label style="font-family: var(--font-label); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--on-surface-variant); margin-bottom: 0.4rem; display: block;">Username</label>
                             <input name="username" type="text" class="input-recessed" th:value="${a.username}" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="margin-bottom: 1.25rem;">
                             <label style="font-family: var(--font-label); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--on-surface-variant); margin-bottom: 0.4rem; display: block;">Email</label>
                             <input name="email" type="email" class="input-recessed" th:value="${a.email}" required>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-family: var(--font-label); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--on-surface-variant); margin-bottom: 0.4rem; display: block;">Admin Level</label>
+                            <select name="adminLevel" class="input-recessed" required>
+                                <option value="ADMIN" th:selected="${a.adminLevel == 'ADMIN'}">Admin</option>
+                                <option value="MANAGER" th:selected="${a.adminLevel == 'MANAGER'}">Manager</option>
+                                <option value="CEO" th:selected="${a.adminLevel == 'CEO'}">CEO</option>
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
