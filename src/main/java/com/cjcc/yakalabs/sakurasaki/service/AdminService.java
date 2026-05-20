@@ -1,5 +1,6 @@
 package com.cjcc.yakalabs.sakurasaki.service;
 
+import com.cjcc.yakalabs.sakurasaki.model.Admin;
 import com.cjcc.yakalabs.sakurasaki.model.User;
 import com.cjcc.yakalabs.sakurasaki.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class AdminService {
@@ -22,34 +24,34 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Check if a user is the protected super admin.
-     */
     public boolean isSuperAdmin(Long id) {
         return userRepo.findById(id)
                 .map(u -> SUPER_ADMIN_USERNAME.equals(u.getUsername()))
                 .orElse(false);
     }
 
-    /**
-     * Check if a user is the protected super admin by username.
-     */
     public boolean isSuperAdmin(String username) {
         return SUPER_ADMIN_USERNAME.equals(username);
     }
 
-    // CREATE — register a new admin user
-    public User createAdmin(String username, String password, String email) {
-        User admin = new User();
+    // CREATE — register a new admin user with adminLevel
+    public User createAdmin(String username, String password, String email, String adminLevel) {
+        Admin admin = new Admin();
         admin.setUsername(username);
         admin.setPassword(passwordEncoder.encode(password));
         admin.setEmail(email);
         admin.setRole("ROLE_ADMIN");
         admin.setEnabled(true);
+        admin.setAdminLevel(adminLevel != null ? adminLevel : "ADMIN");
         return userRepo.save(admin);
     }
 
-    // READ — list all admin users (filtered by role, not instanceof)
+    // Backward-compatible create
+    public User createAdmin(String username, String password, String email) {
+        return createAdmin(username, password, email, "ADMIN");
+    }
+
+    // READ — list all admin users
     public List<User> listAdmins() {
         return userRepo.findByRole("ROLE_ADMIN");
     }
@@ -64,25 +66,34 @@ public class AdminService {
         return userRepo.findAll();
     }
 
-    // READ — search users by username keyword
+    // READ — search users by username
     public List<User> searchUsers(String keyword) {
         return userRepo.findByUsernameContainingIgnoreCase(keyword);
     }
 
-    // UPDATE — update admin details (super admin can still be edited for email/username)
-    public User updateAdmin(Long id, String username, String email) {
+    // READ — list staff
+    public List<User> listStaff() {
+        return userRepo.findByRole("ROLE_STAFF");
+    }
+
+    // UPDATE — update admin details
+    public User updateAdmin(Long id, String username, String email, String adminLevel) {
         User existing = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Admin not found with id: " + id));
-        if (username != null && !username.isBlank()) {
-            existing.setUsername(username);
-        }
-        if (email != null && !email.isBlank()) {
-            existing.setEmail(email);
+        if (username != null && !username.isBlank()) existing.setUsername(username);
+        if (email != null && !email.isBlank()) existing.setEmail(email);
+        if (existing instanceof Admin a && adminLevel != null) {
+            a.setAdminLevel(adminLevel);
         }
         return userRepo.save(existing);
     }
 
-    // UPDATE — change user role (protected: cannot demote super admin)
+    // Backward compatible
+    public User updateAdmin(Long id, String username, String email) {
+        return updateAdmin(id, username, email, null);
+    }
+
+    // UPDATE — change role (protected: cannot demote super admin)
     public User changeRole(Long id, String newRole) {
         if (isSuperAdmin(id)) {
             throw new RuntimeException("The primary admin account cannot be demoted.");
@@ -93,7 +104,7 @@ public class AdminService {
         return userRepo.save(user);
     }
 
-    // UPDATE — toggle user enabled/disabled (protected: cannot disable super admin)
+    // UPDATE — toggle enabled/disabled (protected: cannot disable super admin)
     public User toggleEnabled(Long id) {
         if (isSuperAdmin(id)) {
             throw new RuntimeException("The primary admin account cannot be disabled.");
@@ -104,7 +115,7 @@ public class AdminService {
         return userRepo.save(user);
     }
 
-    // DELETE — deactivate (soft delete) an admin (protected: cannot deactivate super admin)
+    // DELETE — deactivate (soft delete) an admin (protected)
     public void deactivateAdmin(Long id) {
         if (isSuperAdmin(id)) {
             throw new RuntimeException("The primary admin account cannot be deactivated.");
@@ -113,5 +124,18 @@ public class AdminService {
                 .orElseThrow(() -> new RuntimeException("Admin not found with id: " + id));
         admin.setEnabled(false);
         userRepo.save(admin);
+    }
+
+    /**
+     * Check if the requesting admin (by username) has higher or equal level than target admin.
+     */
+    public boolean canManage(String currentUsername, Long targetAdminId) {
+        User current = userRepo.findByUsername(currentUsername).orElse(null);
+        User target = userRepo.findById(targetAdminId).orElse(null);
+        if (current == null || target == null) return false;
+        if (!(current instanceof Admin currentAdmin)) return false;
+        if (!(target instanceof Admin targetAdmin)) return true; // non-admin can always be managed
+
+        return currentAdmin.hasLevelOrHigher(targetAdmin.getAdminLevel());
     }
 }
