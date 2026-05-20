@@ -29,8 +29,8 @@ public class UserService {
     /**
      * Register a new customer user with full validation.
      */
-    public Customer registerCustomer(String username, String rawPassword, String email,
-                                      String firstName, String lastName, String phone) {
+    public User registerNewUser(String username, String rawPassword, String email,
+                                      String firstName, String lastName, String phone, String role) {
         // Username validation
         if (username == null || !USERNAME_PATTERN.matcher(username).matches()) {
             throw new RuntimeException("Username must be 3-30 characters, using only letters, numbers, and underscores.");
@@ -69,17 +69,31 @@ public class UserService {
             throw new RuntimeException("Last name is required.");
         }
 
-        // Create Customer (which IS a User via inheritance)
-        Customer customer = new Customer();
-        customer.setUsername(username);
-        customer.setPassword(passwordEncoder.encode(rawPassword));
-        customer.setEmail(email);
-        customer.setFirstName(firstName);
-        customer.setLastName(lastName);
-        customer.setPhone(cleanPhone);
-        customer.setRole("ROLE_USER");
-        customer.setEnabled(true);
-        return userRepository.save(customer);
+        User user;
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            com.cjcc.yakalabs.sakurasaki.model.Admin admin = new com.cjcc.yakalabs.sakurasaki.model.Admin();
+            admin.setAdminLevel("ADMIN");
+            user = admin;
+        } else if ("STAFF".equalsIgnoreCase(role)) {
+            user = new User(); // Or a separate StaffUser if you had one, but User is fine
+            user.setRole("ROLE_STAFF");
+        } else {
+            Customer customer = new Customer();
+            customer.setPhone(cleanPhone);
+            user = customer;
+            user.setRole("ROLE_USER");
+        }
+
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(rawPassword));
+        user.setEmail(email);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            user.setRole("ROLE_ADMIN");
+        }
+        user.setEnabled(true);
+        return userRepository.save(user);
     }
 
     /**

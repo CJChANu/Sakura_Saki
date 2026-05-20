@@ -57,6 +57,10 @@
         </div>
     </header>
 
+    <!-- Success / Error -->
+    <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
+    <div th:if="${error}"   class="sakura-alert sakura-alert-error"   th:text="${error}"></div>
+
     <!-- Users Table -->
     <div class="content-card glass-pane clay-lift">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">

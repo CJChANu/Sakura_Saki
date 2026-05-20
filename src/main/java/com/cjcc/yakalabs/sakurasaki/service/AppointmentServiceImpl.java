@@ -1,6 +1,6 @@
 package com.cjcc.yakalabs.sakurasaki.service;
 
-import com.cjcc.yakalabs.sakurasaki.entity.Appointment;
+import com.cjcc.yakalabs.sakurasaki.model.Appointment;
 import com.cjcc.yakalabs.sakurasaki.repository.AppointmentRepository;
 import com.cjcc.yakalabs.sakurasaki.validator.ScheduleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public void saveAppointment(Appointment appointment) {
-        appointment.setStatus("PENDING");
+        if (appointment.getStatus() == null || appointment.getStatus().isBlank()) {
+            appointment.setStatus("CONFIRMED");
+        }
         appointment.setCreatedDate(LocalDate.now());
 
         // ── Run all schedule checks before saving

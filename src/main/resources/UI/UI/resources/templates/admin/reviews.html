@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews — Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+</head>
+<body class="admin-body">
+<canvas id="sakura-canvas"></canvas>
+<aside class="admin-sidebar">
+    <div class="sidebar-brand"><h1>🌸 Sakura Saki</h1><p>Admin Panel</p></div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/admin/dashboard}"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+        <a th:href="@{/admin/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/admin/packages}"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
+        <a th:href="@{/admin/staff}"><span class="material-symbols-outlined">badge</span> Staff</a>
+        <a th:href="@{/admin/appointments}"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
+        <a th:href="@{/admin/reviews}" class="active"><span class="material-symbols-outlined">reviews</span> Reviews</a>
+        <a th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span> Users</a>
+        <a th:href="@{/admin/manage}"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
+        <a th:href="@{/admin/reports}"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="sidebar-profile">
+            <div class="avatar" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">AD</div>
+            <div class="info">
+                <span class="name" th:text="${username}">admin</span>
+                <span class="role">Administrator</span>
+            </div>
+        </div>
+    </div>
+</aside>
+<main class="admin-main">
+    <header class="page-header"><div><span class="kicker">Moderation</span><h2>Customer Reviews</h2></div></header>
+    <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
+    <div class="content-card glass-pane clay-lift">
+        <table class="sakura-table">
+            <thead><tr><th>Customer</th><th>Service</th><th>Rating</th><th>Comment</th><th>Visibility</th><th>Date</th><th style="text-align:right;">Actions</th></tr></thead>
+            <tbody>
+                <tr th:each="r : ${reviews}">
+                    <td th:text="${r.customer.firstName + ' ' + r.customer.lastName}">Cust</td>
+                    <td th:text="${r.service.name}">Svc</td>
+                    <td><span th:each="i : ${#numbers.sequence(1,r.rating)}">⭐</span></td>
+                    <td th:text="${r.comment ?: '—'}">Comment</td>
+                    <td><span class="badge-pill badge-active" th:if="${r.visible}">Visible</span><span class="badge-pill badge-inactive" th:if="${!r.visible}">Hidden</span></td>
+                    <td th:text="${#temporals.format(r.createdAt, 'dd MMM yyyy')}">Date</td>
+                    <td style="text-align:right;">
+                        <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+                            <form th:action="@{'/admin/reviews/' + ${r.id} + '/toggle-visibility'}" method="post" style="display:inline;"><button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm" th:text="${r.visible} ? 'Hide' : 'Show'">T</button></form>
+                            <form th:action="@{'/admin/reviews/' + ${r.id} + '/delete'}" method="post" style="display:inline;"><button type="submit" class="btn-sakura btn-sakura-danger btn-sakura-sm" onclick="return confirm('Delete this review?');">Delete</button></form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
+</main>
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>

@@ -19,39 +19,125 @@
             <p>Experience Digital Serenity</p>
         </div>
 
-        <h2>Welcome Back</h2>
-        <p class="subtitle">Sign in to continue</p>
+        <style>
+            .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+            .role-card { background: var(--surface); border: 1px solid var(--surface-variant); border-radius: var(--radius-default); padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+            .role-card:hover { border-color: var(--primary); background: var(--primary-container); color: var(--on-primary-fixed-variant); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+            .role-card .material-symbols-outlined { font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary); }
+            .role-card h3 { margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--on-surface); }
+            #login-form-container { display: none; animation: fadeIn 0.3s ease-in-out; }
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .back-btn { display: inline-flex; align-items: center; gap: 0.25rem; background: none; border: none; color: var(--outline); font-size: 0.8rem; font-weight: 600; cursor: pointer; padding: 0; margin-bottom: 1rem; transition: color 0.2s; }
+            .back-btn:hover { color: var(--primary); }
+        </style>
 
-        <div th:if="${param.error}" class="sakura-alert sakura-alert-error">
-            <span class="material-symbols-outlined" style="vertical-align:middle;font-size:1rem;">error</span>
-            Invalid username or password.
+        <div id="role-selection-container">
+            <h2>Select Your Role</h2>
+            <p class="subtitle">Choose how you want to sign in</p>
+            
+            <div class="role-grid">
+                <div class="role-card" onclick="selectRole('admin')">
+                    <span class="material-symbols-outlined">admin_panel_settings</span>
+                    <h3>Admin</h3>
+                </div>
+                <div class="role-card" onclick="selectRole('staff')">
+                    <span class="material-symbols-outlined">badge</span>
+                    <h3>Staff</h3>
+                </div>
+                <div class="role-card" onclick="selectRole('user')">
+                    <span class="material-symbols-outlined">person</span>
+                    <h3>User</h3>
+                </div>
+            </div>
+            
+            <p style="text-align:center;margin-top:1.5rem;">
+                <a th:href="@{/}" style="font-size:.8rem;color:var(--outline);text-decoration:none;">← Back to Home</a>
+            </p>
         </div>
-        <div th:if="${param.logout}" class="sakura-alert sakura-alert-success">
-            You have been logged out successfully.
-        </div>
-        <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
 
-        <form th:action="@{/do-login}" method="post">
-            <div class="form-group">
-                <label for="username">Username or Email</label>
-                <input id="username" name="username" type="text" class="input-recessed" placeholder="Enter your username or email" required autofocus>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input id="password" name="password" type="password" class="input-recessed" placeholder="Enter your password" required>
-            </div>
-            <button class="btn-sakura btn-sakura-primary" type="submit" style="width:100%;justify-content:center;margin-top:.5rem;">
-                <span class="material-symbols-outlined" style="font-size:1rem;">login</span> Sign In
+        <div id="login-form-container">
+            <button class="back-btn" onclick="showRoleSelection()">
+                <span class="material-symbols-outlined" style="font-size: 1rem;">arrow_back</span> Back
             </button>
-        </form>
+            
+            <h2 id="login-title">Welcome Back</h2>
+            <p class="subtitle" id="login-subtitle">Sign in to continue</p>
 
-        <p style="text-align:center;margin-top:1.5rem;font-size:.875rem;color:var(--outline);">
-            New here? <a th:href="@{/register}" style="color:var(--primary);font-weight:600;text-decoration:none;">Create an account</a>
-        </p>
+            <div th:if="${param.error}" class="sakura-alert sakura-alert-error">
+                <span class="material-symbols-outlined" style="vertical-align:middle;font-size:1rem;">error</span>
+                Invalid username or password.
+            </div>
+            <div th:if="${param.logout}" class="sakura-alert sakura-alert-success">
+                You have been logged out successfully.
+            </div>
+            <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
 
-        <p style="text-align:center;margin-top:.5rem;">
-            <a th:href="@{/}" style="font-size:.8rem;color:var(--outline);text-decoration:none;">← Back to Home</a>
-        </p>
+            <form th:action="@{/do-login}" method="post">
+                <div class="form-group">
+                    <label for="username">Username or Email</label>
+                    <input id="username" name="username" type="text" class="input-recessed" placeholder="Enter your username or email" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" class="input-recessed" placeholder="Enter your password" required>
+                </div>
+                <button class="btn-sakura btn-sakura-primary" type="submit" style="width:100%;justify-content:center;margin-top:.5rem;">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">login</span> Sign In
+                </button>
+            </form>
+            
+            <div id="register-link-container" style="text-align:center;margin-top:1.5rem;font-size:.875rem;color:var(--outline);display:none;">
+                New here? <a th:href="@{/register}" style="color:var(--primary);font-weight:600;text-decoration:none;">Create an account</a>
+            </div>
+
+            <p style="text-align:center;margin-top:1rem;font-size:.875rem;color:var(--outline);">
+                <a href="#" onclick="showRoleSelection()" style="color:var(--primary);font-weight:600;text-decoration:none;">Sign in as a different role</a>
+            </p>
+        </div>
+
+        <script>
+            function selectRole(role) {
+                document.getElementById('role-selection-container').style.display = 'none';
+                document.getElementById('login-form-container').style.display = 'block';
+                
+                const title = document.getElementById('login-title');
+                const userField = document.getElementById('username');
+                const passField = document.getElementById('password');
+                const registerLink = document.getElementById('register-link-container');
+                
+                if (role === 'admin') {
+                    title.innerText = 'Admin Login';
+                    userField.value = 'admin';
+                    passField.value = 'Admin@123';
+                    registerLink.style.display = 'block';
+                } else if (role === 'staff') {
+                    title.innerText = 'Staff Login';
+                    userField.value = 'staff';
+                    passField.value = 'Staff@123';
+                    registerLink.style.display = 'block';
+                } else if (role === 'user') {
+                    title.innerText = 'User Login';
+                    userField.value = 'customer';
+                    passField.value = 'Customer@123';
+                    registerLink.style.display = 'block';
+                }
+            }
+
+            function showRoleSelection() {
+                document.getElementById('role-selection-container').style.display = 'block';
+                document.getElementById('login-form-container').style.display = 'none';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('login-title').innerText = 'Welcome Back';
+            }
+            
+            // Auto-show login form if there's an error
+            if (window.location.search.includes('error=true')) {
+                document.getElementById('role-selection-container').style.display = 'none';
+                document.getElementById('login-form-container').style.display = 'block';
+                document.getElementById('register-link-container').style.display = 'block';
+            }
+        </script>
     </div>
 </div>
 </main>

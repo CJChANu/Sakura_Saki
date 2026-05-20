@@ -4,6 +4,7 @@ import com.cjcc.yakalabs.sakurasaki.model.User;
 import com.cjcc.yakalabs.sakurasaki.service.AdminService;
 import com.cjcc.yakalabs.sakurasaki.service.DashboardService;
 import com.cjcc.yakalabs.sakurasaki.service.UserService;
+import com.cjcc.yakalabs.sakurasaki.service.AppointmentService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,11 +20,13 @@ public class AdminController {
     private final UserService userService;
     private final AdminService adminService;
     private final DashboardService dashboardService;
+    private final AppointmentService appointmentService;
 
-    public AdminController(UserService userService, AdminService adminService, DashboardService dashboardService) {
+    public AdminController(UserService userService, AdminService adminService, DashboardService dashboardService, AppointmentService appointmentService) {
         this.userService = userService;
         this.adminService = adminService;
         this.dashboardService = dashboardService;
+        this.appointmentService = appointmentService;
     }
 
     // ---- Dashboard (Thymeleaf view) ----
@@ -31,6 +34,7 @@ public class AdminController {
     public String dashboard(Authentication auth, Model model) {
         model.addAttribute("username", auth.getName());
         model.addAttribute("summary", dashboardService.getSummary());
+        model.addAttribute("appointments", appointmentService.getAllAppointments());
         return "admin/dashboard";
     }
 
@@ -59,8 +63,9 @@ public class AdminController {
 
     // ---- Make a user admin ----
     @PostMapping("/users/{id}/make-admin")
-    public String makeAdmin(@PathVariable Long id) {
+    public String makeAdmin(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         userService.makeAdmin(id);
+        redirectAttributes.addFlashAttribute("success", "User promoted to Administrator.");
         return "redirect:/admin/users";
     }
 
@@ -69,6 +74,7 @@ public class AdminController {
     public String toggleEnabled(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             adminService.toggleEnabled(id);
+            redirectAttributes.addFlashAttribute("success", "User status updated.");
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
@@ -88,9 +94,11 @@ public class AdminController {
     public String createAdmin(@RequestParam String username,
                               @RequestParam String password,
                               @RequestParam String email,
+                              @RequestParam(required = false, defaultValue = "ADMIN") String adminLevel,
                               RedirectAttributes redirectAttributes) {
         try {
-            adminService.createAdmin(username, password, email);
+            adminService.createAdmin(username, password, email, adminLevel);
+            redirectAttributes.addFlashAttribute("success", "Admin '" + username + "' created successfully.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Failed to create admin: " + e.getMessage());
         }
@@ -101,8 +109,11 @@ public class AdminController {
     @PostMapping("/manage/{id}/update")
     public String updateAdmin(@PathVariable Long id,
                               @RequestParam String username,
-                              @RequestParam String email) {
-        adminService.updateAdmin(id, username, email);
+                              @RequestParam String email,
+                              @RequestParam(required = false) String adminLevel,
+                              RedirectAttributes redirectAttributes) {
+        adminService.updateAdmin(id, username, email, adminLevel);
+        redirectAttributes.addFlashAttribute("success", "Admin updated successfully.");
         return "redirect:/admin/manage";
     }
 

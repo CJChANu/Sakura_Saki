@@ -29,6 +29,10 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = true;
 
+    // Added to satisfy existing DB schema constraint where 'active' field has no default
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
+
     private String firstName;
     private String lastName;
     private String phone;

@@ -58,7 +58,8 @@
         </div>
     </header>
 
-    <!-- Error message -->
+    <!-- Success / Error messages -->
+    <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
 
     <!-- Admins Table -->

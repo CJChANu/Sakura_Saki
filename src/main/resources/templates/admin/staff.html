@@ -68,7 +68,7 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
                 <div class="form-group mb-3"><label>Staff Type</label><select name="staffType" class="input-recessed"><option value="STYLIST">Stylist</option><option value="THERAPIST">Therapist</option><option value="GENERAL">General</option></select></div>
-                <div class="form-group mb-3"><label>Specialization</label><input name="specialization" class="input-recessed" placeholder="e.g., Hair Coloring"></div>
+                <div class="form-group mb-3"><label>Specialization / Service Type</label><select name="specialization" class="input-recessed"><option value="Hair Styling">Hair Styling</option><option value="Skincare & Facials">Skincare & Facials</option><option value="Spa & Massage">Spa & Massage</option><option value="Nail Art & Care">Nail Art & Care</option><option value="General">General</option></select></div>
             </div>
             <div class="form-group mb-3"><label>Working Days</label><input name="workingDays" class="input-recessed" placeholder="MON,TUE,WED,THU,FRI"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
@@ -87,7 +87,7 @@
             </div>
             <div class="form-group mb-3"><label>Email</label><input name="email" type="email" class="input-recessed" th:value="${s.email}" required></div>
             <div class="form-group mb-3"><label>Phone</label><input name="phone" class="input-recessed" th:value="${s.phone}"></div>
-            <div class="form-group mb-3"><label>Specialization</label><input name="specialization" class="input-recessed" th:value="${s.specialization}"></div>
+            <div class="form-group mb-3"><label>Specialization / Service Type</label><select name="specialization" class="input-recessed"><option value="Hair Styling" th:selected="${s.specialization == 'Hair Styling'}">Hair Styling</option><option value="Skincare & Facials" th:selected="${s.specialization == 'Skincare & Facials'}">Skincare & Facials</option><option value="Spa & Massage" th:selected="${s.specialization == 'Spa & Massage'}">Spa & Massage</option><option value="Nail Art & Care" th:selected="${s.specialization == 'Nail Art & Care'}">Nail Art & Care</option><option value="General" th:selected="${s.specialization == 'General'}">General</option><option th:if="${s.specialization != 'Hair Styling' and s.specialization != 'Skincare & Facials' and s.specialization != 'Spa & Massage' and s.specialization != 'Nail Art & Care' and s.specialization != 'General' and s.specialization != null}" th:value="${s.specialization}" th:text="${s.specialization}" selected></option></select></div>
             <div class="form-group mb-3"><label>Working Days</label><input name="workingDays" class="input-recessed" th:value="${s.workingDays}"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
                 <div class="form-group mb-3"><label>Start</label><input name="startTime" type="time" class="input-recessed" th:value="${s.startTime}"></div>

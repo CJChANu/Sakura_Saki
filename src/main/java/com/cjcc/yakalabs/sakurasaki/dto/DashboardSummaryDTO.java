@@ -6,12 +6,22 @@ public class DashboardSummaryDTO {
     private long totalServices;
     private long totalStaff;
     private long todayAppointments;
+    private double totalRevenue;
 
     public DashboardSummaryDTO(long totalCustomers, long totalServices, long totalStaff, long todayAppointments) {
         this.totalCustomers = totalCustomers;
         this.totalServices = totalServices;
         this.totalStaff = totalStaff;
         this.todayAppointments = todayAppointments;
+        this.totalRevenue = 0.0;
+    }
+
+    public DashboardSummaryDTO(long totalCustomers, long totalServices, long totalStaff, long todayAppointments, double totalRevenue) {
+        this.totalCustomers = totalCustomers;
+        this.totalServices = totalServices;
+        this.totalStaff = totalStaff;
+        this.todayAppointments = todayAppointments;
+        this.totalRevenue = totalRevenue;
     }
 
     public long getTotalCustomers() {
@@ -44,5 +54,13 @@ public class DashboardSummaryDTO {
 
     public void setTodayAppointments(long todayAppointments) {
         this.todayAppointments = todayAppointments;
+    }
+
+    public double getTotalRevenue() {
+        return totalRevenue;
+    }
+
+    public void setTotalRevenue(double totalRevenue) {
+        this.totalRevenue = totalRevenue;
     }
 }

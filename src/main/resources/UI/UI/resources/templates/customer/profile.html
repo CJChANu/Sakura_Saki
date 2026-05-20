@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile — Sakura Saki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+</head>
+<body class="admin-body">
+<canvas id="sakura-canvas"></canvas>
+<aside class="admin-sidebar">
+    <div class="sidebar-brand"><h1>🌸 Sakura Saki</h1><p>Beauty & Wellness</p></div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/profile}" class="active"><span class="material-symbols-outlined">person</span> Profile</a>
+        <a th:href="@{/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/staff}"><span class="material-symbols-outlined">badge</span> Our Team</a>
+        <a th:href="@{/booking}"><span class="material-symbols-outlined">calendar_add_on</span> Book Now</a>
+        <a th:href="@{/my-appointments}"><span class="material-symbols-outlined">event_note</span> My Bookings</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="sidebar-profile">
+            <div class="avatar" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">US</div>
+            <div class="info"><span class="name" th:text="${username}">user</span><span class="role">Customer</span></div>
+        </div>
+    </div>
+</aside>
+<main class="admin-main">
+    <header class="page-header"><div><span class="kicker">Account</span><h2>My Profile</h2></div>
+        <div class="header-actions"><a th:href="@{/profile/edit}" class="btn-sakura btn-sakura-outline"><span class="material-symbols-outlined" style="font-size:1rem;">edit</span> Edit Profile</a></div>
+    </header>
+    <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
+
+    <div class="grid-2">
+        <div class="content-card glass-pane clay-lift">
+            <h3>Personal Information</h3>
+            <div th:if="${customer != null}">
+                <div style="display:flex;align-items:center;gap:1.25rem;margin-bottom:1.5rem;">
+                    <div style="width:4rem;height:4rem;border-radius:50%;background:var(--primary-container);display:flex;align-items:center;justify-content:center;font-family:var(--font-headline);font-size:1.5rem;font-weight:700;color:var(--on-primary-container);" th:text="${#strings.toUpperCase(#strings.substring(customer.firstName,0,1)) + #strings.toUpperCase(#strings.substring(customer.lastName,0,1))}">SK</div>
+                    <div>
+                        <div style="font-family:var(--font-headline);font-size:1.25rem;font-weight:700;" th:text="${customer.firstName + ' ' + customer.lastName}">Name</div>
+                        <div style="font-size:.85rem;color:var(--outline);" th:text="${customer.email}">email</div>
+                    </div>
+                </div>
+                <table style="width:100%;font-size:.9rem;">
+                    <tr style="border-bottom:1px solid rgba(0,0,0,.04);"><td style="padding:.75rem 0;color:var(--outline);width:35%;">Phone</td><td style="padding:.75rem 0;font-weight:600;" th:text="${customer.phone ?: '—'}">—</td></tr>
+                    <tr><td style="padding:.75rem 0;color:var(--outline);">Username</td><td style="padding:.75rem 0;font-weight:600;" th:text="${username}">user</td></tr>
+                </table>
+            </div>
+            <p th:if="${customer == null}" style="color:var(--outline);text-align:center;padding:2rem 0;">Profile not set up yet. <a th:href="@{/profile/edit}" style="color:var(--primary);">Complete your profile →</a></p>
+        </div>
+        <div class="content-card glass-pane clay-lift">
+            <h3>Change Password</h3>
+            <form th:action="@{/profile/change-password}" method="post">
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>Current Password</label>
+                    <input name="currentPassword" type="password" class="input-recessed" required>
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label>New Password</label>
+                    <input name="newPassword" type="password" class="input-recessed" required>
+                </div>
+                <button type="submit" class="btn-sakura btn-sakura-primary" style="width:100%;justify-content:center;">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">lock_reset</span> Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
+</main>
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>

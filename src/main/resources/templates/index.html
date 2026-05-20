@@ -1,171 +1,343 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sakura Saki — Beauty & Wellness</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
-    <style>
-        body{margin:0;font-family:var(--font-body);color:var(--on-surface);overflow-x:hidden;background:var(--surface);}
-        .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;background:linear-gradient(135deg,#ffe4ea 0%,#fff5f7 40%,#fce7f3 100%);}
-        .hero-content{position:relative;z-index:10;max-width:700px;padding:2rem;}
-        .hero-kicker{font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.25em;color:var(--primary);margin-bottom:1rem;}
-        .hero h1{font-family:var(--font-headline);font-size:3.5rem;font-weight:700;letter-spacing:-.02em;color:var(--on-surface);margin:0 0 1.5rem;}
-        .hero p{font-size:1.1rem;color:var(--outline);line-height:1.7;margin-bottom:2.5rem;}
-        .hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
-        .section{padding:5rem 2rem;max-width:1100px;margin:0 auto;}
-        .section-kicker{font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:var(--primary);margin-bottom:.5rem;}
-        .section h2{font-family:var(--font-headline);font-size:2.25rem;font-weight:700;letter-spacing:-.02em;margin:0 0 1rem;}
-        .section p.lead{color:var(--outline);font-size:1rem;max-width:600px;margin-bottom:3rem;}
-        .services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
-        .svc-card{background:rgba(255,255,255,.7);backdrop-filter:blur(16px);border-radius:var(--radius-lg);padding:2rem;border:.5px solid rgba(214,194,196,.12);transition:all .4s cubic-bezier(.4,0,.2,1);}
-        .svc-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px -10px rgba(134,78,90,.12);}
-        .svc-icon{width:3rem;height:3rem;border-radius:50%;background:var(--primary-container);display:flex;align-items:center;justify-content:center;color:var(--on-primary-container);margin-bottom:1.25rem;}
-        .svc-card h3{font-family:var(--font-headline);font-size:1.15rem;margin:0 0 .5rem;}
-        .svc-card p{font-size:.875rem;color:var(--outline);line-height:1.6;margin:0;}
-        .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:2.5rem;}
-        .why-item{text-align:center;padding:1.5rem;}
-        .why-item .material-symbols-outlined{font-size:2.5rem;color:var(--primary);margin-bottom:1rem;}
-        .why-item h4{font-family:var(--font-headline);font-size:1rem;margin:0 0 .5rem;}
-        .why-item p{font-size:.85rem;color:var(--outline);line-height:1.6;}
-        .cta-section{text-align:center;padding:5rem 2rem;background:linear-gradient(135deg,var(--primary-container),#fff5f7);}
-        .cta-section h2{font-family:var(--font-headline);font-size:2rem;margin-bottom:1rem;}
-        .cta-section p{color:var(--outline);margin-bottom:2rem;}
-        .site-footer{text-align:center;padding:2rem;background:var(--surface-container-low);}
-        .site-footer span{font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;}
-        .public-topnav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(255,255,255,.6);backdrop-filter:blur(24px);border-bottom:.5px solid rgba(214,194,196,.12);}
-        .public-topnav .brand{font-family:var(--font-headline);font-size:1.15rem;font-weight:700;color:var(--primary);text-decoration:none;}
-        .public-topnav .nav-links{display:flex;gap:2rem;align-items:center;}
-        .public-topnav .nav-links a{font-family:var(--font-label);font-size:.8rem;font-weight:500;letter-spacing:.03em;color:var(--on-surface-variant);text-decoration:none;transition:color .3s;}
-        .public-topnav .nav-links a:hover{color:var(--primary);}
-        @media(max-width:768px){.hero h1{font-size:2.25rem;}.services-grid,.why-grid{grid-template-columns:1fr;}.public-topnav{padding:.75rem 1.5rem;}.public-topnav .nav-links{gap:1rem;}}
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sakura Saki | Digital Serenity</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#574144",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "primary-fixed": "#ffd9df",
+                        "outline": "#837375",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#555555",
+                        "on-primary-fixed-variant": "#6b3743",
+                        "on-secondary-fixed": "#281719",
+                        "surface-tint": "#864e5a",
+                        "tertiary-fixed-dim": "#c8c6c6",
+                        "on-surface-variant": "#514345",
+                        "primary": "#864e5a",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#fbb3c1",
+                        "outline-variant": "#d6c2c4",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-dim": "#dadada",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-primary-container": "#7b4551",
+                        "background": "#f9f9f9",
+                        "secondary-fixed": "#fbdbde",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-container": "#755d5f",
+                        "surface-container-highest": "#e2e2e2",
+                        "secondary-container": "#f8d8db",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "tertiary": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#e4e2e1",
+                        "inverse-on-surface": "#f1f1f1",
+                        "error-container": "#ffdad6",
+                        "secondary": "#70585b",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-container": "#cccaca",
+                        "secondary-fixed-dim": "#debfc2",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#ffb7c5",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-high": "#e8e8e8",
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "primary-fixed-dim": "#fbb3c1",
+                        "on-primary-fixed": "#360c19",
+                        "surface-variant": "#e2e2e2",
+                        "surface-bright": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; background-color: #f9f9f9; }
+        .font-serif { font-family: 'Noto Serif', serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(24px);
+            border: 0.5px solid rgba(214, 194, 196, 0.3);
+        }
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 0 40px 60px -15px rgba(26, 28, 28, 0.06), 
+                        inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(255, 183, 197, 0.4);
+        }
     </style>
 </head>
-<body style="display:flex;flex-direction:column;min-height:100vh;">
-<canvas id="sakura-canvas"></canvas>
-
-<main style="flex:1;">
-<nav class="public-topnav">
-    <a href="/" class="brand">🌸 Sakura Saki</a>
-    <div class="nav-links">
-        <a th:href="@{/services}">Services</a>
-        <a th:href="@{/staff}">Our Team</a>
-        <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn-sakura btn-sakura-primary" style="padding:.5rem 1.25rem;">Sign In</a>
-        <a th:if="${isLoggedIn}" th:href="@{/profile}" class="btn-sakura btn-sakura-outline" style="padding:.5rem 1.25rem;display:flex;align-items:center;gap:.25rem;">
-            <span class="material-symbols-outlined" style="font-size:1.1rem;">person</span> <span th:text="${username}">Profile</span>
-        </a>
-    </div>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
+<canvas class="fixed inset-0 pointer-events-none z-[1] opacity-70" id="sakura-canvas"></canvas>
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 rounded-b-[2rem] bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl border-b border-white/20 dark:border-zinc-800/20 shadow-[0_20px_50px_rgba(0,0,0,0.06)] dark:shadow-none">
+<div class="flex justify-between items-center px-8 h-20 max-w-7xl mx-auto w-full">
+<a th:href="@{/}" class="text-2xl font-serif font-bold text-rose-900 dark:text-rose-100 tracking-tight" style="text-decoration:none;">Sakura Saki</a>
+<div class="hidden md:flex items-center gap-10 font-serif text-slate-800 dark:text-slate-100 tracking-tight">
+<a th:href="@{/}" class="text-rose-900 dark:text-rose-200 border-b-2 border-rose-400 pb-1 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Home</a>
+<a th:href="@{/services}" class="text-slate-500 dark:text-zinc-400 hover:text-rose-400 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Services</a>
+<a th:href="@{/profile}" class="text-slate-500 dark:text-zinc-400 hover:text-rose-400 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Bookings</a>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-full scale-95 duration-200">
+<span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-32 font-medium" placeholder="Search services..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<a th:if="${!isLoggedIn}" th:href="@{/login}" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition-all duration-400 ease-out" style="text-decoration:none;">SIGN IN</a>
+<a th:if="${isAdmin}" th:href="@{/admin/dashboard}" class="material-symbols-outlined text-rose-400 dark:text-rose-300 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" data-icon="dashboard" style="text-decoration:none;" title="Admin Dashboard">dashboard</a>
+<a th:if="${isStaff}" th:href="@{/staff/dashboard}" class="material-symbols-outlined text-rose-400 dark:text-rose-300 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" data-icon="dashboard" style="text-decoration:none;" title="Staff Dashboard">dashboard</a>
+<a th:if="${isLoggedIn}" th:href="@{/profile}" class="material-symbols-outlined text-rose-400 dark:text-rose-300 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" data-icon="account_circle" style="text-decoration:none;" title="Profile">account_circle</a>
+<a th:if="${isLoggedIn}" th:href="@{/logout}" class="material-symbols-outlined text-rose-400 dark:text-rose-300 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" data-icon="logout" style="text-decoration:none;" title="Logout">logout</a>
+</div>
+</div>
+</div>
 </nav>
+<!-- Hero Section -->
+<header class="relative min-h-[972px] flex items-center justify-center pt-20 overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary-container/30 to-surface z-0"></div>
+<div class="absolute top-1/4 -left-10 w-64 h-64 bg-primary-container/20 rounded-full blur-3xl opacity-60"></div>
+<div class="absolute bottom-1/4 -right-10 w-96 h-96 bg-secondary-container/20 rounded-full blur-3xl opacity-60"></div>
+<div class="max-w-7xl mx-auto px-8 w-full relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
+<div class="space-y-8">
+<div>
+<span class="text-primary font-label text-sm font-extrabold tracking-[0.2em] uppercase mb-4 block">Artisanal Beauty &amp; Wellness</span>
+<h1 class="font-headline text-6xl md:text-8xl text-on-surface leading-[1.05] tracking-tight font-bold">
+                        Unveil Your <br/>
+<span class="text-primary italic">Eternal Bloom</span>
+</h1>
+</div>
+<p class="text-body text-lg text-secondary max-w-lg leading-relaxed">
+                    A sensory journey where traditional Japanese precision meets modern aesthetic innovation. Experience beauty as a form of meditation.
+                </p>
+<div class="flex flex-wrap gap-6 pt-4">
+<a th:href="@{/booking}" class="px-10 py-5 bg-primary text-on-primary rounded-full font-label font-bold tracking-wider text-sm shadow-xl hover:scale-[1.02] transition-all duration-400 active:scale-[0.98]" style="text-decoration:none;display:inline-block;">
+                        BOOK AN APPOINTMENT
+                    </a>
+</div>
+</div>
+<!-- 3D Glassmorphism Centerpiece -->
+<div class="relative flex justify-center items-center h-[500px] lg:h-full">
+<div class="glass-panel w-full max-w-md aspect-[4/5] rounded-xl relative z-20 overflow-hidden shadow-2xl flex flex-col items-center justify-center p-8 group">
+<div class="absolute inset-0 -z-10">
+<img alt="Interior of a luxury spa with cherry blossom branches and soft high-key lighting" class="w-full h-full object-cover opacity-30 scale-110 group-hover:scale-100 transition-transform duration-[2000ms]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkbKR7PNv2z0Ao9G1c1NLMl4T74kL10Gm9IuT345a-Gcfo12jYIBtrn8jihoH2xgurlF8I0bU-bt0a1tt_PeMqm0BtVjmFJ9CSeqk_tZCHNtGKfJZ6lfM0toMH-henqIJE33-xDG_BWSt_SkPBPEbuDEVhwFpEZXso7L--XIbFE07aTiFoQdTXzEjIXXiKkibi8tVivBJvaH2HCcUX1UibFxhNd1keXptT_uGfzFYt3xJus-pg00g-f8e2_ccMZB9u8pjTlY6XWEFU"/>
+</div>
+<div class="w-48 h-48 relative mb-8">
+<div class="absolute inset-0 bg-primary-container/40 rounded-full blur-xl scale-125"></div>
+<img alt="Macro photography of a delicate cherry blossom petal with crystalline dew drops" class="w-full h-full object-cover rounded-full shadow-inner border-4 border-white/40 relative z-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNooYEtdTIDbwDNHvzdG_78UsrA0C8I46Zt2F7DlxId4YJMAjjMpZh2izNeipx5tt6iJMXd133rut49wQOO_r3wawlPPBu7tNXLk6hDEW7Ct7mnH_hLeJK8pXm-GaSXOsm3JWW5NUB6O7AYk7UQq9y_NfbXIj-LnQ7c12TRMbwrKr9S7bTo3pos9Xhw2hAnqu50H9aGWtsM4NYObOgYifsymtQ1AOMeIzoDSQOrD-HtBwvdEiDd7NzCT_ruKiSvHA433V9RpFKP3tr"/>
+</div>
+<div class="text-center space-y-4">
+<h3 class="font-serif text-2xl font-bold text-on-primary-container">Skin Rituals</h3>
+<p class="text-sm font-medium text-on-secondary-fixed-variant max-w-[240px]">Tailored treatments infused with Sakura extracts for a translucent glow.</p>
+</div>
+</div>
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-container rounded-full blur-2xl -z-10 mix-blend-multiply opacity-50"></div>
+<div class="absolute bottom-10 left-0 w-40 h-40 bg-secondary-container rounded-full blur-3xl -z-10 mix-blend-multiply opacity-50"></div>
+</div>
+</div>
+</header>
 
-<section class="hero">
-    <div class="hero-content">
-        <span class="hero-kicker">Beauty · Wellness · Serenity</span>
-        <h1>Experience Digital Serenity</h1>
-        <p>Where timeless Japanese beauty traditions meet modern elegance. Discover our curated selection of premium salon services designed to nurture your body and soul.</p>
-        <div class="hero-btns">
-            <a th:if="${!isLoggedIn}" th:href="@{/register}" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2rem;">
-                <span class="material-symbols-outlined" style="font-size:1rem;">spa</span> Get Started
-            </a>
-            <a th:href="@{/services}" class="btn-sakura btn-sakura-outline" style="padding:.75rem 2rem;">
-                <span class="material-symbols-outlined" style="font-size:1rem;">content_cut</span> View Services
-            </a>
-        </div>
-    </div>
+<!-- Services Bento Grid -->
+<section class="py-32 px-8 max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+<div class="max-w-xl">
+<span class="text-primary font-label text-xs font-extrabold tracking-[0.3em] uppercase mb-4 block">Curated Experience</span>
+<h2 class="font-headline text-5xl text-on-surface font-bold">Services Crafted <br/>for Your Essence</h2>
+</div>
+<p class="text-secondary md:text-right max-w-xs text-sm leading-relaxed">
+                Every treatment is a bespoke ceremony designed to restore your natural balance and luminosity.
+            </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Service Card 1 -->
+<div class="clay-card md:col-span-8 rounded-lg p-10 flex flex-col md:flex-row gap-8 items-center group overflow-hidden">
+<div class="w-full md:w-1/2 aspect-square rounded-lg overflow-hidden order-2 md:order-1">
+<img alt="Woman receiving a facial massage" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMVmauqXvwu-XPflLT6_tc7BAOCxLUAMerznAYD3ep-cA75N01-c0M0jV1ztBu7cnB2D8y7SiBuXRFnE4yFWu_uxb3EOl2faSywTB6fKXVipFFH9_BseBEMAF6N3S7xNifA1XAPu4SXAphtEuUAGRBWPK8T1yK99Ed-GRZOX0wDGmnBqtMrwNnAwysI9JwNcgGFb7WW3P57J4jLJQz7dkX41QbHQIrJEPBl33hwE-W3WdAcFoCVw8eNvgUcHCpzPbGq2xf_67pKuZS"/>
+</div>
+<div class="w-full md:w-1/2 space-y-6 order-1 md:order-2">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="face_retouching_natural">face_retouching_natural</span>
+<h3 class="font-serif text-3xl font-bold text-on-surface">Rejuvenating Facials</h3>
+<p class="text-secondary text-sm leading-loose">Deeply cleansing and hydrating rituals using authentic Japanese pearl powder and silk proteins.</p>
+<ul class="space-y-2 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span> Hydra-Glow Ritual</li>
+<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span> Zen Lifting Therapy</li>
+</ul>
+<a class="inline-block text-primary font-label text-sm font-bold border-b border-primary-container pb-1 hover:border-primary transition-colors" th:href="@{/services}" style="text-decoration:none;">Explore Rituals</a>
+</div>
+</div>
+<!-- Service Card 2 -->
+<div class="clay-card md:col-span-4 rounded-lg p-8 flex flex-col justify-between group">
+<div class="aspect-square rounded-lg overflow-hidden mb-8">
+<img alt="Beautifully manicured nails" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVnmyWYt0yAS0QFQ7OZAzGL_3gm-rhLott5pdF2G5DKaMVS2ejFiEy0h4Hq_IwfZRo66RIU2e85Qy080PYoU3FhAGH6SrU7eOQP2YBGgVJmNYK7wp4KMLZ2VhPT-MtxvfrkNrHmvGYZLYQWGHmNEEWKAQ8jmlfXl0OfRCyadstyC6Fgp7rwe8eACmraOb44ToTqAffCB6oLl1sJinMxKFLlCMifnJEA5PRtX6ciJZKKRl-PnTbhDMmzZccoGK4n_Ko1-JMWKVD1FYi"/>
+</div>
+<div class="space-y-4">
+<h3 class="font-serif text-2xl font-bold text-on-surface">Artisan Nails</h3>
+<p class="text-secondary text-sm">Minimalist elegance meets meticulous care for your hands and feet.</p>
+</div>
+</div>
+<!-- Service Card 3 -->
+<div class="clay-card md:col-span-4 rounded-lg p-8 flex flex-col justify-between group">
+<div class="aspect-square rounded-lg overflow-hidden mb-8">
+<img alt="Selection of organic essential oils" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuGXM18yNJfvYyW8FWijrS5vbnIDkFyfDbJws-PCm0ep5tSxAOoW7wAW9F_FqEb-GNyHMCC6efDHL6_5bQupdCun9O_yX1baw3mm6siddpeqdq9JHgg0zRNB3r2TdTvQzUPdbkewoJYOFZUnebLnFG1PHRNovxg9NEV3vcNZXlnEG3ZEnBIapQuF7Tv8_NM7Ki9O2Z6rEBeDI4wF1weyJx-JCBYapoFhWJDVnLqFHRkLO5MZZkQEKnyeu9fhp-hzoKxRaFC5r64Eye"/>
+</div>
+<div class="space-y-4">
+<h3 class="font-serif text-2xl font-bold text-on-surface">Scalp Therapy</h3>
+<p class="text-secondary text-sm">Traditional head spa techniques to promote hair health and mental clarity.</p>
+</div>
+</div>
+<!-- Service Card 4 -->
+<div class="clay-card md:col-span-8 rounded-lg p-10 flex flex-col md:flex-row gap-8 items-center group overflow-hidden bg-primary-container/20">
+<div class="w-full md:w-1/2 space-y-6">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="spa">spa</span>
+<h3 class="font-serif text-3xl font-bold text-on-surface">Body Harmonization</h3>
+<p class="text-secondary text-sm leading-loose">Experience the transformative power of Japanese Shiatsu and hot stone treatments in a serene environment.</p>
+<a th:href="@{/services}" class="inline-block px-8 py-4 bg-primary text-on-primary rounded-full font-label font-bold tracking-wider text-xs" style="text-decoration:none;">VIEW FULL MENU</a>
+</div>
+<div class="w-full md:w-1/2 aspect-[4/3] rounded-lg overflow-hidden shadow-lg">
+<img alt="Smooth basalt stones" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpmY8u3lvCFodVohOMTsvUWPsJfUNkDeGGhmEm28830d9xe4GBw7ixJejz1jv657oghTYYGJjDVernhM-5F98BUq5sf4vNH-XjPT9E4NFvVx94FoNmp6AI3hVyiLYNkB54QEF6Pzz_3bIW6jvgh86zGelWbeFvfZe3PevVoyUwc1j4-SDJohy7__zr82qIORX1Sds9_idV8J7-umrbDJ-yYCnZE5oLt9J5nQbwRmsPiAAb9bmv7jG3nIRwJfYouNGGn60mG9nvbCFC"/>
+</div>
+</div>
+</div>
 </section>
-
-<section class="section">
-    <span class="section-kicker">Our Services</span>
-    <h2>Curated Beauty Experiences</h2>
-    <p class="lead">Each treatment is crafted with care, blending tradition and innovation for results that radiate.</p>
-    <div class="services-grid">
-        <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">content_cut</span></div>
-            <h3>Hair Styling</h3>
-            <p>From precision cuts to vibrant colors, our master stylists create looks that express your unique beauty.</p>
-        </div>
-        <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">face</span></div>
-            <h3>Skincare & Facials</h3>
-            <p>Rejuvenating treatments using premium products to restore your skin's natural radiance and glow.</p>
-        </div>
-        <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">self_improvement</span></div>
-            <h3>Spa & Massage</h3>
-            <p>Unwind with our therapeutic massage and body treatments that melt stress away completely.</p>
-        </div>
-        <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">palette</span></div>
-            <h3>Nail Art & Care</h3>
-            <p>Express yourself with our creative nail designs and meticulous hand and foot care services.</p>
-        </div>
-        <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">diamond</span></div>
-            <h3>Bridal Packages</h3>
-            <p>Your special day deserves perfection. Complete bridal beauty preparation from head to toe.</p>
-        </div>
-        <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">inventory_2</span></div>
-            <h3>Wellness Bundles</h3>
-            <p>Curated service packages combining our best treatments at exclusive discounted prices.</p>
-        </div>
-    </div>
+<!-- Register/Membership CTA -->
+<section class="py-32 px-8">
+<div class="max-w-7xl mx-auto glass-panel rounded-xl p-12 md:p-24 relative overflow-hidden text-center shadow-inner">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 bg-[radial-gradient(circle_at_center,rgba(255,183,197,0.2)_0%,transparent_70%)]"></div>
+<div class="max-w-3xl mx-auto space-y-10">
+<h2 class="font-headline text-4xl md:text-6xl text-on-surface font-bold leading-tight">Become a Sakura <br/>Circle Member</h2>
+<p class="text-secondary text-lg leading-relaxed">
+                    Enjoy exclusive access to early bookings, member-only rituals, and a seasonal gift box curated by our lead estheticians.
+                </p>
+<div class="flex flex-col sm:flex-row justify-center items-center gap-6 pt-6">
+<a th:href="@{/register}" class="w-full sm:w-auto px-12 py-5 bg-on-background text-surface rounded-full font-label font-bold tracking-widest text-sm hover:bg-primary transition-all duration-400" style="text-decoration:none;">
+                        REGISTER NOW
+                    </a>
+</div>
+<p class="text-xs text-slate-400 uppercase tracking-widest font-bold">Complimentary 15-min consultation for all new members</p>
+</div>
+</div>
 </section>
-
-<section class="section" style="background:var(--surface-container-low);max-width:100%;padding-left:2rem;padding-right:2rem;">
-    <div style="max-width:1100px;margin:0 auto;">
-        <span class="section-kicker">Why Choose Us</span>
-        <h2>The Sakura Difference</h2>
-        <div class="why-grid">
-            <div class="why-item">
-                <span class="material-symbols-outlined">verified</span>
-                <h4>Expert Stylists</h4>
-                <p>Our team of certified professionals brings years of experience and continuous training.</p>
-            </div>
-            <div class="why-item">
-                <span class="material-symbols-outlined">eco</span>
-                <h4>Premium Products</h4>
-                <p>We use only the finest, sustainably sourced beauty products for every treatment.</p>
-            </div>
-            <div class="why-item">
-                <span class="material-symbols-outlined">schedule</span>
-                <h4>Easy Booking</h4>
-                <p>Book your appointments online anytime with our seamless scheduling system.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="section" th:if="${recentReviews != null and !recentReviews.isEmpty()}">
-    <span class="section-kicker">Client Stories</span>
-    <h2>What Our Clients Say</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:1.5rem;margin-top:2.5rem;">
-        <div th:each="r : ${recentReviews}" class="svc-card" style="padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
-            <div style="display:flex;gap:.25rem;color:#f59e0b;">
-                <span class="material-symbols-outlined" th:each="i : ${#numbers.sequence(1, 5)}" th:text="${i <= r.rating ? 'star' : 'star_border'}">star</span>
-            </div>
-            <p style="flex:1;font-style:italic;" th:text="${'&quot;' + r.comment + '&quot;'}">"Great!"</p>
-            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(0,0,0,0.05);padding-top:1rem;margin-top:auto;">
-                <div style="font-size:.875rem;font-weight:600;color:var(--on-surface);" th:text="${r.customer.firstName + ' ' + r.customer.lastName}">Name</div>
-                <div style="font-size:.75rem;color:var(--outline);" th:text="${r.service.name}">Service</div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="cta-section">
-    <h2>Ready to Begin Your Journey?</h2>
-    <p>Join thousands of satisfied clients who trust Sakura Saki for their beauty and wellness needs.</p>
-    <a th:if="${!isLoggedIn}" th:href="@{/register}" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2.5rem;">Create Free Account</a>
-    <a th:if="${isLoggedIn}" th:href="@{/services}" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2.5rem;">Book an Appointment</a>
-</section>
-</main>
-
-<footer class="site-footer">
-    <span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span>
+<!-- Footer -->
+<footer class="bg-stone-50 dark:bg-zinc-950 w-full py-12 border-t border-rose-100/50 dark:border-zinc-800/50">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-8 gap-8">
+<div class="flex flex-col items-center md:items-start gap-4">
+<div class="text-xl font-serif font-bold text-rose-900">Sakura Saki</div>
+<p class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">© 2024 Sakura Saki Beauty. All rights reserved.</p>
+</div>
+</div>
 </footer>
 
-<script th:src="@{/js/sakura-petals.js}"></script>
+<script>
+    const canvas = document.getElementById('sakura-canvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const petals = [];
+    const numPetals = 45;
+    let mouseX = -1000;
+    let mouseY = -1000;
+
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    class Petal {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height - height;
+            this.size = Math.random() * 12 + 8;
+            this.speedY = Math.random() * 1.5 + 0.5;
+            this.speedX = Math.random() * 2 - 1;
+            this.angle = Math.random() * 360;
+            this.spin = Math.random() * 0.05 - 0.025;
+            this.opacity = Math.random() * 0.6 + 0.2;
+        }
+
+        update() {
+            this.y += this.speedY;
+            this.x += this.speedX;
+            this.angle += this.spin;
+
+            const dx = mouseX - this.x;
+            const dy = mouseY - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 120) {
+                const force = (120 - dist) / 120;
+                this.x -= (dx / dist) * force * 3;
+                this.y -= (dy / dist) * force * 3;
+            }
+
+            if (this.y > height + this.size) {
+                this.y = -this.size;
+                this.x = Math.random() * width;
+            }
+            if (this.x > width + this.size) this.x = -this.size;
+            if (this.x < -this.size) this.x = width + this.size;
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.quadraticCurveTo(this.size * 0.8, -this.size * 0.8, this.size * 1.2, 0);
+            ctx.quadraticCurveTo(this.size * 0.8, this.size * 0.8, 0, 0);
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    for (let i = 0; i < numPetals; i++) {
+        petals.push(new Petal());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        petals.forEach(petal => {
+            petal.update();
+            petal.draw();
+        });
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+</script>
 </body>
 </html>

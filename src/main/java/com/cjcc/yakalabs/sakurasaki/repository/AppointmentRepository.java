@@ -1,13 +1,12 @@
 package com.cjcc.yakalabs.sakurasaki.repository;
 
-import com.cjcc.yakalabs.sakurasaki.entity.Appointment;
+import com.cjcc.yakalabs.sakurasaki.model.Appointment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 
@@ -39,61 +38,18 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     //  Schedule conflict detection (used by ScheduleValidator) ─
 
-    /**
-     * Returns appointments where the requested staff member is already booked
-     * within an overlapping time window on the same date.
-     *
-     * Overlap condition:
-     *   existing.start < requested.end  AND  existing.end > requested.start
-     *
-     * existing.end = existing.appointmentTime + existing.durationMinutes
-     * requested.end = requestedStart + requestedDurationMinutes
-     *
-     * @param staffId               Staff to check
-     * @param date                  Date to check
-     * @param requestedStart        Start time of the new appointment
-     * @param requestedEnd          End time  of the new appointment
-     * @param excludeAppointmentId  Pass the current ID when editing (0L for new)
-     */
-    @Query("""
-        SELECT a FROM Appointment a
-        WHERE a.staffId = :staffId
-          AND a.appointmentDate = :date
-          AND a.status NOT IN ('CANCELLED')
-          AND a.appointmentId <> :excludeId
-          AND a.appointmentTime < :requestedEnd
-          AND FUNCTION('ADDTIME', a.appointmentTime,
-                       FUNCTION('SEC_TO_TIME', a.durationMinutes * 60))
-              > :requestedStart
-        """)
-    List<Appointment> findStaffConflicts(
-            @Param("staffId")       String staffId,
-            @Param("date")          LocalDate date,
-            @Param("requestedStart") LocalTime requestedStart,
-            @Param("requestedEnd")   LocalTime requestedEnd,
-            @Param("excludeId")      Long excludeAppointmentId
-    );
+    List<Appointment> findByStaffIdAndAppointmentDateAndStatusNot(String staffId, LocalDate date, String status);
 
-    /**
-     * Returns appointments where the same customer already has an overlapping
-     * slot on the same date (prevents double-booking a customer).
-     */
-    @Query("""
-        SELECT a FROM Appointment a
-        WHERE a.userId = :userId
-          AND a.appointmentDate = :date
-          AND a.status NOT IN ('CANCELLED')
-          AND a.appointmentId <> :excludeId
-          AND a.appointmentTime < :requestedEnd
-          AND FUNCTION('ADDTIME', a.appointmentTime,
-                       FUNCTION('SEC_TO_TIME', a.durationMinutes * 60))
-              > :requestedStart
-        """)
-    List<Appointment> findCustomerConflicts(
-            @Param("userId")        String userId,
-            @Param("date")          LocalDate date,
-            @Param("requestedStart") LocalTime requestedStart,
-            @Param("requestedEnd")   LocalTime requestedEnd,
-            @Param("excludeId")      Long excludeAppointmentId
-    );
+    List<Appointment> findByUserIdAndAppointmentDateAndStatusNot(String userId, LocalDate date, String status);
+
+    long countByAppointmentDate(LocalDate date);
+
+    @Query("SELECT a.appointmentDate, COUNT(a) FROM Appointment a WHERE a.appointmentDate BETWEEN :from AND :to GROUP BY a.appointmentDate ORDER BY a.appointmentDate")
+    List<Object[]> countAppointmentsPerDay(@Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    @Query("SELECT a.serviceId, COUNT(a) FROM Appointment a WHERE a.serviceId IS NOT NULL AND a.appointmentDate BETWEEN :from AND :to GROUP BY a.serviceId ORDER BY COUNT(a) DESC")
+    List<Object[]> countByServiceBetween(@Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    @Query("SELECT COALESCE(SUM(a.totalAmount), 0) FROM Appointment a WHERE a.status = 'COMPLETED'")
+    Double sumTotalRevenue();
 }

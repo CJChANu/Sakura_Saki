@@ -4,9 +4,182 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — Sakura Saki Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+    <style>
+        /* Specific enhancements matching Stitch design system in screenshots */
+        :root {
+            --stitch-pink: #fbcfe8;
+            --stitch-pink-dark: #9d174d;
+            --stitch-text: #1e293b;
+            --stitch-muted: #64748b;
+            --stitch-bg-gradient: linear-gradient(135deg, #fdf4f5 0%, #fff1f2 100%);
+        }
+        body.admin-body {
+            background: #fafaf9;
+            color: var(--stitch-text);
+        }
+        .admin-sidebar {
+            background: #ffffff;
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.02);
+        }
+        .sidebar-brand h1 {
+            color: var(--stitch-pink-dark);
+            font-weight: 800;
+        }
+        .sidebar-nav a.active {
+            background: #fff1f2;
+            color: var(--stitch-pink-dark);
+            font-weight: 700;
+        }
+        .sidebar-nav a:hover {
+            background: #fff1f2;
+            color: var(--stitch-pink-dark);
+        }
+        .page-header h2 {
+            font-family: var(--font-headline);
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: #0f172a;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .performer-card {
+            background: linear-gradient(135deg, #fbcfe8 0%, #fda4af 100%);
+            color: var(--stitch-pink-dark);
+            border-radius: var(--radius-default);
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 25px rgba(253, 164, 175, 0.2);
+        }
+        .performer-card h4 {
+            margin: 0;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            opacity: 0.85;
+        }
+        .performer-card h3 {
+            margin: 0.5rem 0 0.2rem;
+            font-family: var(--font-headline);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .performer-card .satisfaction {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0;
+        }
+        .performer-avatar {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #fbcfe8;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background: #f1f5f9;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .progress-bar-fill {
+            background: var(--stitch-pink-dark);
+            height: 100%;
+            border-radius: 3px;
+        }
+        .appointment-trends-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .trend-stats {
+            text-align: right;
+        }
+        .trend-stats .total {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--stitch-pink-dark);
+        }
+        .trend-stats .label {
+            font-size: 0.65rem;
+            color: var(--stitch-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .upcoming-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .upcoming-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 1rem;
+            border-radius: var(--radius-default);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .upcoming-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.04);
+        }
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .client-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: #f8fafc;
+            color: var(--stitch-pink-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid #f1f5f9;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-booked { background: #ffe4e6; color: #9f1239; }
+        .status-completed { background: #dcfce7; color: #166534; }
+        .status-cancelled { background: #fee2e2; color: #991b1b; }
+        .status-pending { background: #fef9c3; color: #854d0e; }
+    </style>
 </head>
 <body class="admin-body">
 <canvas id="sakura-canvas"></canvas>
@@ -18,7 +191,7 @@
         <p>Sakura Saki Management</p>
     </div>
     <nav class="sidebar-nav">
-        <a th:href="@{/admin/dashboard}" class="active"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+        <a th:href="@{/admin/dashboard}" class="active"><span class="material-symbols-outlined">dashboard</span> Overview</a>
         <a th:href="@{/admin/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
         <a th:href="@{/admin/packages}"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
         <a th:href="@{/admin/staff}"><span class="material-symbols-outlined">badge</span> Staff</a>
@@ -46,106 +219,184 @@
     <!-- Page Header -->
     <header class="page-header">
         <div>
-            <span class="kicker">Dashboard Overview</span>
+            <span class="kicker" style="color: var(--stitch-pink-dark);">Dashboard Overview</span>
             <h2>Welcome back, <span th:text="${username}">Admin</span>.</h2>
         </div>
         <div class="header-actions">
-            <form th:action="@{/admin/users}" method="get" class="search-pill">
+            <form th:action="@{/admin/users}" method="get" class="search-pill" style="background: #ffffff; border: 1px solid #f1f5f9; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
                 <span class="material-symbols-outlined" style="color: var(--outline);">search</span>
                 <input type="text" name="search" placeholder="Search users...">
             </form>
         </div>
     </header>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
+    <!-- KPI Stat Cards -->
+    <div class="stats-grid" style="margin-bottom: 2rem;">
         <div class="stat-card glass-pane clay-lift">
-            <div class="stat-icon">
-                <span class="material-symbols-outlined">group</span>
-            </div>
+            <div class="stat-icon"><span class="material-symbols-outlined">group</span></div>
             <div class="stat-label">Total Customers</div>
             <div class="stat-value" th:text="${summary.totalCustomers}">0</div>
         </div>
         <div class="stat-card glass-pane clay-lift">
-            <div class="stat-icon">
-                <span class="material-symbols-outlined">content_cut</span>
-            </div>
-            <div class="stat-label">Salon Services</div>
+            <div class="stat-icon"><span class="material-symbols-outlined">content_cut</span></div>
+            <div class="stat-label">Active Services</div>
             <div class="stat-value" th:text="${summary.totalServices}">0</div>
         </div>
         <div class="stat-card glass-pane clay-lift">
-            <div class="stat-icon">
-                <span class="material-symbols-outlined">badge</span>
-            </div>
+            <div class="stat-icon"><span class="material-symbols-outlined">badge</span></div>
             <div class="stat-label">Total Staff</div>
             <div class="stat-value" th:text="${summary.totalStaff}">0</div>
         </div>
         <div class="stat-card glass-pane clay-lift highlight">
-            <div class="stat-icon">
-                <span class="material-symbols-outlined">calendar_today</span>
-            </div>
-            <div class="stat-label">Today's Appointments</div>
+            <div class="stat-icon"><span class="material-symbols-outlined">calendar_today</span></div>
+            <div class="stat-label">Today's Bookings</div>
             <div class="stat-value" th:text="${summary.todayAppointments}">0</div>
+        </div>
+        <div class="stat-card glass-pane clay-lift" style="background: linear-gradient(135deg,#fbcfe8 0%,#fda4af 100%); border:none;">
+            <div class="stat-icon" style="background:rgba(255,255,255,.3);color:#9d174d;"><span class="material-symbols-outlined">payments</span></div>
+            <div class="stat-label" style="color:#9d174d;">Total Revenue</div>
+            <div class="stat-value" style="color:#9d174d;" th:text="'Rs. ' + ${#numbers.formatDecimal(summary.totalRevenue,1,'COMMA',0,'POINT')}">Rs. 0</div>
         </div>
     </div>
 
-    <!-- Two-column grid: Chart + Quick Stats -->
-    <div class="grid-2" style="margin-bottom: 2rem;">
+    <!-- Top Dashboard Grid -->
 
-        <!-- Appointment Trends Chart -->
-        <div class="content-card glass-pane clay-lift">
-            <h3>Appointment Trends</h3>
-            <div class="chart-container">
+    <div class="dashboard-grid">
+        <!-- Monthly Revenue Card -->
+        <div class="content-card glass-pane clay-lift" style="background: #ffffff; margin-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin-bottom: 0;">Monthly Revenue</h3>
+                <span style="font-size: 0.75rem; color: var(--stitch-muted); font-weight: 500;">LAST 6 MONTHS</span>
+            </div>
+            <div class="chart-container" style="height: 220px;">
+                <canvas id="monthlyRevenueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Right Side Cards -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Top Performer -->
+            <div class="performer-card">
+                <div>
+                    <h4>Top Performer</h4>
+                    <h3>Yumi Tanaka</h3>
+                    <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem;">
+                        <span class="material-symbols-outlined" style="font-size: 0.95rem; font-weight: bold;">star</span> Client Satisfaction
+                    </div>
+                </div>
+                <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+                    <div class="performer-avatar">
+                        <span class="material-symbols-outlined" style="font-size: 2.25rem; color: var(--stitch-pink-dark);">face_3</span>
+                    </div>
+                    <p class="satisfaction">98%</p>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="content-card glass-pane clay-lift" style="background: #ffffff; margin-bottom: 0; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; gap: 1rem;">
+                <h4 style="margin: 0; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--stitch-muted); font-weight: 600;">Quick Stats</h4>
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700;">
+                        <span>New Clients</span>
+                        <span style="color: var(--stitch-pink-dark);">+24%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 24%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700;">
+                        <span>Repeat Rate</span>
+                        <span style="color: var(--stitch-pink-dark);">82%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 82%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Dashboard Grid -->
+    <div class="dashboard-grid">
+        <!-- Appointment Trends -->
+        <div class="content-card glass-pane clay-lift" style="background: #ffffff; margin-bottom: 0;">
+            <div class="appointment-trends-header">
+                <h3>Appointment Trends</h3>
+                <div class="trend-stats">
+                    <p class="total" th:text="${summary.todayAppointments}">0</p>
+                    <p class="label">Bookings Today</p>
+                </div>
+            </div>
+            <div class="chart-container" style="height: 200px;">
                 <canvas id="trendChart"></canvas>
             </div>
         </div>
 
-        <!-- Quick Navigation Cards -->
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            <div class="content-card glass-pane clay-lift" style="flex: 1;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div>
-                        <div class="stat-label">Quick Actions</div>
-                        <h3 style="margin-bottom: 0;">Manage your salon</h3>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap;">
-                    <a th:href="@{/admin/users}" class="btn-sakura btn-sakura-outline btn-sakura-sm">
-                        <span class="material-symbols-outlined" style="font-size: 1rem;">group</span> Users
-                    </a>
-                    <a th:href="@{/admin/manage}" class="btn-sakura btn-sakura-outline btn-sakura-sm">
-                        <span class="material-symbols-outlined" style="font-size: 1rem;">shield_person</span> Admins
-                    </a>
-                    <a th:href="@{/admin/reports}" class="btn-sakura btn-sakura-outline btn-sakura-sm">
-                        <span class="material-symbols-outlined" style="font-size: 1rem;">analytics</span> Reports
-                    </a>
-                </div>
+        <!-- Upcoming Appointments -->
+        <div class="content-card glass-pane clay-lift" style="background: #ffffff; margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin-bottom: 0;">Upcoming Appointments</h3>
+                <a th:href="@{/admin/appointments}" style="font-size: 0.7rem; font-weight: 700; color: var(--stitch-pink-dark); text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none;">View All</a>
             </div>
-            <div class="content-card clay-lift" style="flex: 1; background: var(--primary-container);">
-                <div class="stat-label" style="opacity: 0.7;">System Status</div>
-                <h3 style="color: var(--on-primary-container);">All systems online</h3>
-                <div style="display: flex; gap: 2rem; margin-top: 1rem;">
-                    <div>
-                        <span style="font-family: var(--font-headline); font-size: 1.75rem; font-weight: 700; color: var(--on-primary-container);" th:text="${summary.totalCustomers + summary.totalStaff}">0</span>
-                        <span style="display: block; font-size: 0.625rem; opacity: 0.7; text-transform: uppercase;">Total People</span>
+            <div class="upcoming-list">
+                <!-- Loop over the first 3 appointments -->
+                <div th:each="appt, iter : ${appointments}" th:if="${iter.index < 3}" class="upcoming-item">
+                    <div class="client-info">
+                        <div class="client-avatar" th:text="${#strings.toUpperCase(#strings.substring(appt.userId, 0, 2))}">MK</div>
+                        <div>
+                            <p style="margin: 0; font-weight: 700; font-size: 0.85rem;" th:text="${appt.userId}">Client Name</p>
+                            <p style="margin: 2px 0 0; font-size: 0.7rem; color: var(--stitch-muted);" th:text="${appt.serviceId != null ? appt.serviceId : appt.packageId}">Service</p>
+                        </div>
                     </div>
-                    <div>
-                        <span style="font-family: var(--font-headline); font-size: 1.75rem; font-weight: 700; color: var(--on-primary-container);" th:text="${summary.totalServices}">0</span>
-                        <span style="display: block; font-size: 0.625rem; opacity: 0.7; text-transform: uppercase;">Active Services</span>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-weight: 600; font-size: 0.8rem;" th:text="${appt.appointmentTime}">14:30</p>
+                        <span class="status-badge" th:classappend="${appt.status == 'CONFIRMED' ? 'status-booked' : (appt.status == 'COMPLETED' ? 'status-completed' : (appt.status == 'CANCELLED' ? 'status-cancelled' : 'status-pending'))}" th:text="${appt.status}">Booked</span>
                     </div>
+                </div>
+                <div th:if="${#lists.isEmpty(appointments)}" style="text-align: center; padding: 2rem; color: var(--stitch-muted); font-size: 0.85rem;">
+                    No appointments scheduled.
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
+    <footer class="admin-footer">
+        <span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span>
+    </footer>
 </main>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
-    // Load appointment trends for the last 7 days
+    // 1. Monthly Revenue Chart (Bar Chart)
+    const revCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
+    new Chart(revCtx, {
+        type: 'bar',
+        data: {
+            labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN'],
+            datasets: [{
+                label: 'Revenue ($)',
+                data: [12000, 18000, 24000, 16000, 21000, 28000],
+                backgroundColor: '#fbcfe8',
+                hoverBackgroundColor: '#9d174d',
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { display: false }, ticks: { font: { family: 'Manrope', size: 10 } } },
+                x: { grid: { display: false }, ticks: { font: { family: 'Manrope', size: 10 } } }
+            }
+        }
+    });
+
+    // 2. Appointment Trends (Line Chart)
     (async function() {
         const today = new Date();
         const weekAgo = new Date();
@@ -162,39 +413,35 @@
             });
             const values = Object.values(json.data);
 
-            new Chart(document.getElementById('trendChart'), {
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            const pinkGradient = trendCtx.createLinearGradient(0, 0, 0, 200);
+            pinkGradient.addColorStop(0, 'rgba(253, 164, 175, 0.4)');
+            pinkGradient.addColorStop(1, 'rgba(253, 164, 175, 0)');
+
+            new Chart(trendCtx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'Appointments',
                         data: values,
-                        borderColor: '#864e5a',
-                        backgroundColor: 'rgba(255, 183, 197, 0.15)',
+                        borderColor: '#9d174d',
+                        backgroundColor: pinkGradient,
                         fill: true,
                         tension: 0.4,
                         borderWidth: 3,
-                        pointBackgroundColor: '#864e5a',
-                        pointRadius: 5,
-                        pointHoverRadius: 8
+                        pointBackgroundColor: '#9d174d',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1, font: { family: 'Manrope', size: 11 } },
-                            grid: { color: 'rgba(0,0,0,0.04)' }
-                        },
-                        x: {
-                            ticks: { font: { family: 'Manrope', size: 11 } },
-                            grid: { display: false }
-                        }
+                        y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Manrope', size: 10 } }, grid: { color: 'rgba(0,0,0,0.03)' } },
+                        x: { ticks: { font: { family: 'Manrope', size: 10 } }, grid: { display: false } }
                     }
                 }
             });

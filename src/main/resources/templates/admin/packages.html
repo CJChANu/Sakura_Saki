@@ -45,6 +45,7 @@
                     <td th:text="${p.totalDuration} + ' min'">min</td>
                     <td><span class="badge-pill badge-active" th:if="${p.active}">Active</span><span class="badge-pill badge-inactive" th:if="${!p.active}">Inactive</span></td>
                     <td style="text-align:right;">
+                        <button class="btn-sakura btn-sakura-primary btn-sakura-sm" data-bs-toggle="modal" th:data-bs-target="'#editPkgModal' + ${p.id}">Edit</button>
                         <form th:action="@{'/admin/packages/' + ${p.id} + '/toggle-active'}" method="post" style="display:inline;"><button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm" th:text="${p.active} ? 'Disable' : 'Enable'">Toggle</button></form>
                     </td>
                 </tr>
@@ -65,6 +66,22 @@
             </div>
         </div><div class="modal-footer"><button type="submit" class="btn-sakura btn-sakura-primary">Create Package</button></div></form>
     </div></div></div>
+    
+    <!-- Edit Modals -->
+    <div th:each="p : ${packages}" th:id="'editPkgModal' + ${p.id}" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content glass-pane">
+        <div class="modal-header"><h5 class="modal-title">Edit Package</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <form th:action="@{'/admin/packages/' + ${p.id} + '/update'}" method="post"><div class="modal-body">
+            <div class="form-group mb-3"><label>Package Name</label><input name="name" class="input-recessed" th:value="${p.name}" required></div>
+            <div class="form-group mb-3"><label>Description</label><textarea name="description" class="input-recessed" rows="2" th:text="${p.description}"></textarea></div>
+            <div class="form-group mb-3"><label>Discount (%)</label><input name="discountPercent" type="number" step="0.5" class="input-recessed" th:value="${p.discountPercent}" required></div>
+            <div class="form-group mb-3"><label>Select Services</label>
+                <select name="serviceIds" class="input-recessed" multiple style="min-height:120px;">
+                    <option th:each="s : ${allServices}" th:value="${s.id}" th:text="${s.name + ' — Rs.' + s.price}" th:selected="${#lists.contains(p.services, s)}">svc</option>
+                </select>
+            </div>
+        </div><div class="modal-footer"><button type="submit" class="btn-sakura btn-sakura-primary">Save Changes</button></div></form>
+    </div></div></div>
+
     <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

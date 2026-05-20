@@ -21,9 +21,9 @@ public class SecurityConfig {
 
     /**
      * Role-based redirect after login:
-     *   ADMIN  → /admin/dashboard
-     *   STAFF  → /staff/dashboard
-     *   USER   → / (homepage)
+     * ADMIN → /admin/dashboard
+     * STAFF → /staff/dashboard
+     * USER → / (homepage)
      */
     @Bean
     public AuthenticationSuccessHandler successHandler() {
@@ -54,22 +54,19 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/staff/dashboard/**").hasAnyRole("STAFF", "ADMIN")
                         .requestMatchers("/profile/**", "/booking/**", "/my-appointments/**").authenticated()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/do-login")
                         .successHandler(successHandler())
                         .failureUrl("/login?error=true")
-                        .permitAll()
-                )
+                        .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        .permitAll()
-                )
+                        .permitAll())
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();

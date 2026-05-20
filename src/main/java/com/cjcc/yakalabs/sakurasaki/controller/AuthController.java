@@ -34,10 +34,11 @@ public class AuthController {
             @RequestParam String firstName,
             @RequestParam String lastName,
             @RequestParam String phone,
+            @RequestParam(required = false, defaultValue = "USER") String role,
             Model model
     ) {
         try {
-            userService.registerCustomer(username, password, email, firstName, lastName, phone);
+            userService.registerNewUser(username, password, email, firstName, lastName, phone, role);
             model.addAttribute("success", "Registration successful! Please sign in.");
             return "auth/login";
         } catch (RuntimeException e) {
