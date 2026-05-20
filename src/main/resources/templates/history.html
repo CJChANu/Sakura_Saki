@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments History — Sakura Saki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+    <style>
+        :root {
+            --stitch-pink: #fbcfe8;
+            --stitch-pink-dark: #9d174d;
+            --stitch-text: #1e293b;
+            --stitch-muted: #64748b;
+        }
+        body.admin-body {
+            background: #fafaf9;
+            color: var(--stitch-text);
+        }
+        .admin-sidebar {
+            background: #ffffff;
+            border-right: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .sidebar-brand h1 {
+            color: var(--stitch-pink-dark);
+            font-weight: 800;
+        }
+        .sidebar-nav a.active {
+            background: #fff1f2;
+            color: var(--stitch-pink-dark);
+            font-weight: 700;
+        }
+        .sidebar-nav a:hover {
+            background: #fff1f2;
+            color: var(--stitch-pink-dark);
+        }
+        .page-header h2 {
+            font-family: var(--font-headline);
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body class="admin-body">
+<canvas id="sakura-canvas"></canvas>
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="admin-sidebar">
+    <div>
+        <div class="sidebar-brand">
+            <h1>🌸 Sakura Portal</h1>
+            <p>Sakura Saki Management</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a th:href="@{/}" style="text-decoration:none;"><span class="material-symbols-outlined">home</span> Store Front</a>
+            <a th:href="@{/profile}" style="text-decoration:none;"><span class="material-symbols-outlined">dashboard</span> Overview</a>
+            <a th:href="@{/services}" style="text-decoration:none;"><span class="material-symbols-outlined">content_cut</span> Services</a>
+            <a th:href="@{/booking}" style="text-decoration:none;"><span class="material-symbols-outlined">calendar_month</span> Book Ritual</a>
+            <a th:href="@{/appointments/history}" class="active" style="text-decoration:none;"><span class="material-symbols-outlined">history</span> History</a>
+        </nav>
+    </div>
+
+    <div class="sidebar-footer" style="display: flex; flex-direction: column; gap: 1rem;">
+        <a th:href="@{/booking}" class="btn-sakura btn-sakura-primary" style="margin: 0 1rem; display: flex; justify-content: center; font-weight: 700;">
+            <span class="material-symbols-outlined" style="font-size: 1.1rem;">calendar_month</span> My Appointments
+        </a>
+
+        <div class="sidebar-profile" style="margin-top: 0.5rem;">
+            <div class="avatar" th:text="${#strings.toUpperCase(#strings.substring(user.firstName != null ? user.firstName : username, 0, 2))}">CU</div>
+            <div class="info">
+                <span class="name" th:text="${user.fullName}">Customer Name</span>
+                <span class="role">Loyalty Member</span>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="admin-main">
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div>
+            <span class="kicker" style="color: var(--stitch-pink-dark);">JOURNAL & HISTORY</span>
+            <h2>Appointments History</h2>
+        </div>
+        <div class="header-actions">
+            <!-- My Appointments Button to go to booking page -->
+            <a th:href="@{/booking}" class="btn-sakura btn-sakura-primary">
+                <span class="material-symbols-outlined" style="font-size: 1.1rem;">calendar_month</span> My Appointments
+            </a>
+            <a th:if="${isAdmin}" th:href="@{/admin/dashboard}" class="btn-sakura btn-sakura-outline btn-sakura-sm">
+                <span class="material-symbols-outlined" style="font-size: 1.1rem;">dashboard</span> Admin Dashboard
+            </a>
+            <a th:href="@{/logout}" class="btn-sakura btn-sakura-outline btn-sakura-sm">
+                <span class="material-symbols-outlined" style="font-size: 1.1rem;">logout</span> Logout
+            </a>
+        </div>
+    </header>
+
+    <!-- Alert Messages -->
+    <div th:if="${success}" class="alert alert-success" style="background-color: #d1fae5; color: #065f46; padding: 1rem; border-radius: var(--radius-default); margin-bottom: 1.5rem; border: 1px solid #10b981; display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 600;">
+        <span class="material-symbols-outlined">check_circle</span>
+        <span th:text="${success}">Ritual updated successfully!</span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger" style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: var(--radius-default); margin-bottom: 1.5rem; border: 1px solid #f87171; display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 600;">
+        <span class="material-symbols-outlined">error</span>
+        <span th:text="${error}">Error booking ritual.</span>
+    </div>
+
+    <!-- ===== ALL BOOKINGS SECTION ===== -->
+    <div class="content-card glass-pane clay-lift" style="background:#ffffff;margin-top:1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+            <h3 style="margin-bottom:0;">
+                <span class="material-symbols-outlined" style="vertical-align:middle;font-size:1.4rem;color:var(--stitch-pink-dark);">history</span>
+                All Bookings History
+            </h3>
+        </div>
+
+        <div style="overflow-x:auto;">
+            <table class="sakura-table">
+                <thead>
+                <tr>
+                    <th>Service / Package</th>
+                    <th>Staff</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="b : ${bookings}">
+                    <td>
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="material-symbols-outlined" style="font-size:1.1rem;color:var(--stitch-pink-dark);">spa</span>
+                            <span th:text="${b.serviceId != null ? b.serviceId : b.packageId}" style="font-weight:600;font-size:0.85rem;">Service</span>
+                        </div>
+                    </td>
+                    <td th:text="${b.staffId != null ? b.staffId : '—'}" style="font-size:0.85rem;">Staff</td>
+                    <td th:text="${b.appointmentDate}" style="font-size:0.85rem;">Date</td>
+                    <td th:text="${b.appointmentTime}" style="font-size:0.85rem;">Time</td>
+                    <td style="font-weight:700;color:var(--stitch-pink-dark);font-size:0.85rem;" th:text="'Rs. ' + ${b.totalAmount}">Rs. 0</td>
+                    <td>
+                        <span style="padding:.25rem .75rem;border-radius:20px;font-size:.65rem;font-weight:700;text-transform:uppercase;background:#dbeafe;color:#1d4ed8;"
+                              th:if="${b.status == 'CONFIRMED' or b.status == 'SCHEDULED'}">Confirmed</span>
+                        <span style="padding:.25rem .75rem;border-radius:20px;font-size:.65rem;font-weight:700;text-transform:uppercase;background:#fef9c3;color:#854d0e;"
+                              th:if="${b.status == 'PENDING'}">Pending</span>
+                        <span style="padding:.25rem .75rem;border-radius:20px;font-size:.65rem;font-weight:700;text-transform:uppercase;background:#dcfce7;color:#166534;"
+                              th:if="${b.status == 'COMPLETED'}">Completed</span>
+                        <span style="padding:.25rem .75rem;border-radius:20px;font-size:.65rem;font-weight:700;text-transform:uppercase;background:#ffedd5;color:#c2410c;"
+                              th:if="${b.status == 'RESCHEDULED'}">Rescheduled</span>
+                        <span style="padding:.25rem .75rem;border-radius:20px;font-size:.65rem;font-weight:700;text-transform:uppercase;background:#fee2e2;color:#991b1b;"
+                              th:if="${b.status == 'CANCELLED'}">Cancelled</span>
+                    </td>
+                    <td style="text-align:right;">
+                        <div style="display:flex;gap:0.4rem;justify-content:flex-end;align-items:center;">
+                            <!-- Reschedule option -->
+                            <a th:if="${b.status == 'CONFIRMED' or b.status == 'PENDING' or b.status == 'SCHEDULED' or b.status == 'RESCHEDULED'}"
+                               th:href="@{/booking(reschedule=${b.appointmentId})}" 
+                               class="btn-sakura btn-sakura-outline btn-sakura-sm"
+                               style="color:#0f766e;border-color:#99f6e4;display:inline-flex;align-items:center;gap:0.2rem;text-decoration:none;"
+                               title="Reschedule Booking">
+                                <span class="material-symbols-outlined" style="font-size:.85rem;">sync_alt</span>
+                                Reschedule
+                            </a>
+                            <!-- Cancel (active bookings) -->
+                            <form th:if="${b.status == 'CONFIRMED' or b.status == 'PENDING' or b.status == 'SCHEDULED' or b.status == 'RESCHEDULED'}"
+                                  th:action="@{'/appointments/' + ${b.appointmentId} + '/cancel'}" method="post" style="display:inline;">
+                                <button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm"
+                                        style="color:#b45309;border-color:#fde68a;"
+                                        onclick="return confirm('Cancel this appointment?');"
+                                        title="Cancel Booking">
+                                    <span class="material-symbols-outlined" style="font-size:.85rem;">event_busy</span>
+                                    Cancel
+                                </button>
+                            </form>
+                            <!-- Review (completed, triggers modal) -->
+                            <button th:if="${b.status == 'COMPLETED'}"
+                                    class="btn-sakura btn-sakura-outline btn-sakura-sm"
+                                    style="color:#9d174d;border-color:#fbcfe8;"
+                                    th:attr="onclick='openReviewModal(' + ${b.appointmentId} + ')'"
+                                    title="Leave a Review">
+                                <span class="material-symbols-outlined" style="font-size:.85rem;">rate_review</span>
+                                Review
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(bookings)}">
+                    <td colspan="7" style="text-align:center;padding:3rem;color:var(--stitch-muted);">
+                        <span class="material-symbols-outlined" style="font-size:3rem;opacity:.3;display:block;margin-bottom:.5rem;">calendar_off</span>
+                        No bookings yet. <a th:href="@{/booking}" style="color:var(--stitch-pink-dark);font-weight:700;">Book your first ritual →</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;">
+        <div style="background:#fff;border-radius:1.5rem;padding:2rem;max-width:480px;width:90%;box-shadow:0 25px 50px rgba(0,0,0,.2);">
+            <h3 style="font-family:var(--font-headline);color:#0f172a;margin-bottom:1.5rem;">
+                <span class="material-symbols-outlined" style="vertical-align:middle;color:var(--stitch-pink-dark);">rate_review</span>
+                Leave a Review
+            </h3>
+            <form th:action="@{/reviews/submit}" method="post" id="reviewForm">
+                <input type="hidden" name="appointmentId" id="reviewAppointmentId">
+                <div style="margin-bottom:1.25rem;">
+                    <label style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;display:block;margin-bottom:.5rem;">Rating</label>
+                    <div id="starRating" style="display:flex;gap:.5rem;font-size:1.75rem;cursor:pointer;">
+                        <span data-v="1" onclick="setRating(1)">☆</span>
+                        <span data-v="2" onclick="setRating(2)">☆</span>
+                        <span data-v="3" onclick="setRating(3)">☆</span>
+                        <span data-v="4" onclick="setRating(4)">☆</span>
+                        <span data-v="5" onclick="setRating(5)">☆</span>
+                    </div>
+                    <input type="hidden" name="rating" id="ratingInput" value="5">
+                </div>
+                <div style="margin-bottom:1.5rem;">
+                    <label style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;display:block;margin-bottom:.5rem;">Your Experience</label>
+                    <textarea name="comment" rows="4" class="input-recessed" style="width:100%;" placeholder="Share your experience..."></textarea>
+                </div>
+                <div style="display:flex;gap:.75rem;justify-content:flex-end;">
+                    <button type="button" onclick="closeReviewModal()" class="btn-sakura btn-sakura-outline">Cancel</button>
+                    <button type="submit" class="btn-sakura btn-sakura-primary">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="admin-footer">
+        <span>© 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS</span>
+    </footer>
+</main>
+
+<script>
+    // Review Modal helpers
+    function openReviewModal(appointmentId) {
+        document.getElementById('reviewAppointmentId').value = appointmentId;
+        document.getElementById('reviewModal').style.display = 'flex';
+        setRating(5);
+    }
+    function closeReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+    }
+    function setRating(val) {
+        document.getElementById('ratingInput').value = val;
+        document.querySelectorAll('#starRating span').forEach((s, i) => {
+            s.textContent = i < val ? '★' : '☆';
+            s.style.color = i < val ? '#f59e0b' : '#cbd5e1';
+        });
+    }
+    // Close modal on backdrop click
+    document.getElementById('reviewModal').addEventListener('click', function(e) {
+        if (e.target === this) closeReviewModal();
+    });
+</script>
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>

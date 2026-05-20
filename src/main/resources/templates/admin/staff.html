@@ -24,15 +24,6 @@
         <a th:href="@{/admin/reports}"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
         <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
     </nav>
-    <div class="sidebar-footer">
-        <div class="sidebar-profile">
-            <div class="avatar" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">AD</div>
-            <div class="info">
-                <span class="name" th:text="${username}">admin</span>
-                <span class="role">Administrator</span>
-            </div>
-        </div>
-    </div>
 </aside>
 <main class="admin-main">
     <header class="page-header">
@@ -73,11 +64,11 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
                 <div class="form-group mb-3"><label>Email</label><input name="email" type="email" class="input-recessed" required></div>
-                <div class="form-group mb-3"><label>Phone</label><input name="phone" type="tel" class="input-recessed" pattern="[0-9]{10}" minlength="10" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="07X XXXX XXX"></div>
+                <div class="form-group mb-3"><label>Phone</label><input name="phone" class="input-recessed"></div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
                 <div class="form-group mb-3"><label>Staff Type</label><select name="staffType" class="input-recessed"><option value="STYLIST">Stylist</option><option value="THERAPIST">Therapist</option><option value="GENERAL">General</option></select></div>
-                <div class="form-group mb-3"><label>Specialization</label><input name="specialization" class="input-recessed" placeholder="e.g., Hair Coloring"></div>
+                <div class="form-group mb-3"><label>Specialization / Service Type</label><select name="specialization" class="input-recessed"><option value="Hair Styling">Hair Styling</option><option value="Skincare & Facials">Skincare & Facials</option><option value="Spa & Massage">Spa & Massage</option><option value="Nail Art & Care">Nail Art & Care</option><option value="General">General</option></select></div>
             </div>
             <div class="form-group mb-3"><label>Working Days</label><input name="workingDays" class="input-recessed" placeholder="MON,TUE,WED,THU,FRI"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
@@ -95,8 +86,8 @@
                 <div class="form-group mb-3"><label>Last Name</label><input name="lastName" class="input-recessed" th:value="${s.lastName}" required></div>
             </div>
             <div class="form-group mb-3"><label>Email</label><input name="email" type="email" class="input-recessed" th:value="${s.email}" required></div>
-            <div class="form-group mb-3"><label>Phone</label><input name="phone" type="tel" class="input-recessed" th:value="${s.phone}" pattern="[0-9]{10}" minlength="10" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="07X XXXX XXX"></div>
-            <div class="form-group mb-3"><label>Specialization</label><input name="specialization" class="input-recessed" th:value="${s.specialization}"></div>
+            <div class="form-group mb-3"><label>Phone</label><input name="phone" class="input-recessed" th:value="${s.phone}"></div>
+            <div class="form-group mb-3"><label>Specialization / Service Type</label><select name="specialization" class="input-recessed"><option value="Hair Styling" th:selected="${s.specialization == 'Hair Styling'}">Hair Styling</option><option value="Skincare & Facials" th:selected="${s.specialization == 'Skincare & Facials'}">Skincare & Facials</option><option value="Spa & Massage" th:selected="${s.specialization == 'Spa & Massage'}">Spa & Massage</option><option value="Nail Art & Care" th:selected="${s.specialization == 'Nail Art & Care'}">Nail Art & Care</option><option value="General" th:selected="${s.specialization == 'General'}">General</option><option th:if="${s.specialization != 'Hair Styling' and s.specialization != 'Skincare & Facials' and s.specialization != 'Spa & Massage' and s.specialization != 'Nail Art & Care' and s.specialization != 'General' and s.specialization != null}" th:value="${s.specialization}" th:text="${s.specialization}" selected></option></select></div>
             <div class="form-group mb-3"><label>Working Days</label><input name="workingDays" class="input-recessed" th:value="${s.workingDays}"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
                 <div class="form-group mb-3"><label>Start</label><input name="startTime" type="time" class="input-recessed" th:value="${s.startTime}"></div>
@@ -104,7 +95,7 @@
             </div>
         </div><div class="modal-footer"><button type="submit" class="btn-sakura btn-sakura-primary">Save</button></div></form>
     </div></div></div>
-    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS</span></footer>
+    <footer class="admin-footer"><span>© 2024 Sakura Saki Beauty.</span></footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/sakura-petals.js}"></script>
