@@ -52,8 +52,9 @@ public class SecurityConfig {
                         .requestMatchers("/staff", "/reviews/**", "/api/staff/**").permitAll()
                         .requestMatchers("/services", "/services/**", "/packages", "/packages/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/staff/dashboard/**").hasAnyRole("STAFF", "ADMIN")
-                        .requestMatchers("/profile/**", "/booking/**", "/my-appointments/**").authenticated()
+                        .requestMatchers("/staff/dashboard/**", "/staff/appointments/**").hasAnyRole("STAFF", "ADMIN")
+                        .requestMatchers("/profile/**").authenticated()
+                        .requestMatchers("/booking/**", "/my-appointments/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

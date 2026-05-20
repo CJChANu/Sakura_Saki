@@ -64,7 +64,7 @@
         </div>
         
         <div style="display:flex;gap:1rem;">
-            <button th:if="${isLoggedIn}" onclick="toggleBooking()" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2rem;">
+            <button th:if="${isLoggedIn and !isStaff}" onclick="toggleBooking()" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2rem;">
                 <span class="material-symbols-outlined" style="font-size:1rem;">calendar_add_on</span> Book This Service
             </button>
             <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2rem;">
@@ -74,7 +74,7 @@
     </div>
     
     <!-- Inline Booking Form -->
-    <div id="bookingSection" class="booking-section" th:if="${isLoggedIn}">
+    <div id="bookingSection" class="booking-section" th:if="${isLoggedIn and !isStaff}">
         <h2 style="font-family:var(--font-headline);margin:0 0 1.5rem;font-size:1.5rem;">Schedule Appointment</h2>
         <form th:action="@{/booking}" method="post" id="bookingForm">
             <input type="hidden" name="serviceId" th:value="${service.id}">
@@ -88,7 +88,7 @@
                 </div>
                 <div class="form-group">
                     <label for="bookingTime">Time</label>
-                    <input type="time" id="bookingTime" name="time" class="input-recessed" required min="09:00" max="17:00" step="1800">
+                    <input type="time" id="bookingTime" name="time" class="input-recessed" required>
                 </div>
             </div>
 
@@ -137,12 +137,98 @@
 
 <script th:src="@{/js/sakura-petals.js}"></script>
 <script>
-    // Set min date to today
+    function getLocalDateStr() {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+    }
+    function getCurrentTimeStr() {
+        var d = new Date();
+        return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-        var today = new Date().toISOString().split('T')[0];
         var dateInput = document.getElementById('bookingDate');
-        if (dateInput) dateInput.setAttribute('min', today);
+        var timeInput = document.getElementById('bookingTime');
+        var form = document.getElementById('bookingForm');
+
+        if (dateInput) {
+            dateInput.setAttribute('min', getLocalDateStr());
+        }
+
+        // Validate on form submission
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                var selectedDate = dateInput ? dateInput.value : '';
+                var selectedTime = timeInput ? timeInput.value : '';
+                var today = getLocalDateStr();
+
+                if (!selectedDate || !selectedTime) return;
+
+                if (selectedDate < today) {
+                    e.preventDefault();
+                    showTimeError('Cannot book on a past date. Please select today or a future date.');
+                    return;
+                }
+
+                if (selectedDate === today && selectedTime <= getCurrentTimeStr()) {
+                    e.preventDefault();
+                    showTimeError('The selected time has already passed. Please choose a later time for today.');
+                    return;
+                }
+
+                // Check staff selected
+                var staffId = document.getElementById('selectedStaffId');
+                if (staffId && !staffId.value) {
+                    e.preventDefault();
+                    showTimeError('Please select a staff member before booking.');
+                    return;
+                }
+            });
+        }
+
+        // Validate when time changes
+        if (timeInput) {
+            timeInput.addEventListener('change', function() {
+                var today = getLocalDateStr();
+                if (dateInput && dateInput.value === today && this.value && this.value <= getCurrentTimeStr()) {
+                    showTimeError('The selected time has already passed. Please choose a later time for today.');
+                    this.value = '';
+                } else {
+                    clearTimeError();
+                }
+            });
+        }
+
+        // Revalidate time when date changes
+        if (dateInput) {
+            dateInput.addEventListener('change', function() {
+                clearTimeError();
+                var today = getLocalDateStr();
+                if (this.value === today && timeInput && timeInput.value && timeInput.value <= getCurrentTimeStr()) {
+                    timeInput.value = '';
+                    showTimeError('The selected time has already passed. Please choose a later time for today.');
+                }
+            });
+        }
     });
+
+    function showTimeError(msg) {
+        clearTimeError();
+        var err = document.createElement('div');
+        err.className = 'sakura-alert sakura-alert-error';
+        err.id = 'time-validation-error';
+        err.textContent = msg;
+        var section = document.getElementById('bookingSection');
+        if (section) section.insertBefore(err, section.firstChild);
+        err.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }
+    function clearTimeError() {
+        var existing = document.getElementById('time-validation-error');
+        if (existing) existing.remove();
+    }
 
     function toggleBooking() {
         var sec = document.getElementById('bookingSection');

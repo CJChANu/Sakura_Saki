@@ -62,5 +62,91 @@
     <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
 </main>
 <script th:src="@{/js/sakura-petals.js}"></script>
+<script>
+(function() {
+    function getLocalDateStr() {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+    }
+    function getCurrentTimeStr() {
+        var d = new Date();
+        return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
+
+    var dateInput = document.querySelector('input[name="date"]');
+    var timeInput = document.querySelector('input[name="time"]');
+    var form = document.querySelector('form[action]');
+
+    if (dateInput) {
+        dateInput.setAttribute('min', getLocalDateStr());
+    }
+
+    // Validate on form submission
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            var selectedDate = dateInput.value;
+            var selectedTime = timeInput.value;
+            var today = getLocalDateStr();
+
+            if (!selectedDate || !selectedTime) return; // let HTML5 required handle it
+
+            if (selectedDate < today) {
+                e.preventDefault();
+                showTimeError('Cannot book on a past date. Please select today or a future date.');
+                return;
+            }
+
+            if (selectedDate === today && selectedTime <= getCurrentTimeStr()) {
+                e.preventDefault();
+                showTimeError('The selected time has already passed. Please choose a later time for today.');
+                return;
+            }
+        });
+    }
+
+    // Also validate when time input changes
+    if (timeInput) {
+        timeInput.addEventListener('change', function() {
+            var today = getLocalDateStr();
+            if (dateInput.value === today && this.value && this.value <= getCurrentTimeStr()) {
+                showTimeError('The selected time has already passed. Please choose a later time for today.');
+                this.value = '';
+            } else {
+                clearTimeError();
+            }
+        });
+    }
+
+    // Revalidate time when date changes
+    if (dateInput) {
+        dateInput.addEventListener('change', function() {
+            clearTimeError();
+            var today = getLocalDateStr();
+            if (this.value === today && timeInput.value && timeInput.value <= getCurrentTimeStr()) {
+                timeInput.value = '';
+                showTimeError('The selected time has already passed. Please choose a later time for today.');
+            }
+        });
+    }
+
+    function showTimeError(msg) {
+        clearTimeError();
+        var err = document.createElement('div');
+        err.className = 'sakura-alert sakura-alert-error';
+        err.id = 'time-validation-error';
+        err.textContent = msg;
+        var card = document.querySelector('.content-card');
+        if (card) card.insertBefore(err, card.firstChild);
+        err.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }
+    function clearTimeError() {
+        var existing = document.getElementById('time-validation-error');
+        if (existing) existing.remove();
+    }
+})();
+</script>
 </body>
 </html>
