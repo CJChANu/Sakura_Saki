@@ -44,3 +44,12 @@ sakura_saki_admin_api.postman_collection.json
 
 ### others ###
 scratch
+
+### macOS ###
+.DS_Store
+**/.DS_Store
+
+### Logs ###
+*.log
+run.log
+run_error.log
