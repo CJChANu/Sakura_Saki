@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: sakura-saki
+    env: docker
+    branch: main
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:mysql://sakura-saki-sakura-saki-8f40.h.aivencloud.com:26530/defaultdb?sslMode=REQUIRED
+      - key: SPRING_DATASOURCE_USERNAME
+        value: avnadmin
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: AVNS_dDB2Ptw4NTfc_MUy5CZ

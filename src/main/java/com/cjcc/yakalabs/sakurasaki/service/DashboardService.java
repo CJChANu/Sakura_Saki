@@ -32,7 +32,8 @@ public class DashboardService {
         long totalServices       = salonServiceRepo.count();
         long totalStaff          = staffRepo.count();
         long todayAppointments   = appointmentRepo.countByAppointmentDate(LocalDate.now());
+        double totalRevenue      = appointmentRepo.sumRevenueCompleted();
 
-        return new DashboardSummaryDTO(totalCustomers, totalServices, totalStaff, todayAppointments);
+        return new DashboardSummaryDTO(totalCustomers, totalServices, totalStaff, todayAppointments, totalRevenue);
     }
 }

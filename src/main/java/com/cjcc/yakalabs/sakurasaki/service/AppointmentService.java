@@ -136,4 +136,17 @@ public class AppointmentService {
     public void cancelAppointment(Long id) {
         changeStatus(id, "CANCELLED");
     }
+
+    public List<Appointment> getLatestAppointments() {
+        return appointmentRepo.findTop5ByOrderByAppointmentDateDescAppointmentTimeDesc();
+    }
+
+    public Optional<Appointment> getNextAppointmentForCustomer(Long customerId) {
+        return appointmentRepo.findFirstByCustomerIdAndAppointmentDateGreaterThanEqualAndStatusOrderByAppointmentDateAscAppointmentTimeAsc(
+                customerId, LocalDate.now(), "SCHEDULED");
+    }
+
+    public long countCompletedForCustomer(Long customerId) {
+        return appointmentRepo.countByCustomerIdAndStatus(customerId, "COMPLETED");
+    }
 }

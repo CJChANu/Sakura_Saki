@@ -18,21 +18,21 @@ public class AppointmentViewController {
 
     @GetMapping
     public String viewAllAppointments(Model model) {
-        model.addAttribute("appointments", appointmentService.getAllAppointments());
+        model.addAttribute("appointments", appointmentService.findAll());
         model.addAttribute("pageTitle", "All Appointments");
         return "appointments-list";
     }
 
     @GetMapping("/completed")
     public String viewCompletedAppointments(Model model) {
-        model.addAttribute("appointments", appointmentService.getAppointmentsByStatus("COMPLETED"));
+        model.addAttribute("appointments", appointmentService.findByStatus("COMPLETED"));
         model.addAttribute("pageTitle", "Completed Appointments");
         return "appointments-list";
     }
 
     @GetMapping("/{appointmentId}")
     public String viewAppointmentById(@PathVariable Long appointmentId, Model model) {
-        Appointment appointment = appointmentService.getAppointmentById(appointmentId);
+        Appointment appointment = appointmentService.findById(appointmentId).orElse(null);
         model.addAttribute("appointment", appointment);
         return "appointment-details";
     }

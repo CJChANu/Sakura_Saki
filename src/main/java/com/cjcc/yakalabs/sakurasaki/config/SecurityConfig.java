@@ -50,9 +50,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**", "/videos/**", "/our-services", "/our-packages").permitAll()
                         .requestMatchers("/staff", "/reviews/**", "/api/staff/**").permitAll()
-                        .requestMatchers("/services", "/services/**", "/packages", "/packages/**").hasRole("ADMIN")
+                        .requestMatchers("/services", "/services/**").permitAll()
+                        .requestMatchers("/packages", "/packages/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/staff/dashboard/**", "/staff/appointments/**").hasAnyRole("STAFF", "ADMIN")
+                        .requestMatchers("/staff/**").hasAnyRole("STAFF", "ADMIN")
+                        .requestMatchers("/customer/**").hasRole("USER")
                         .requestMatchers("/profile/**").authenticated()
                         .requestMatchers("/booking/**", "/my-appointments/**").hasRole("USER")
                         .anyRequest().authenticated()

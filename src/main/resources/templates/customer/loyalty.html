@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Sakura Circle — Sakura Saki')}"></head>
+<body class="bg-surface text-on-surface overflow-x-hidden">
+<th:block th:replace="~{layout/fragments :: sakura-canvas}" />
+
+<div class="flex min-h-screen">
+    <aside th:replace="~{layout/fragments :: customer-sidebar('loyalty')}"></aside>
+
+    <main class="flex-1 overflow-y-auto p-12 relative flex flex-col min-h-screen">
+        <header class="mb-12">
+            <span class="text-primary font-label text-xs font-extrabold tracking-[0.2em] uppercase block mb-2">Membership</span>
+            <h1 class="font-headline text-4xl text-on-surface font-bold">Sakura Circle</h1>
+        </header>
+
+        <!-- Membership Hero -->
+        <div class="rounded-xl p-10 md:p-16 relative overflow-hidden mb-12" style="background: linear-gradient(135deg, #fbcfe8 0%, #fda4af 60%, #be185d 100%);">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div>
+                    <p class="text-xs font-label font-bold uppercase tracking-[0.15em] text-rose-100/80 mb-3">Your Points Balance</p>
+                    <p class="text-6xl font-headline font-bold text-white" th:text="${customer != null ? customer.loyaltyPoints : 0}">2,450</p>
+                    <div class="mt-4 flex items-center gap-3">
+                        <span class="px-4 py-1.5 rounded-full bg-white/20 text-white text-xs font-bold uppercase tracking-wider" th:text="${customer != null ? customer.membershipTier : 'Bronze'}">Platinum</span>
+                        <span class="text-rose-100 text-xs">Member since 2024</span>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="w-32 h-32 rounded-full bg-white/10 border-4 border-white/30 flex items-center justify-center mx-auto">
+                        <span class="material-symbols-outlined text-6xl text-white">local_florist</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tier Progress -->
+        <div class="bg-white rounded-lg p-8 clay-lift mb-8">
+            <h3 class="font-headline text-xl font-bold text-on-surface mb-6">Tier Progress</h3>
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="text-center p-4 rounded-lg" th:classappend="${customer != null && customer.membershipTier == 'Bronze'} ? 'bg-amber-50 border-2 border-amber-300' : 'bg-surface'">
+                    <span class="material-symbols-outlined text-2xl text-amber-600">workspace_premium</span>
+                    <p class="text-xs font-bold mt-2">Bronze</p>
+                    <p class="text-[10px] text-on-surface-variant">0 pts</p>
+                </div>
+                <div class="text-center p-4 rounded-lg" th:classappend="${customer != null && customer.membershipTier == 'Silver'} ? 'bg-slate-100 border-2 border-slate-400' : 'bg-surface'">
+                    <span class="material-symbols-outlined text-2xl text-slate-500">workspace_premium</span>
+                    <p class="text-xs font-bold mt-2">Silver</p>
+                    <p class="text-[10px] text-on-surface-variant">500 pts</p>
+                </div>
+                <div class="text-center p-4 rounded-lg" th:classappend="${customer != null && customer.membershipTier == 'Gold'} ? 'bg-yellow-50 border-2 border-yellow-400' : 'bg-surface'">
+                    <span class="material-symbols-outlined text-2xl text-yellow-600">workspace_premium</span>
+                    <p class="text-xs font-bold mt-2">Gold</p>
+                    <p class="text-[10px] text-on-surface-variant">1,500 pts</p>
+                </div>
+                <div class="text-center p-4 rounded-lg" th:classappend="${customer != null && customer.membershipTier == 'Platinum'} ? 'bg-rose-50 border-2 border-rose-400' : 'bg-surface'">
+                    <span class="material-symbols-outlined text-2xl text-rose-600">workspace_premium</span>
+                    <p class="text-xs font-bold mt-2">Platinum</p>
+                    <p class="text-[10px] text-on-surface-variant">3,000 pts</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- How to Earn & Rewards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white rounded-lg p-8 clay-lift">
+                <h3 class="font-headline text-xl font-bold text-on-surface mb-6">How to Earn</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 p-4 bg-surface rounded-lg">
+                        <span class="material-symbols-outlined text-primary">spa</span>
+                        <div>
+                            <p class="font-bold text-sm">Book a Service</p>
+                            <p class="text-xs text-on-surface-variant">Earn 10 points per Rs. 100 spent</p>
+                        </div>
+                        <span class="ml-auto text-primary font-bold text-sm">+10 pts</span>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 bg-surface rounded-lg">
+                        <span class="material-symbols-outlined text-primary">rate_review</span>
+                        <div>
+                            <p class="font-bold text-sm">Write a Review</p>
+                            <p class="text-xs text-on-surface-variant">Share your experience</p>
+                        </div>
+                        <span class="ml-auto text-primary font-bold text-sm">+25 pts</span>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 bg-surface rounded-lg">
+                        <span class="material-symbols-outlined text-primary">group_add</span>
+                        <div>
+                            <p class="font-bold text-sm">Refer a Friend</p>
+                            <p class="text-xs text-on-surface-variant">When they complete first visit</p>
+                        </div>
+                        <span class="ml-auto text-primary font-bold text-sm">+100 pts</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg p-8 clay-lift">
+                <h3 class="font-headline text-xl font-bold text-on-surface mb-6">Available Rewards</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 p-4 bg-surface rounded-lg">
+                        <span class="material-symbols-outlined text-primary">redeem</span>
+                        <div>
+                            <p class="font-bold text-sm">Free Mini Facial</p>
+                            <p class="text-xs text-on-surface-variant">15-min express treatment</p>
+                        </div>
+                        <span class="ml-auto text-primary font-bold text-sm">500 pts</span>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 bg-surface rounded-lg">
+                        <span class="material-symbols-outlined text-primary">card_giftcard</span>
+                        <div>
+                            <p class="font-bold text-sm">Rs. 500 Off</p>
+                            <p class="text-xs text-on-surface-variant">Any service over Rs. 2,000</p>
+                        </div>
+                        <span class="ml-auto text-primary font-bold text-sm">1,000 pts</span>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 bg-surface rounded-lg">
+                        <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                        <div>
+                            <p class="font-bold text-sm">Premium Skin Ritual</p>
+                            <p class="text-xs text-on-surface-variant">Full 90-min luxury treatment</p>
+                        </div>
+                        <span class="ml-auto text-primary font-bold text-sm">2,500 pts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
+    </main>
+</div>
+
+<th:block th:replace="~{layout/fragments :: sakura-js}" />
+</body>
+</html>

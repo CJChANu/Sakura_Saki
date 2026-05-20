@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
@@ -62,4 +63,18 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
            "ORDER BY COUNT(a) DESC")
     List<Object[]> countByServiceBetween(@Param("from") LocalDate from,
                                          @Param("to") LocalDate to);
+
+    // ---- Revenue: sum of service prices for completed appointments ----
+    @Query("SELECT COALESCE(SUM(a.service.price), 0) FROM Appointment a WHERE a.status = 'COMPLETED'")
+    Double sumRevenueCompleted();
+
+    // ---- Latest appointments for dashboard display ----
+    List<Appointment> findTop5ByOrderByAppointmentDateDescAppointmentTimeDesc();
+
+    // ---- Find next upcoming appointment for a customer ----
+    Optional<Appointment> findFirstByCustomerIdAndAppointmentDateGreaterThanEqualAndStatusOrderByAppointmentDateAscAppointmentTimeAsc(
+            Long customerId, LocalDate date, String status);
+
+    // ---- Count completed appointments for a customer ----
+    long countByCustomerIdAndStatus(Long customerId, String status);
 }

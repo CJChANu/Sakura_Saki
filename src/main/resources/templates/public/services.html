@@ -1,102 +1,321 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html class="scroll-smooth light" lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Services — Sakura Saki</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Sakura Saki | Service Catalog</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#574144",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "primary-fixed": "#ffd9df",
+                        "outline": "#837375",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#555555",
+                        "on-primary-fixed-variant": "#6b3743",
+                        "on-secondary-fixed": "#281719",
+                        "surface-tint": "#864e5a",
+                        "tertiary-fixed-dim": "#c8c6c6",
+                        "on-surface-variant": "#514345",
+                        "primary": "#864e5a",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#fbb3c1",
+                        "outline-variant": "#d6c2c4",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-dim": "#dadada",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-primary-container": "#7b4551",
+                        "background": "#f9f9f9",
+                        "secondary-fixed": "#fbdbde",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-container": "#755d5f",
+                        "surface-container-highest": "#e2e2e2",
+                        "secondary-container": "#f8d8db",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "tertiary": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#e4e2e1",
+                        "inverse-on-surface": "#f1f1f1",
+                        "error-container": "#ffdad6",
+                        "secondary": "#70585b",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-container": "#cccaca",
+                        "secondary-fixed-dim": "#debfc2",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#ffb7c5",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-high": "#e8e8e8",
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "primary-fixed-dim": "#fbb3c1",
+                        "on-primary-fixed": "#360c19",
+                        "surface-variant": "#e2e2e2",
+                        "surface-bright": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
     <style>
-        body{margin:0;font-family:var(--font-body);color:var(--on-surface);background:var(--surface);}
-        .public-topnav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(255,255,255,.6);backdrop-filter:blur(24px);border-bottom:.5px solid rgba(214,194,196,.12);}
-        .public-topnav .brand{font-family:var(--font-headline);font-size:1.15rem;font-weight:700;color:var(--primary);text-decoration:none;}
-        .public-topnav .nav-links{display:flex;gap:2rem;align-items:center;}
-        .public-topnav .nav-links a{font-family:var(--font-label);font-size:.8rem;font-weight:500;color:var(--on-surface-variant);text-decoration:none;transition:color .3s;}
-        .public-topnav .nav-links a:hover{color:var(--primary);}
-        .page-hero{padding:7rem 2rem 3rem;text-align:center;background:linear-gradient(135deg,#ffe4ea,#fff5f7,#fce7f3);}
-        .page-hero h1{font-family:var(--font-headline);font-size:2.5rem;font-weight:700;letter-spacing:-.02em;margin:0 0 .75rem;}
-        .page-hero p{color:var(--outline);font-size:1rem;max-width:500px;margin:0 auto 2rem;}
-        .container{max-width:1100px;margin:0 auto;padding:3rem 2rem;}
-        .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
-        .svc-card{background:rgba(255,255,255,.7);backdrop-filter:blur(16px);border-radius:var(--radius-lg);padding:2rem;border:.5px solid rgba(214,194,196,.12);transition:all .4s cubic-bezier(.4,0,.2,1);}
-        .svc-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px -10px rgba(134,78,90,.12);}
-        .svc-card .cat{font-family:var(--font-label);font-size:.6rem;text-transform:uppercase;letter-spacing:.15em;color:var(--primary);margin-bottom:.5rem;}
-        .svc-card h3{font-family:var(--font-headline);font-size:1.1rem;margin:0 0 .5rem;}
-        .svc-card .desc{font-size:.85rem;color:var(--outline);line-height:1.6;margin-bottom:1rem;}
-        .svc-card .meta{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--on-surface-variant);}
-        .svc-card .price{font-family:var(--font-headline);font-weight:700;color:var(--primary);font-size:1.1rem;}
-        .pkg-section{margin-top:3rem;}
-        .pkg-card{background:linear-gradient(135deg,var(--primary-container),#fff5f7);border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem;}
-        .pkg-card h3{font-family:var(--font-headline);font-size:1.15rem;margin:0 0 .5rem;}
-        .pkg-card .desc{font-size:.85rem;color:var(--on-primary-container);margin-bottom:1rem;}
-        .pkg-card .meta{font-size:.85rem;color:var(--on-primary-container);}
-
-        @media(max-width:768px){.svc-grid{grid-template-columns:1fr;}.public-topnav{padding:.75rem 1.5rem;}}
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(255, 255, 255, 0.3);
+        }
+        .clay-shadow {
+            box-shadow: 0 40px 60px -15px rgba(26, 28, 28, 0.06), inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+        }
+        .service-card:hover {
+            transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale(1.02);
+        }
     </style>
 </head>
-<body style="display:flex;flex-direction:column;min-height:100vh;">
-<canvas id="sakura-canvas"></canvas>
-<main style="flex:1;">
-<nav class="public-topnav">
-    <a th:href="@{/}" class="brand">🌸 Sakura Saki</a>
-    <div class="nav-links">
-        <a th:href="@{/services}" style="color:var(--primary);font-weight:600;">Services</a>
-        <a th:href="@{/staff}">Our Team</a>
-        <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn-sakura btn-sakura-primary" style="padding:.5rem 1.25rem;">Sign In</a>
-        <a th:if="${isLoggedIn}" th:href="@{/profile}" class="btn-sakura btn-sakura-outline" style="padding:.5rem 1.25rem;display:flex;align-items:center;gap:.25rem;">
-            <span class="material-symbols-outlined" style="font-size:1.1rem;">person</span> <span th:text="${username}">Profile</span>
-        </a>
-    </div>
-</nav>
+<body class="bg-surface font-body text-on-surface antialiased relative overflow-x-hidden">
+    <!-- Sakura Canvas -->
+    <canvas class="fixed inset-0 pointer-events-none z-0 opacity-70" id="sakura-canvas"></canvas>
 
-<div class="page-hero">
-    <span style="font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:var(--primary);">Our Offerings</span>
-    <h1>Service Catalog</h1>
-    <p>Discover our curated selection of premium beauty and wellness treatments.</p>
-    <div class="search-pill" style="display:inline-flex;margin:0 auto;">
-        <span class="material-symbols-outlined" style="color:var(--outline);">search</span>
-        <input type="text" id="serviceSearch" placeholder="Search services..." onkeyup="filterServices()">
-    </div>
-</div>
-
-<div class="container">
-    <div class="svc-grid" id="serviceGrid">
-        <div class="svc-card" th:each="s : ${services}" th:data-name="${s.name}" th:data-cat="${s.category}">
-            <div class="cat" th:text="${s.category ?: 'General'}">Category</div>
-            <h3 th:text="${s.name}">Service</h3>
-            <p class="desc" th:text="${s.description}">Description</p>
-            <div class="meta">
-                <span th:text="'⏱ ' + ${s.durationMinutes} + ' min'">30 min</span>
-                <span class="price" th:text="'Rs.' + ${#numbers.formatDecimal(s.price,1,2)}">Rs.1500.00</span>
-            </div>
-            <a th:href="@{'/services/' + ${s.id}}" class="btn-sakura btn-sakura-outline btn-sakura-sm" style="margin-top:1rem;width:100%;justify-content:center;">View Details</a>
-        </div>
-    </div>
-
-    <div class="pkg-section" th:if="${packages != null && !packages.isEmpty()}">
-        <span style="font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:var(--primary);">Bundles</span>
-        <h2 style="font-family:var(--font-headline);font-size:1.75rem;margin:.25rem 0 1.5rem;">Service Packages</h2>
-        <div class="pkg-card" th:each="p : ${packages}">
-            <h3 th:text="${p.name}">Package</h3>
-            <p class="desc" th:text="${p.description}">Description</p>
-            <div class="meta">
-                <span th:text="${p.services.size()} + ' services · ' + ${p.getTotalDuration()} + ' min total'">Details</span>
-                <span style="font-family:var(--font-headline);font-weight:700;font-size:1.1rem;">
-                    <span style="text-decoration:line-through;color:var(--outline);font-size:.85rem;" th:text="'Rs.' + ${#numbers.formatDecimal(p.getTotalPrice(),1,2)}">Total</span>
-                    <span style="color:var(--primary);margin-left:.5rem;" th:text="'Rs.' + ${#numbers.formatDecimal(p.getDiscountedPrice(),1,2)}">Discounted</span>
-                </span>
+    <!-- Top Navigation Shell -->
+    <nav class="fixed top-0 w-full z-50 rounded-b-[2rem] bg-white/60 backdrop-blur-xl border-b border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.06)]">
+        <div class="flex justify-between items-center px-8 h-20 max-w-7xl mx-auto w-full">
+            <a th:href="@{/}" class="text-2xl font-serif font-bold text-rose-900 tracking-tight shrink-0" style="text-decoration:none;">Sakura Saki</a>
+            <div class="flex items-center gap-8">
+                <div class="hidden md:flex items-center gap-8 font-serif tracking-tight">
+                    <a th:href="@{/}" class="text-slate-500 hover:text-rose-400 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Home</a>
+                    <a th:href="@{/services}" class="text-rose-900 border-b-2 border-rose-400 pb-1 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Services</a>
+                    <a th:href="@{/booking}" class="text-slate-500 hover:text-rose-400 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Bookings</a>
+                </div>
+                <form th:action="@{/services}" method="get" class="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-full">
+                    <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+                    <input name="q" th:value="${search}" class="bg-transparent border-none focus:ring-0 text-sm w-32 font-medium" placeholder="Search services..." type="text"/>
+                    <input type="hidden" name="category" th:value="${activeCategory}" />
+                </form>
+                <div class="flex items-center gap-4">
+                    <a th:if="${!isLoggedIn}" th:href="@{/login}" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition-all duration-400 ease-out" style="text-decoration:none;">SIGN IN</a>
+                    <a th:if="${isAdmin}" th:href="@{/admin/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Admin Dashboard">dashboard</a>
+                    <a th:if="${isStaff}" th:href="@{/staff/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Staff Dashboard">dashboard</a>
+                    <a th:if="${isLoggedIn}" th:href="@{/profile}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Profile">account_circle</a>
+                    <a th:if="${isLoggedIn}" th:href="@{/logout}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Logout">logout</a>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-</main>
+    </nav>
 
-<footer class="site-footer">
-    <span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span>
-</footer>
-<script th:src="@{/js/sakura-petals.js}"></script>
-<script>
-function filterServices(){const q=document.getElementById('serviceSearch').value.toLowerCase();document.querySelectorAll('#serviceGrid .svc-card').forEach(c=>{const n=c.dataset.name.toLowerCase();const cat=(c.dataset.cat||'').toLowerCase();c.style.display=(n.includes(q)||cat.includes(q))?'':'none';});}
-</script>
+    <main class="pt-32 pb-24 px-6 max-w-7xl mx-auto relative z-10">
+        <!-- Hero Header -->
+        <header class="mb-16 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div class="max-w-2xl">
+                <span class="font-label text-primary uppercase tracking-[0.15em] text-xs font-bold mb-4 block">Artisanal Beauty</span>
+                <h1 class="font-headline text-5xl md:text-7xl text-on-surface font-bold tracking-tight leading-none mb-6">Service Catalog</h1>
+                <p class="text-tertiary text-lg max-w-lg leading-relaxed">Experience the delicate harmony of Japanese aesthetics and modern wellness. Each treatment is a ritual designed for your serenity.</p>
+            </div>
+            <div class="flex flex-wrap justify-center md:justify-end gap-3">
+                <a th:href="@{/booking}" class="px-8 py-3 rounded-full bg-primary text-white font-label text-sm uppercase tracking-widest transition-all duration-400 hover:scale-105 clay-shadow block text-center" style="text-decoration:none;">Book Now</a>
+            </div>
+        </header>
+
+        <!-- Filters Section -->
+        <section class="mb-12">
+            <div class="flex overflow-x-auto pb-4 gap-4 no-scrollbar items-center">
+                <a th:href="@{/services}" th:classappend="${activeCategory == null ? 'bg-primary text-white' : 'bg-white text-primary border border-primary-container shadow-sm'}" class="flex-shrink-0 px-6 py-3 rounded-full font-label text-xs uppercase tracking-widest transition-all duration-300" style="text-decoration:none;">All Rituals</a>
+                <a th:each="cat : ${categories}" th:href="@{/services(category=${cat})}" th:text="${cat}" th:classappend="${activeCategory == cat ? 'bg-primary text-white' : 'bg-white text-primary border border-primary-container shadow-sm'}" class="flex-shrink-0 px-6 py-3 rounded-full font-label text-xs uppercase tracking-widest transition-all duration-300" style="text-decoration:none;">Category</a>
+            </div>
+        </section>
+
+        <!-- Service Grid (Bento Style Layout) -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div th:each="s, stat : ${services}"
+                 th:classappend="${stat.index % 5 == 0} ? 'md:col-span-8' : (${stat.index % 5 == 1} ? 'md:col-span-4 flex flex-col' : 'md:col-span-4')"
+                 class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card">
+                
+                <div th:classappend="${stat.index % 5 == 0} ? 'aspect-[16/9]' : (${stat.index % 5 == 1} ? 'aspect-square' : 'aspect-[4/3]')" class="overflow-hidden relative">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                         th:src="${stat.index % 5 == 0 ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuDeWpC51Otw39WPnoS34IVa4m2qD_lkkaonTo27UAlp1HljleGuSy1fzEbD1d_vwHYqREtBmKCvxjy4mjpAKi2mHGJi0JR3SKacUnAeqvrurLcI7dey-llIlvd-w82kSbI7P2E37iDiQH7zxw7uJL_3Ysb8R-3wDj1FvP-KG7q5huXT6of0B_5h6Vll0FZvXxfjq41oCC9bfI6Y9s6uVLRxpCTK3RBpr5_yUpJQu0kuWdpbP9SOFxIswnY0usT-KlHGrfq6VY5avhBw' : 
+                                  (stat.index % 5 == 1 ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuA0AttB9AKJdcFHymHLvxLMcnsWWiUu9q9Dmf3FOJzdB-GHCiudo-HUIX7WWq6UifQutO0Y3LAJm8Dx5wn2umlIGautxIZl3ZiXueCmerOTGlPQ2nv2AZi-Gp36ttMdxUxwHPd2WkS922CY8r6ddIGKuMfajsp__W3YI53WtQ3zdKb9XGGxL4kgv1EhlVkhbpMJWSNTr7xPcZNXu1wpNhYbMwdrL1YWPiysO5DGl8x66HewLHzSz3Hb7B_VdQqBobRF5m-qOFl9zswR' : 
+                                  'https://lh3.googleusercontent.com/aida-public/AB6AXuDWRC_taj5s-TU98jH53tRoaoaFwtaUPmFBTgtplLVqC_8KTYYkK_9KK835QjzEkE4GmFh4v1t4o_b9CkjmmzjjyaDDJmxmKvz0sGqU9SVVSn7fT7CqAGTml_UtdUEveEHWuhYvGxTIkdg7s3NjJoDvmZFXuOrzN6MCDmKnl0GrEgXjTU47KW6vQ4F7Ig5cDZzw5nYnOKv5LLL4RjIiCSsm6spSoMLqVJfWGR_6CiDyVmBfKgMaH4Lwc6eYSn1q0WE27E-AbiINlHwa')}" />
+                </div>
+                
+                <div th:classappend="${stat.index % 5 == 0} ? 'p-8 md:p-12 relative z-10' : (${stat.index % 5 == 1} ? 'p-8 flex-grow flex flex-col justify-between' : 'p-8')">
+                    <div>
+                        <span class="font-label text-primary text-xs uppercase tracking-widest font-bold" th:text="${s.category ?: 'General'}">Category</span>
+                        <h3 th:classappend="${stat.index % 5 == 0} ? 'font-headline text-3xl md:text-4xl text-on-surface mt-2 font-bold mb-4' : 'font-headline text-xl text-on-surface mt-2 font-bold mb-4'" th:text="${s.name}">Service Name</h3>
+                        <p th:if="${stat.index % 5 == 0}" class="text-tertiary max-w-xl mb-10 leading-relaxed" th:text="${s.description}">Description</p>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span th:classappend="${stat.index % 5 == 0} ? 'text-2xl font-serif text-primary' : 'text-lg font-serif text-primary'" th:text="'Rs.' + ${#numbers.formatDecimal(s.price,1,2)}">Price</span>
+                            <span class="text-xs text-tertiary uppercase" th:text="${s.durationMinutes} + ' min'">Duration</span>
+                        </div>
+                        
+                        <a th:href="@{'/services/' + ${s.id}}" th:if="${stat.index % 5 != 0}" class="block w-full py-3 rounded-full bg-surface-container-high text-on-surface font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400 text-center" style="text-decoration:none;">View Details</a>
+                        
+                        <div th:if="${stat.index % 5 == 0}" class="flex items-center gap-6">
+                            <a th:href="@{'/services/' + ${s.id}}" class="group/btn flex items-center gap-3 text-primary font-label text-sm uppercase tracking-widest" style="text-decoration:none;">
+                                View Details 
+                                <span class="h-[1px] w-8 bg-primary transition-all duration-300 group-hover/btn:w-12"></span>
+                            </a>
+                            <a th:href="@{'/booking?serviceId=' + ${s.id}}" class="px-6 py-2 rounded-full border border-primary text-primary font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400" style="text-decoration:none;">Quick Book</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div th:if="${stat.index % 5 == 0}" class="absolute -bottom-10 -right-10 w-40 h-40 bg-primary-container/20 rounded-full blur-3xl pointer-events-none"></div>
+            </div>
+        </div>
+
+        <!-- Special Promotion Section (Packages) -->
+        <section th:if="${packages != null && !packages.isEmpty()}" class="mt-24 grid md:grid-cols-2 gap-12 items-center bg-primary-container/20 rounded-xl p-8 md:p-16 relative overflow-hidden" th:each="pkg, pkgStat : ${packages}" th:if="${pkgStat.index == 0}">
+            <div class="relative z-10">
+                <span class="font-label text-primary text-xs uppercase tracking-[0.2em] font-bold mb-6 block">Seasonal Curations</span>
+                <h2 class="font-headline text-4xl md:text-5xl text-on-surface font-bold mb-6 leading-tight" th:text="${pkg.name}">The Blooming Autumn Retreat</h2>
+                <p class="text-on-primary-container/80 text-lg mb-10 leading-relaxed" th:text="${pkg.description}">Description</p>
+                <div class="flex gap-4 items-center">
+                    <span class="font-headline text-3xl text-primary font-bold" th:text="'Rs.' + ${#numbers.formatDecimal(pkg.getDiscountedPrice(),1,2)}">Price</span>
+                    <span class="text-outline line-through text-sm" th:text="'Rs.' + ${#numbers.formatDecimal(pkg.getTotalPrice(),1,2)}">Orig Price</span>
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <a th:href="@{'/services/package/' + ${pkg.id}}" class="px-10 py-4 rounded-full bg-primary text-white font-label text-sm uppercase tracking-widest clay-shadow hover:scale-105 transition-all duration-400 text-center inline-block" style="text-decoration:none;">Learn More</a>
+                </div>
+            </div>
+            <div class="relative flex justify-center items-center z-10">
+                <div class="w-full max-w-md aspect-square rounded-full overflow-hidden border-[12px] border-white/50 clay-shadow">
+                    <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBBhfxDdZdWR4jBjuYw_UGeBeBFafI1jPTIcOxX5neL-1VBdAfMR532TDMaykst9-aJx8nFa_vxxiZCPZFuoEWSEz2ICAbbUsI2JmXIxolE2sYo1GLty5Pcs4fyNHbt-m02P3so7qcW3_5b7EqL8zEmUccgu4RihvzMKg-ibr_p-llp_YW11u_K_s2iLtC6K8CfIvc6g9GJLxSBIaFFkrQGXiutt-G7zp03ajSfSAA1JBbDY8VSoduveo9lkXxLzejyd8EV-3V6cQG"/>
+                </div>
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/40 backdrop-blur-xl rounded-full border border-white/60 clay-shadow flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary scale-150">spa</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Shell -->
+    <footer class="w-full py-12 border-t border-rose-100/50 dark:border-zinc-800/50 bg-stone-50 dark:bg-zinc-950 relative z-10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-8">
+            <div class="mb-6 md:mb-0">
+                <span class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">© 2024 Sakura Saki Beauty. All rights reserved.</span>
+            </div>
+            <div class="flex gap-8">
+                <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Privacy</a>
+                <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Terms</a>
+                <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- FAB -->
+    <a th:href="@{/booking}" class="fixed bottom-10 right-10 w-16 h-16 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center transition-all duration-400 hover:scale-110 active:scale-95 z-50 clay-shadow" style="text-decoration:none;">
+        <span class="material-symbols-outlined">calendar_month</span>
+    </a>
+
+    <script>
+        const canvas = document.getElementById('sakura-canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const petals = [];
+        const numPetals = 45;
+        let mouseX = -1000;
+        let mouseY = -1000;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        class Petal {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height - height;
+                this.size = Math.random() * 12 + 8;
+                this.speedY = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 2 - 1;
+                this.angle = Math.random() * 360;
+                this.spin = Math.random() * 0.05 - 0.025;
+                this.opacity = Math.random() * 0.6 + 0.2;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.spin;
+
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 120) {
+                    const force = (120 - dist) / 120;
+                    this.x -= (dx / dist) * force * 3;
+                    this.y -= (dy / dist) * force * 3;
+                }
+
+                if (this.y > height + this.size) {
+                    this.y = -this.size;
+                    this.x = Math.random() * width;
+                }
+                if (this.x > width + this.size) this.x = -this.size;
+                if (this.x < -this.size) this.x = width + this.size;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.quadraticCurveTo(this.size * 0.8, -this.size * 0.8, this.size * 1.2, 0);
+                ctx.quadraticCurveTo(this.size * 0.8, this.size * 0.8, 0, 0);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < numPetals; i++) {
+            petals.push(new Petal());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            petals.forEach(petal => {
+                petal.update();
+                petal.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
 </body>
 </html>

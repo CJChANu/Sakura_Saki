@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{layout/fragments :: head('Calendar — Sakura Saki')}"></head>
+<body class="bg-background text-on-surface font-body overflow-x-hidden">
+<th:block th:replace="~{layout/fragments :: sakura-canvas}" />
+
+<div class="flex h-screen w-full relative z-10">
+    <aside th:replace="~{layout/fragments :: staff-sidebar('calendar')}"></aside>
+
+    <main class="flex-1 ml-0 md:ml-72 p-6 md:p-10 lg:p-14 overflow-y-auto min-h-screen pb-24 md:pb-14 relative flex flex-col">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+            <div>
+                <h2 class="font-headline text-3xl md:text-4xl text-tertiary tracking-tight font-bold">My Calendar</h2>
+                <p class="font-body text-on-surface-variant mt-2">Your complete schedule overview</p>
+            </div>
+        </header>
+
+        <!-- Upcoming Appointments -->
+        <section class="glass-pane rounded-[2rem] p-6 md:p-8 clay-lift mb-8">
+            <h3 class="font-headline text-xl text-tertiary mb-6 font-bold flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary">calendar_month</span>
+                All Scheduled Appointments
+            </h3>
+            <div th:if="${appointments == null || appointments.isEmpty()}" class="text-center py-12">
+                <span class="material-symbols-outlined text-outline-variant text-5xl mb-4 block">event_busy</span>
+                <p class="text-on-surface-variant font-medium">No appointments found.</p>
+            </div>
+            <div th:if="${appointments != null && !appointments.isEmpty()}" class="space-y-4">
+                <div th:each="appt : ${appointments}" class="flex items-center justify-between p-5 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:shadow-md transition-all">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold"
+                             th:classappend="${appt.status == 'COMPLETED' ? 'bg-green-100 text-green-700' : (appt.status == 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-primary-container text-on-primary-container')}">
+                            <span class="material-symbols-outlined text-lg" th:text="${appt.status == 'COMPLETED' ? 'check' : (appt.status == 'CANCELLED' ? 'close' : 'schedule')}">schedule</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-on-surface" th:text="${appt.customer != null ? appt.customer.firstName + ' ' + appt.customer.lastName : 'Walk-in'}">Client</p>
+                            <p class="text-xs text-on-surface-variant" th:text="${appt.service.name}">Service</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-semibold text-on-surface" th:text="${appt.appointmentDate}">Date</p>
+                        <p class="text-xs text-on-surface-variant" th:text="${appt.appointmentTime}">Time</p>
+                    </div>
+                    <span class="hidden sm:inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                          th:classappend="${appt.status == 'COMPLETED' ? 'bg-green-100 text-green-700' : (appt.status == 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-primary-container text-on-primary-container')}"
+                          th:text="${appt.status}">Status</span>
+                </div>
+            </div>
+        </section>
+        <footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
+    </main>
+</div>
+
+<th:block th:replace="~{layout/fragments :: sakura-js}" />
+</body>
+</html>

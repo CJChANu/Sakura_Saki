@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- ===== HEAD FRAGMENT: Tailwind Config + Fonts + Shared CSS ===== -->
+<th:block th:fragment="head(title)">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title th:text="${title}">Sakura Saki</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#574144",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "primary-fixed": "#ffd9df",
+                        "outline": "#837375",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#555555",
+                        "on-primary-fixed-variant": "#6b3743",
+                        "on-secondary-fixed": "#281719",
+                        "surface-tint": "#864e5a",
+                        "tertiary-fixed-dim": "#c8c6c6",
+                        "on-surface-variant": "#514345",
+                        "primary": "#864e5a",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#fbb3c1",
+                        "outline-variant": "#d6c2c4",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-dim": "#dadada",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-primary-container": "#7b4551",
+                        "background": "#f9f9f9",
+                        "secondary-fixed": "#fbdbde",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-container": "#755d5f",
+                        "surface-container-highest": "#e2e2e2",
+                        "secondary-container": "#f8d8db",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "tertiary": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#e4e2e1",
+                        "inverse-on-surface": "#f1f1f1",
+                        "error-container": "#ffdad6",
+                        "secondary": "#70585b",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-container": "#cccaca",
+                        "secondary-fixed-dim": "#debfc2",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#ffb7c5",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-high": "#e8e8e8",
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "primary-fixed-dim": "#fbb3c1",
+                        "on-primary-fixed": "#360c19",
+                        "surface-variant": "#e2e2e2",
+                        "surface-bright": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; background-color: #f9f9f9; }
+        .font-serif { font-family: 'Noto Serif', serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 0.5px solid rgba(214, 194, 196, 0.15);
+        }
+        .glass-pane {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(214, 194, 196, 0.15);
+            box-shadow: 0 8px 32px rgba(26, 28, 28, 0.04);
+        }
+        .clay-card {
+            background: #ffffff;
+            box-shadow: 0 40px 60px -15px rgba(26, 28, 28, 0.06),
+                        inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+        }
+        .clay-lift {
+            box-shadow: 0 40px 60px -15px rgba(26, 28, 28, 0.06),
+                        inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+            transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .clay-lift:hover {
+            box-shadow: 0 50px 70px -15px rgba(26, 28, 28, 0.08),
+                        inset 2px 2px 4px rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(255, 183, 197, 0.4);
+        }
+        .recessed {
+            background: #e8e8e8;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+        }
+        .glow-active {
+            box-shadow: 0 0 20px rgba(255, 183, 197, 0.5);
+            border: 1px solid rgba(255, 183, 197, 0.3);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</th:block>
+
+<!-- ===== SAKURA PETALS CANVAS ===== -->
+<th:block th:fragment="sakura-canvas">
+    <canvas class="fixed inset-0 pointer-events-none z-[1] opacity-70" id="sakura-canvas"></canvas>
+</th:block>
+
+<!-- ===== SAKURA PETALS JS ===== -->
+<th:block th:fragment="sakura-js">
+<script>
+    const canvas = document.getElementById('sakura-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+        const petals = [];
+        const numPetals = 45;
+        let mouseX = -1000;
+        let mouseY = -1000;
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        class Petal {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height - height;
+                this.size = Math.random() * 12 + 8;
+                this.speedY = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 2 - 1;
+                this.angle = Math.random() * 360;
+                this.spin = Math.random() * 0.05 - 0.025;
+                this.opacity = Math.random() * 0.6 + 0.2;
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.spin;
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120) {
+                    const force = (120 - dist) / 120;
+                    this.x -= (dx / dist) * force * 3;
+                    this.y -= (dy / dist) * force * 3;
+                }
+                if (this.y > height + this.size) {
+                    this.y = -this.size;
+                    this.x = Math.random() * width;
+                }
+                if (this.x > width + this.size) this.x = -this.size;
+                if (this.x < -this.size) this.x = width + this.size;
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.quadraticCurveTo(this.size * 0.8, -this.size * 0.8, this.size * 1.2, 0);
+                ctx.quadraticCurveTo(this.size * 0.8, this.size * 0.8, 0, 0);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        for (let i = 0; i < numPetals; i++) {
+            petals.push(new Petal());
+        }
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            petals.forEach(petal => {
+                petal.update();
+                petal.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+</script>
+</th:block>
+
+<!-- ===== TOP NAVBAR (Public Pages) ===== -->
+<nav th:fragment="topnav(activePage)" class="fixed top-0 w-full z-50 rounded-b-[2rem] bg-white/60 backdrop-blur-xl border-b border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.06)]">
+    <div class="flex justify-between items-center px-8 h-20 max-w-7xl mx-auto w-full">
+        <a th:href="@{/}" class="text-2xl font-serif font-bold text-rose-900 tracking-tight" style="text-decoration:none;">Sakura Saki</a>
+        <div class="hidden md:flex items-center gap-10 font-serif text-slate-800 tracking-tight">
+            <a th:href="@{/}" th:classappend="${activePage == 'home'} ? 'text-rose-900 border-b-2 border-rose-400 pb-1' : 'text-slate-500 hover:text-rose-400'" class="transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Home</a>
+            <a th:href="@{/services}" th:classappend="${activePage == 'services'} ? 'text-rose-900 border-b-2 border-rose-400 pb-1' : 'text-slate-500 hover:text-rose-400'" class="transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Services</a>
+            <a th:href="@{/booking}" th:classappend="${activePage == 'booking'} ? 'text-rose-900 border-b-2 border-rose-400 pb-1' : 'text-slate-500 hover:text-rose-400'" class="transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Bookings</a>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-full scale-95 duration-200">
+                <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+                <input class="bg-transparent border-none focus:ring-0 text-sm w-32 font-medium" placeholder="Search services..." type="text"/>
+            </div>
+            <div class="flex items-center gap-4">
+                <a th:if="${!isLoggedIn}" th:href="@{/login}" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition-all duration-400 ease-out" style="text-decoration:none;">SIGN IN</a>
+                <a th:if="${isAdmin}" th:href="@{/admin/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Admin Dashboard">dashboard</a>
+                <a th:if="${isStaff}" th:href="@{/staff/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Staff Dashboard">dashboard</a>
+                <a th:if="${isLoggedIn}" th:href="@{/customer/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="My Dashboard">account_circle</a>
+                <a th:if="${isLoggedIn}" th:href="@{/logout}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Logout">logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== ADMIN SIDEBAR ===== -->
+<aside th:fragment="admin-sidebar(activePage)" class="h-screen w-72 rounded-r-[3rem] sticky left-0 top-0 bg-stone-50 flex flex-col py-8 gap-2 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.05)] z-50 shrink-0">
+    <div class="px-8 mb-10">
+        <h1 class="text-lg font-serif text-rose-800 tracking-tight">Admin Portal</h1>
+        <p class="font-sans text-sm font-medium tracking-wide text-slate-400">Sakura Saki Management</p>
+    </div>
+    <nav class="flex-1 space-y-2 overflow-y-auto">
+        <a th:href="@{/admin/dashboard}" th:classappend="${activePage == 'dashboard'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">dashboard</span> Overview</a>
+        <a th:href="@{/admin/services}" th:classappend="${activePage == 'services'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/admin/packages}" th:classappend="${activePage == 'packages'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
+        <a th:href="@{/admin/staff}" th:classappend="${activePage == 'staff'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">badge</span> Staff</a>
+        <a th:href="@{/admin/appointments}" th:classappend="${activePage == 'appointments'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
+        <a th:href="@{/admin/reviews}" th:classappend="${activePage == 'reviews'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">reviews</span> Reviews</a>
+        <a th:href="@{/admin/customers}" th:classappend="${activePage == 'customers'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">group</span> Clients</a>
+        <a th:href="@{/admin/reports}" th:classappend="${activePage == 'reports'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
+        <a th:href="@{/admin/manage}" th:classappend="${activePage == 'manage'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
+    </nav>
+    <div class="px-8 mt-auto">
+        <a th:href="@{/booking}" class="block w-full py-4 px-6 bg-primary text-center text-on-primary rounded-full font-label text-xs uppercase tracking-[0.1em] shadow-lg hover:scale-105 transition-all duration-400" style="text-decoration:none;">New Booking</a>
+        <div class="mt-6 flex items-center gap-3 p-2 bg-stone-100 rounded-full">
+            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">AD</div>
+            <div class="flex flex-col">
+                <span class="text-xs font-bold text-on-surface" th:text="${username}">admin</span>
+                <span class="text-[10px] text-slate-500 uppercase tracking-tighter">Administrator</span>
+            </div>
+        </div>
+        <a th:href="@{/logout}" class="flex items-center gap-3 text-slate-400 px-4 py-2 mt-4 hover:text-rose-600 transition-colors font-sans text-xs" style="text-decoration:none;"><span class="material-symbols-outlined text-sm">logout</span> Logout</a>
+    </div>
+</aside>
+
+<!-- ===== STAFF SIDEBAR ===== -->
+<aside th:fragment="staff-sidebar(activePage)" class="hidden md:flex flex-col h-full py-8 px-4 bg-surface-container-low/70 backdrop-blur-2xl fixed left-0 top-0 w-72 rounded-r-lg shadow-2xl shadow-on-surface/5 z-40">
+    <div class="mb-10 px-4 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary">spa</span>
+        </div>
+        <div>
+            <h1 class="font-headline text-xl text-primary font-bold">Sakura Saki</h1>
+            <p class="font-body text-xs tracking-wider uppercase text-on-surface-variant">Staff Portal</p>
+        </div>
+    </div>
+    <nav class="flex-1 space-y-2">
+        <a th:href="@{/staff/dashboard}" th:classappend="${activePage == 'today'} ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'" class="flex items-center gap-4 rounded-full px-6 py-3 my-1 hover:scale-[1.02] transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">event_note</span><span class="font-body text-xs tracking-wider uppercase font-semibold">Today</span></a>
+        <a th:href="@{/staff/calendar}" th:classappend="${activePage == 'calendar'} ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'" class="flex items-center gap-4 rounded-full px-6 py-3 my-1 hover:scale-[1.02] transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">calendar_month</span><span class="font-body text-xs tracking-wider uppercase">Calendar</span></a>
+        <a th:href="@{/staff/clients}" th:classappend="${activePage == 'clients'} ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'" class="flex items-center gap-4 rounded-full px-6 py-3 my-1 hover:scale-[1.02] transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">face_6</span><span class="font-body text-xs tracking-wider uppercase">Clients</span></a>
+        <a th:href="@{/staff/inventory}" th:classappend="${activePage == 'inventory'} ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'" class="flex items-center gap-4 rounded-full px-6 py-3 my-1 hover:scale-[1.02] transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">inventory_2</span><span class="font-body text-xs tracking-wider uppercase">Inventory</span></a>
+        <a th:href="@{/staff/performance}" th:classappend="${activePage == 'performance'} ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'" class="flex items-center gap-4 rounded-full px-6 py-3 my-1 hover:scale-[1.02] transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">analytics</span><span class="font-body text-xs tracking-wider uppercase">Performance</span></a>
+    </nav>
+    <div class="mt-8 mb-6 px-4">
+        <a th:href="@{/booking}" class="block w-full bg-primary text-on-primary text-center rounded-full py-4 px-6 font-body text-xs uppercase tracking-wider clay-lift hover:opacity-90" style="text-decoration:none;">New Appointment</a>
+    </div>
+    <div class="mt-auto border-t border-outline-variant/20 pt-4 space-y-2">
+        <a th:href="@{/profile}" class="flex items-center gap-4 text-on-surface-variant px-6 py-3 my-1 hover:bg-surface-container-high rounded-full transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">person</span><span class="font-body text-xs tracking-wider uppercase">Profile</span></a>
+        <a th:href="@{/logout}" class="flex items-center gap-4 text-on-surface-variant px-6 py-3 my-1 hover:bg-surface-container-high rounded-full transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">logout</span><span class="font-body text-xs tracking-wider uppercase">Logout</span></a>
+    </div>
+</aside>
+
+<!-- ===== CUSTOMER SIDEBAR ===== -->
+<aside th:fragment="customer-sidebar(activePage)" class="h-screen w-72 rounded-r-xl sticky left-0 top-0 bg-stone-50 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.05)] flex flex-col py-8 gap-2 z-40 shrink-0">
+    <div class="px-8 mb-10">
+        <h1 class="text-lg font-serif text-rose-800 tracking-tight">My Dashboard</h1>
+        <p class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">Sakura Saki</p>
+    </div>
+    <nav class="flex flex-col gap-2 flex-grow">
+        <a th:href="@{/customer/dashboard}" th:classappend="${activePage == 'overview'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">dashboard</span><span>Overview</span></a>
+        <a th:href="@{/customer/bookings}" th:classappend="${activePage == 'bookings'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">calendar_month</span><span>My Bookings</span></a>
+        <a th:href="@{/customer/loyalty}" th:classappend="${activePage == 'loyalty'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">stars</span><span>Sakura Circle</span></a>
+        <a th:href="@{/customer/rituals}" th:classappend="${activePage == 'rituals'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">self_improvement</span><span>Rituals</span></a>
+        <a th:href="@{/customer/settings}" th:classappend="${activePage == 'settings'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">settings</span><span>Settings</span></a>
+    </nav>
+    <div class="px-8 pt-6 border-t border-rose-100/50">
+        <a th:href="@{/booking}" class="block w-full bg-primary text-on-primary text-center py-4 rounded-full clay-lift hover:scale-[1.02] transition-all duration-400 font-label text-xs uppercase tracking-widest" style="text-decoration:none;">New Booking</a>
+    </div>
+    <div class="px-8 mt-4">
+        <a th:href="@{/logout}" class="flex items-center gap-3 text-slate-400 px-2 py-2 hover:text-rose-600 transition-colors font-sans text-xs" style="text-decoration:none;"><span class="material-symbols-outlined text-sm">logout</span> Logout</a>
+    </div>
+</aside>
+
+<!-- ===== FOOTER (Public) ===== -->
+<footer th:fragment="footer" class="bg-stone-50 w-full py-12 border-t border-rose-100/50">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-8 gap-8">
+        <div class="flex flex-col items-center md:items-start gap-4">
+            <div class="text-xl font-serif font-bold text-rose-900">Sakura Saki</div>
+            <p class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">© 2024 Sakura Saki Beauty. All rights reserved.</p>
+        </div>
+        <div class="flex gap-10">
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Privacy</a>
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Terms</a>
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Contact</a>
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Careers</a>
+        </div>
+    </div>
+</footer>
+
+<!-- ===== DASHBOARD FOOTER ===== -->
+<footer th:fragment="dashboard-footer" class="mt-auto w-full py-12 border-t border-rose-100/50 flex flex-col md:flex-row justify-between items-center px-4">
+    <span class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">© 2024 Sakura Saki Beauty. All rights reserved.</span>
+    <div class="flex gap-8 mt-6 md:mt-0">
+        <a class="text-slate-400 hover:text-rose-500 font-sans text-xs uppercase tracking-[0.1em] transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Privacy</a>
+        <a class="text-slate-400 hover:text-rose-500 font-sans text-xs uppercase tracking-[0.1em] transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Terms</a>
+        <a class="text-slate-400 hover:text-rose-500 font-sans text-xs uppercase tracking-[0.1em] transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Contact</a>
+    </div>
+</footer>
+
+</html>

@@ -212,7 +212,10 @@ body:not(.admin-body) {
     margin: 0 auto;
     overflow-y: auto;
     position: relative;
-    z-index: 10;
+    /* z-index removed: was trapping Bootstrap modals inside this stacking context */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* ---------- Page Header ---------- */
@@ -528,7 +531,7 @@ body:not(.admin-body) {
 
 /* ---------- Footer ---------- */
 .admin-footer {
-    margin-top: 4rem;
+    margin-top: auto;
     padding: 3rem 0;
     border-top: 1px solid rgba(255, 183, 197, 0.2);
     display: flex;
@@ -568,8 +571,12 @@ body:not(.admin-body) {
     top: 0; left: 0;
     width: 100%; height: 100%;
     pointer-events: none;
-    z-index: 5;
+    z-index: 1;
 }
+
+/* ---------- Modal z-index fix ---------- */
+.modal-backdrop { z-index: 1050 !important; }
+.modal { z-index: 1055 !important; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1024px) {

@@ -1,5 +1,6 @@
 package com.cjcc.yakalabs.sakurasaki.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -11,6 +12,12 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("CUSTOMER")
 public class Customer extends User {
 
+    @Column(name = "loyalty_points")
+    private int loyaltyPoints = 0;
+
+    @Column(name = "membership_tier")
+    private String membershipTier = "Bronze";
+
     public Customer() {}
 
     public Customer(String firstName, String lastName, String email, String phone) {
@@ -20,5 +27,21 @@ public class Customer extends User {
         this.setPhone(phone);
         this.setRole("ROLE_USER");
         this.setEnabled(true);
+    }
+
+    public int getLoyaltyPoints() {
+        return loyaltyPoints;
+    }
+
+    public void setLoyaltyPoints(int loyaltyPoints) {
+        this.loyaltyPoints = loyaltyPoints;
+    }
+
+    public String getMembershipTier() {
+        return membershipTier;
+    }
+
+    public void setMembershipTier(String membershipTier) {
+        this.membershipTier = membershipTier;
     }
 }

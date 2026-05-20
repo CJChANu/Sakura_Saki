@@ -1,5 +1,6 @@
 package com.cjcc.yakalabs.sakurasaki.controller;
 
+import com.cjcc.yakalabs.sakurasaki.model.Appointment;
 import com.cjcc.yakalabs.sakurasaki.model.Staff;
 import com.cjcc.yakalabs.sakurasaki.repository.StaffRepository;
 import com.cjcc.yakalabs.sakurasaki.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 @RequestMapping("/staff")
@@ -30,27 +32,67 @@ public class StaffDashboardController {
         this.appointmentService = appointmentService;
     }
 
-    @GetMapping("/dashboard")
-    public String staffDashboard(Authentication auth, Model model) {
+    private void populateStaffModel(Authentication auth, Model model) {
         var user = userRepo.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         model.addAttribute("username", auth.getName());
 
-        // Find the Staff entity for this user (Staff extends User, same ID)
         if (user instanceof Staff staffMember) {
             model.addAttribute("staff", staffMember);
             var appointments = appointmentService.findByStaff(staffMember.getId());
             model.addAttribute("appointments", appointments);
-            // Count today's appointments
-            long todayCount = appointments.stream()
+
+            // Today's appointments
+            List<Appointment> todayAppts = appointments.stream()
                     .filter(a -> a.getAppointmentDate().equals(LocalDate.now()))
-                    .count();
-            model.addAttribute("todayCount", todayCount);
+                    .toList();
+            model.addAttribute("todayAppointments", todayAppts);
+            model.addAttribute("todayCount", todayAppts.size());
+
+            // Calculate hours booked today
+            double hoursBooked = todayAppts.stream()
+                    .mapToDouble(a -> a.getService().getDurationMinutes() / 60.0)
+                    .sum();
+            model.addAttribute("hoursBooked", String.format("%.1f", hoursBooked));
+
+            // Estimated Tips (15% of total service cost)
+            double estTips = todayAppts.stream()
+                    .mapToDouble(a -> a.getService().getPrice() * 0.15)
+                    .sum();
+            model.addAttribute("estTips", String.format("%.2f", estTips));
         } else {
-            // Admin viewing staff dashboard — show all staff appointments
             model.addAttribute("allStaffAppointments", appointmentService.findAll());
         }
+    }
+
+    @GetMapping("/dashboard")
+    public String staffDashboard(Authentication auth, Model model) {
+        populateStaffModel(auth, model);
         return "staff/dashboard";
+    }
+
+    @GetMapping("/calendar")
+    public String calendar(Authentication auth, Model model) {
+        populateStaffModel(auth, model);
+        return "staff/calendar";
+    }
+
+    @GetMapping("/performance")
+    public String performance(Authentication auth, Model model) {
+        populateStaffModel(auth, model);
+        return "staff/performance";
+    }
+
+    @GetMapping("/clients")
+    public String clients(Authentication auth, Model model) {
+        populateStaffModel(auth, model);
+        return "staff/clients";
+    }
+
+    @GetMapping("/inventory")
+    public String inventory(Authentication auth, Model model) {
+        populateStaffModel(auth, model);
+        return "staff/inventory";
     }
 
     @PostMapping("/appointments/{id}/complete")
@@ -65,3 +107,4 @@ public class StaffDashboardController {
         return "redirect:/staff/dashboard";
     }
 }
+

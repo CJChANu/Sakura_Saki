@@ -29,19 +29,51 @@ public class ServiceBrowseController {
 
     @GetMapping("/services")
     public String browseServices(@RequestParam(required = false) String search,
+                                  @RequestParam(required = false) String q,
+                                  @RequestParam(required = false) String category,
                                   Authentication auth, Model model) {
-        if (search != null && !search.isBlank()) {
-            model.addAttribute("services", salonServiceService.searchByName(search));
-            model.addAttribute("search", search);
-        } else {
-            model.addAttribute("services", salonServiceService.findActive());
+        // Accept both 'search' and 'q' params (from nav search bar)
+        String query = (q != null && !q.isBlank()) ? q : search;
+
+        var allServices = salonServiceService.findActive();
+
+        if (query != null && !query.isBlank()) {
+            allServices = allServices.stream()
+                    .filter(s -> s.getName().toLowerCase().contains(query.toLowerCase())
+                            || (s.getDescription() != null && s.getDescription().toLowerCase().contains(query.toLowerCase())))
+                    .toList();
+            model.addAttribute("search", query);
         }
+
+        if (category != null && !category.isBlank() && !category.equalsIgnoreCase("all")) {
+            allServices = allServices.stream()
+                    .filter(s -> s.getCategory() != null && s.getCategory().equalsIgnoreCase(category))
+                    .toList();
+            model.addAttribute("activeCategory", category);
+        }
+
+        model.addAttribute("services", allServices);
         model.addAttribute("packages", packageService.findActive());
+
+        // All unique categories for filter pills
+        var categories = salonServiceService.findActive().stream()
+                .map(s -> s.getCategory())
+                .filter(c -> c != null && !c.isBlank())
+                .distinct()
+                .sorted()
+                .toList();
+        model.addAttribute("categories", categories);
 
         // Auth state for nav
         boolean loggedIn = (auth != null && auth.isAuthenticated());
         model.addAttribute("isLoggedIn", loggedIn);
-        if (loggedIn) model.addAttribute("username", auth.getName());
+        if (loggedIn) {
+            model.addAttribute("username", auth.getName());
+            model.addAttribute("isAdmin", auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
+            model.addAttribute("isStaff", auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_STAFF")));
+        }
 
         return "public/services";
     }
