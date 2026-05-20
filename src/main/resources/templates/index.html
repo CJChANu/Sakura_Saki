@@ -9,30 +9,70 @@
     <link th:href="@{/css/admin-style.css}" rel="stylesheet">
     <style>
         body{margin:0;font-family:var(--font-body);color:var(--on-surface);overflow-x:hidden;background:var(--surface);}
-        .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;background:linear-gradient(135deg,#ffe4ea 0%,#fff5f7 40%,#fce7f3 100%);}
+
+        /* ── HERO ── */
+        .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;}
+        .hero-bg{position:absolute;inset:0;z-index:1;}
+        .hero-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(.45) saturate(.8);}
+        .hero-gradient{position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(134,78,90,.35) 0%,rgba(255,183,197,.2) 50%,rgba(249,249,249,1) 100%);}
         .hero-content{position:relative;z-index:10;max-width:700px;padding:2rem;}
-        .hero-kicker{font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.25em;color:var(--primary);margin-bottom:1rem;}
-        .hero h1{font-family:var(--font-headline);font-size:3.5rem;font-weight:700;letter-spacing:-.02em;color:var(--on-surface);margin:0 0 1.5rem;}
-        .hero p{font-size:1.1rem;color:var(--outline);line-height:1.7;margin-bottom:2.5rem;}
+        .hero-kicker{font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.25em;color:#ffb7c5;margin-bottom:1rem;}
+        .hero h1{font-family:var(--font-headline);font-size:3.5rem;font-weight:700;letter-spacing:-.02em;color:#fff;margin:0 0 1.5rem;text-shadow:0 2px 30px rgba(0,0,0,.25);}
+        .hero p{font-size:1.1rem;color:rgba(255,255,255,.85);line-height:1.7;margin-bottom:2.5rem;text-shadow:0 1px 10px rgba(0,0,0,.2);}
         .hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+
+        /* ── GALLERY STRIP ── */
+        .gallery-strip{padding:0 2rem;margin-top:-3rem;position:relative;z-index:15;max-width:1200px;margin-left:auto;margin-right:auto;}
+        .gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+        .gallery-item{border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:4/3;position:relative;box-shadow:0 10px 30px -5px rgba(0,0,0,.15);transition:all .5s cubic-bezier(.4,0,.2,1);}
+        .gallery-item:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 25px 50px -10px rgba(134,78,90,.25);}
+        .gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.4,0,.2,1);}
+        .gallery-item:hover img{transform:scale(1.08);}
+        .gallery-label{position:absolute;bottom:0;left:0;right:0;padding:.75rem 1rem;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;}
+
+        /* ── SECTIONS ── */
         .section{padding:5rem 2rem;max-width:1100px;margin:0 auto;}
         .section-kicker{font-family:var(--font-label);font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:var(--primary);margin-bottom:.5rem;}
         .section h2{font-family:var(--font-headline);font-size:2.25rem;font-weight:700;letter-spacing:-.02em;margin:0 0 1rem;}
         .section p.lead{color:var(--outline);font-size:1rem;max-width:600px;margin-bottom:3rem;}
+
+        /* ── SERVICE CARDS WITH IMAGES ── */
         .services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
-        .svc-card{background:rgba(255,255,255,.7);backdrop-filter:blur(16px);border-radius:var(--radius-lg);padding:2rem;border:.5px solid rgba(214,194,196,.12);transition:all .4s cubic-bezier(.4,0,.2,1);}
+        .svc-card{background:rgba(255,255,255,.7);backdrop-filter:blur(16px);border-radius:var(--radius-lg);overflow:hidden;border:.5px solid rgba(214,194,196,.12);transition:all .4s cubic-bezier(.4,0,.2,1);}
         .svc-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px -10px rgba(134,78,90,.12);}
-        .svc-icon{width:3rem;height:3rem;border-radius:50%;background:var(--primary-container);display:flex;align-items:center;justify-content:center;color:var(--on-primary-container);margin-bottom:1.25rem;}
+        .svc-card-img{width:100%;height:180px;object-fit:cover;display:block;}
+        .svc-card-body{padding:1.5rem 2rem;}
+        .svc-icon{width:3rem;height:3rem;border-radius:50%;background:var(--primary-container);display:flex;align-items:center;justify-content:center;color:var(--on-primary-container);margin-bottom:1rem;margin-top:-2.5rem;position:relative;z-index:5;box-shadow:0 4px 12px rgba(0,0,0,.1);}
         .svc-card h3{font-family:var(--font-headline);font-size:1.15rem;margin:0 0 .5rem;}
         .svc-card p{font-size:.875rem;color:var(--outline);line-height:1.6;margin:0;}
+
+        /* ── AMBIANCE SPLIT ── */
+        .ambiance{display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:100%;overflow:hidden;}
+        .ambiance-img{height:400px;overflow:hidden;}
+        .ambiance-img img{width:100%;height:100%;object-fit:cover;transition:transform 8s cubic-bezier(.4,0,.2,1);}
+        .ambiance-img:hover img{transform:scale(1.05);}
+        .ambiance-text{display:flex;flex-direction:column;justify-content:center;padding:3rem 4rem;background:var(--surface-container-low);}
+        .ambiance-text .section-kicker{margin-bottom:.5rem;}
+        .ambiance-text h2{font-family:var(--font-headline);font-size:2rem;margin:0 0 1rem;}
+        .ambiance-text p{font-size:.95rem;color:var(--outline);line-height:1.7;}
+
+        /* ── WHY US ── */
         .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:2.5rem;}
         .why-item{text-align:center;padding:1.5rem;}
         .why-item .material-symbols-outlined{font-size:2.5rem;color:var(--primary);margin-bottom:1rem;}
         .why-item h4{font-family:var(--font-headline);font-size:1rem;margin:0 0 .5rem;}
         .why-item p{font-size:.85rem;color:var(--outline);line-height:1.6;}
-        .cta-section{text-align:center;padding:5rem 2rem;background:linear-gradient(135deg,var(--primary-container),#fff5f7);}
-        .cta-section h2{font-family:var(--font-headline);font-size:2rem;margin-bottom:1rem;}
-        .cta-section p{color:var(--outline);margin-bottom:2rem;}
+
+        /* ── CTA ── */
+        .cta-section{text-align:center;padding:5rem 2rem;position:relative;overflow:hidden;}
+        .cta-bg{position:absolute;inset:0;z-index:1;}
+        .cta-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(.3) saturate(.7);}
+        .cta-overlay{position:absolute;inset:0;z-index:2;background:linear-gradient(135deg,rgba(134,78,90,.7),rgba(255,183,197,.4));}
+        .cta-content{position:relative;z-index:10;}
+        .cta-section h2{font-family:var(--font-headline);font-size:2rem;margin-bottom:1rem;color:#fff;text-shadow:0 2px 15px rgba(0,0,0,.3);}
+        .cta-section p{color:rgba(255,255,255,.85);margin-bottom:2rem;}
+
+        /* ── FOOTER & NAV ── */
         .site-footer{text-align:center;padding:2rem;background:var(--surface-container-low);}
         .site-footer span{font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;}
         .public-topnav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(255,255,255,.6);backdrop-filter:blur(24px);border-bottom:.5px solid rgba(214,194,196,.12);}
@@ -40,7 +80,16 @@
         .public-topnav .nav-links{display:flex;gap:2rem;align-items:center;}
         .public-topnav .nav-links a{font-family:var(--font-label);font-size:.8rem;font-weight:500;letter-spacing:.03em;color:var(--on-surface-variant);text-decoration:none;transition:color .3s;}
         .public-topnav .nav-links a:hover{color:var(--primary);}
-        @media(max-width:768px){.hero h1{font-size:2.25rem;}.services-grid,.why-grid{grid-template-columns:1fr;}.public-topnav{padding:.75rem 1.5rem;}.public-topnav .nav-links{gap:1rem;}}
+
+        @media(max-width:768px){
+            .hero h1{font-size:2.25rem;}
+            .services-grid,.why-grid{grid-template-columns:1fr;}
+            .gallery-grid{grid-template-columns:repeat(2,1fr);}
+            .ambiance{grid-template-columns:1fr;}
+            .ambiance-text{padding:2rem;}
+            .public-topnav{padding:.75rem 1.5rem;}
+            .public-topnav .nav-links{gap:1rem;}
+        }
     </style>
 </head>
 <body style="display:flex;flex-direction:column;min-height:100vh;">
@@ -60,7 +109,10 @@
     </div>
 </nav>
 
+<!-- ════════════ HERO with Stitch spa-hallway image ════════════ -->
 <section class="hero">
+    <div class="hero-bg"><img th:src="@{/images/stitch/spa-hallway.jpg}" alt="Sakura Saki Luxury Spa"></div>
+    <div class="hero-gradient"></div>
     <div class="hero-content">
         <span class="hero-kicker">Beauty · Wellness · Serenity</span>
         <h1>Experience Digital Serenity</h1>
@@ -69,51 +121,110 @@
             <a th:if="${!isLoggedIn}" th:href="@{/register}" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2rem;">
                 <span class="material-symbols-outlined" style="font-size:1rem;">spa</span> Get Started
             </a>
-            <a th:href="@{/our-services}" class="btn-sakura btn-sakura-outline" style="padding:.75rem 2rem;">
+            <a th:href="@{/our-services}" class="btn-sakura btn-sakura-outline" style="padding:.75rem 2rem;color:#fff;border-color:rgba(255,255,255,.4);">
                 <span class="material-symbols-outlined" style="font-size:1rem;">content_cut</span> View Services
             </a>
         </div>
     </div>
 </section>
 
+<!-- ════════════ GALLERY STRIP — 4 Stitch images ════════════ -->
+<div class="gallery-strip">
+    <div class="gallery-grid">
+        <div class="gallery-item">
+            <img th:src="@{/images/stitch/skin-therapy.jpg}" alt="Skin Therapy">
+            <div class="gallery-label">Skincare & Facials</div>
+        </div>
+        <div class="gallery-item">
+            <img th:src="@{/images/stitch/nail-art.jpg}" alt="Nail Art">
+            <div class="gallery-label">Nail Art & Care</div>
+        </div>
+        <div class="gallery-item">
+            <img th:src="@{/images/stitch/massage.jpg}" alt="Body Massage">
+            <div class="gallery-label">Spa & Massage</div>
+        </div>
+        <div class="gallery-item">
+            <img th:src="@{/images/stitch/head-spa.jpg}" alt="Head Spa">
+            <div class="gallery-label">Scalp Therapy</div>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════ SERVICES with Stitch images ════════════ -->
 <section class="section">
     <span class="section-kicker">Our Services</span>
     <h2>Curated Beauty Experiences</h2>
     <p class="lead">Each treatment is crafted with care, blending tradition and innovation for results that radiate.</p>
     <div class="services-grid">
         <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">content_cut</span></div>
-            <h3>Hair Styling</h3>
-            <p>From precision cuts to vibrant colors, our master stylists create looks that express your unique beauty.</p>
+            <img class="svc-card-img" th:src="@{/images/stitch/head-spa.jpg}" alt="Hair Styling">
+            <div class="svc-card-body">
+                <div class="svc-icon"><span class="material-symbols-outlined">content_cut</span></div>
+                <h3>Hair Styling</h3>
+                <p>From precision cuts to vibrant colors, our master stylists create looks that express your unique beauty.</p>
+            </div>
         </div>
         <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">face</span></div>
-            <h3>Skincare & Facials</h3>
-            <p>Rejuvenating treatments using premium products to restore your skin's natural radiance and glow.</p>
+            <img class="svc-card-img" th:src="@{/images/stitch/skin-therapy.jpg}" alt="Skincare & Facials">
+            <div class="svc-card-body">
+                <div class="svc-icon"><span class="material-symbols-outlined">face</span></div>
+                <h3>Skincare & Facials</h3>
+                <p>Rejuvenating treatments using premium products to restore your skin's natural radiance and glow.</p>
+            </div>
         </div>
         <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">self_improvement</span></div>
-            <h3>Spa & Massage</h3>
-            <p>Unwind with our therapeutic massage and body treatments that melt stress away completely.</p>
+            <img class="svc-card-img" th:src="@{/images/stitch/massage.jpg}" alt="Spa & Massage">
+            <div class="svc-card-body">
+                <div class="svc-icon"><span class="material-symbols-outlined">self_improvement</span></div>
+                <h3>Spa & Massage</h3>
+                <p>Unwind with our therapeutic massage and body treatments that melt stress away completely.</p>
+            </div>
         </div>
         <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">palette</span></div>
-            <h3>Nail Art & Care</h3>
-            <p>Express yourself with our creative nail designs and meticulous hand and foot care services.</p>
+            <img class="svc-card-img" th:src="@{/images/stitch/nail-art.jpg}" alt="Nail Art & Care">
+            <div class="svc-card-body">
+                <div class="svc-icon"><span class="material-symbols-outlined">palette</span></div>
+                <h3>Nail Art & Care</h3>
+                <p>Express yourself with our creative nail designs and meticulous hand and foot care services.</p>
+            </div>
         </div>
         <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">diamond</span></div>
-            <h3>Bridal Packages</h3>
-            <p>Your special day deserves perfection. Complete bridal beauty preparation from head to toe.</p>
+            <img class="svc-card-img" th:src="@{/images/stitch/skincare-products.jpg}" alt="Bridal Packages">
+            <div class="svc-card-body">
+                <div class="svc-icon"><span class="material-symbols-outlined">diamond</span></div>
+                <h3>Bridal Packages</h3>
+                <p>Your special day deserves perfection. Complete bridal beauty preparation from head to toe.</p>
+            </div>
         </div>
         <div class="svc-card">
-            <div class="svc-icon"><span class="material-symbols-outlined">inventory_2</span></div>
-            <h3>Wellness Bundles</h3>
-            <p>Curated service packages combining our best treatments at exclusive discounted prices.</p>
+            <img class="svc-card-img" th:src="@{/images/stitch/zen-tea.jpg}" alt="Wellness Bundles">
+            <div class="svc-card-body">
+                <div class="svc-icon"><span class="material-symbols-outlined">inventory_2</span></div>
+                <h3>Wellness Bundles</h3>
+                <p>Curated service packages combining our best treatments at exclusive discounted prices.</p>
+            </div>
         </div>
     </div>
 </section>
 
+<!-- ════════════ AMBIANCE SPLIT with Stitch spa-interior image ════════════ -->
+<section class="ambiance">
+    <div class="ambiance-img">
+        <img th:src="@{/images/stitch/spa-interior.jpg}" alt="Our Spa Interior">
+    </div>
+    <div class="ambiance-text">
+        <span class="section-kicker">Our Space</span>
+        <h2>A Sanctuary of Calm</h2>
+        <p>Step into our serene, Zen-inspired space where every detail is designed to soothe your senses. From the warm natural light to the delicate cherry blossom accents, every visit feels like an escape into tranquility.</p>
+        <div style="margin-top:1.5rem;">
+            <a th:href="@{/staff}" class="btn-sakura btn-sakura-primary" style="padding:.65rem 1.5rem;">
+                <span class="material-symbols-outlined" style="font-size:1rem;">groups</span> Meet Our Team
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ════════════ WHY US with zen-garden image bg ════════════ -->
 <section class="section" style="background:var(--surface-container-low);max-width:100%;padding-left:2rem;padding-right:2rem;">
     <div style="max-width:1100px;margin:0 auto;">
         <span class="section-kicker">Why Choose Us</span>
@@ -138,6 +249,7 @@
     </div>
 </section>
 
+<!-- ════════════ REVIEWS (existing) ════════════ -->
 <section class="section" th:if="${recentReviews != null and !recentReviews.isEmpty()}">
     <span class="section-kicker">Client Stories</span>
     <h2>What Our Clients Say</h2>
@@ -155,11 +267,16 @@
     </div>
 </section>
 
+<!-- ════════════ CTA with Stitch zen-garden image ════════════ -->
 <section class="cta-section">
-    <h2>Ready to Begin Your Journey?</h2>
-    <p>Join thousands of satisfied clients who trust Sakura Saki for their beauty and wellness needs.</p>
-    <a th:if="${!isLoggedIn}" th:href="@{/register}" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2.5rem;">Create Free Account</a>
-    <a th:if="${isLoggedIn}" th:href="@{/our-services}" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2.5rem;">Book an Appointment</a>
+    <div class="cta-bg"><img th:src="@{/images/stitch/zen-garden.jpg}" alt="Zen Garden"></div>
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+        <h2>Ready to Begin Your Journey?</h2>
+        <p>Join thousands of satisfied clients who trust Sakura Saki for their beauty and wellness needs.</p>
+        <a th:if="${!isLoggedIn}" th:href="@{/register}" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2.5rem;">Create Free Account</a>
+        <a th:if="${isLoggedIn}" th:href="@{/our-services}" class="btn-sakura btn-sakura-primary" style="padding:.75rem 2.5rem;">Book an Appointment</a>
+    </div>
 </section>
 </main>
 
