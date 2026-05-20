@@ -62,7 +62,14 @@ public class ServiceBrowseController {
         // Auth state
         boolean loggedIn = (auth != null && auth.isAuthenticated());
         model.addAttribute("isLoggedIn", loggedIn);
-        if (loggedIn) model.addAttribute("username", auth.getName());
+        if (loggedIn) {
+            model.addAttribute("username", auth.getName());
+            boolean isStaff = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_STAFF"));
+            model.addAttribute("isStaff", isStaff);
+        } else {
+            model.addAttribute("isStaff", false);
+        }
 
         return "public/service-detail";
     }

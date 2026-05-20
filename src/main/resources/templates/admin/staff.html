@@ -73,7 +73,7 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
                 <div class="form-group mb-3"><label>Email</label><input name="email" type="email" class="input-recessed" required></div>
-                <div class="form-group mb-3"><label>Phone</label><input name="phone" class="input-recessed"></div>
+                <div class="form-group mb-3"><label>Phone</label><input name="phone" type="tel" class="input-recessed" pattern="[0-9]{10}" minlength="10" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="07X XXXX XXX"></div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
                 <div class="form-group mb-3"><label>Staff Type</label><select name="staffType" class="input-recessed"><option value="STYLIST">Stylist</option><option value="THERAPIST">Therapist</option><option value="GENERAL">General</option></select></div>
@@ -95,7 +95,7 @@
                 <div class="form-group mb-3"><label>Last Name</label><input name="lastName" class="input-recessed" th:value="${s.lastName}" required></div>
             </div>
             <div class="form-group mb-3"><label>Email</label><input name="email" type="email" class="input-recessed" th:value="${s.email}" required></div>
-            <div class="form-group mb-3"><label>Phone</label><input name="phone" class="input-recessed" th:value="${s.phone}"></div>
+            <div class="form-group mb-3"><label>Phone</label><input name="phone" type="tel" class="input-recessed" th:value="${s.phone}" pattern="[0-9]{10}" minlength="10" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="07X XXXX XXX"></div>
             <div class="form-group mb-3"><label>Specialization</label><input name="specialization" class="input-recessed" th:value="${s.specialization}"></div>
             <div class="form-group mb-3"><label>Working Days</label><input name="workingDays" class="input-recessed" th:value="${s.workingDays}"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">

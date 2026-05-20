@@ -28,7 +28,7 @@
                 <div class="form-group"><label>First Name</label><input name="firstName" type="text" class="input-recessed" th:value="${customer?.firstName}" required></div>
                 <div class="form-group"><label>Last Name</label><input name="lastName" type="text" class="input-recessed" th:value="${customer?.lastName}" required></div>
             </div>
-            <div class="form-group" style="margin-bottom:1.25rem;"><label>Phone</label><input name="phone" type="tel" class="input-recessed" th:value="${customer?.phone}" placeholder="07X XXXX XXX"></div>
+            <div class="form-group" style="margin-bottom:1.25rem;"><label>Phone</label><input name="phone" type="tel" class="input-recessed" th:value="${customer?.phone}" placeholder="07X XXXX XXX" pattern="[0-9]{10}" minlength="10" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
             <div style="display:flex;gap:1rem;">
                 <button type="submit" class="btn-sakura btn-sakura-primary"><span class="material-symbols-outlined" style="font-size:1rem;">save</span> Save Changes</button>
                 <a th:href="@{/profile}" class="btn-sakura btn-sakura-outline">Cancel</a>

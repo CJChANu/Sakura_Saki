@@ -45,6 +45,9 @@
         </div>
     </header>
 
+    <div th:if="${success}" class="sakura-alert sakura-alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
+
     <!-- Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card glass-pane clay-lift">
@@ -73,11 +76,12 @@
         <table class="sakura-table">
             <thead>
                 <tr>
-                    <th>Date & Time</th>
+                    <th>Date &amp; Time</th>
                     <th>Customer</th>
                     <th>Service</th>
                     <th th:if="${staff == null}">Staff Member</th>
                     <th>Status</th>
+                    <th th:if="${staff != null}">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -97,6 +101,17 @@
                         <span class="badge-pill" style="background:#fef9c3;color:#854d0e;" th:if="${appt.status.toString() == 'PENDING'}" th:text="${appt.status}">PENDING</span>
                         <span class="badge-pill badge-inactive" th:if="${appt.status.toString() == 'CANCELLED'}" th:text="${appt.status}">CANCELLED</span>
                         <span class="badge-pill" style="background:#dbeafe;color:#1e40af;" th:if="${appt.status.toString() == 'COMPLETED'}" th:text="${appt.status}">COMPLETED</span>
+                        <span class="badge-pill badge-active" th:if="${appt.status.toString() == 'SCHEDULED'}" th:text="${appt.status}">SCHEDULED</span>
+                    </td>
+                    <td th:if="${staff != null}">
+                        <form th:if="${appt.status.toString() == 'SCHEDULED' or appt.status.toString() == 'CONFIRMED'}"
+                              th:action="@{'/staff/appointments/' + ${appt.id} + '/complete'}" method="post" style="display:inline;">
+                            <button type="submit" class="btn-sakura btn-sakura-primary btn-sakura-sm" style="white-space:nowrap;">
+                                <span class="material-symbols-outlined" style="font-size:0.9rem;">check_circle</span> Complete
+                            </button>
+                        </form>
+                        <span th:if="${appt.status.toString() == 'COMPLETED'}" style="font-size:0.8rem;color:var(--outline);">Done</span>
+                        <span th:if="${appt.status.toString() == 'CANCELLED'}" style="font-size:0.8rem;color:var(--outline);">—</span>
                     </td>
                 </tr>
                 <tr th:if="${(appointments == null or appointments.isEmpty()) and (allStaffAppointments == null or allStaffAppointments.isEmpty())}">

@@ -39,6 +39,15 @@ public class AppointmentService {
         Staff staff = staffRepo.findById(staffId)
                 .orElseThrow(() -> new RuntimeException("Staff not found"));
 
+        // Prevent booking in the past
+        LocalDate today = LocalDate.now();
+        if (date.isBefore(today)) {
+            throw new RuntimeException("Cannot book an appointment on a past date. Please select today or a future date.");
+        }
+        if (date.isEqual(today) && time.isBefore(LocalTime.now())) {
+            throw new RuntimeException("Cannot book an appointment at a past time. Please select a future time slot.");
+        }
+
         // Double-booking prevention: check for time overlap
         if (!isStaffAvailable(staffId, date, time, service.getDurationMinutes())) {
             throw new RuntimeException("This staff member is already booked during that time slot. Please choose a different time or staff member.");
