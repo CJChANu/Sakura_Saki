@@ -34,6 +34,17 @@ public class AdminController {
         return "admin/dashboard";
     }
 
+    // ---- Redirects to Service Module ----
+    @GetMapping("/services")
+    public String servicesRedirect() {
+        return "redirect:/services";
+    }
+
+    @GetMapping("/packages")
+    public String packagesRedirect() {
+        return "redirect:/packages";
+    }
+
     // ---- Reports (Thymeleaf view) ----
     @GetMapping("/reports")
     public String reports(Authentication auth, Model model) {

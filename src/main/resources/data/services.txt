@@ -1,0 +1,6 @@
+S001|Hair Cut|Hair|30|1500.0|Basic hair cutting service|true
+S002|Facial|Skin|45|3000.0|Refreshing facial treatment|true
+S003|Manicure|Nail|40|2000.0|Complete manicure service|true
+S004|Pedicure|Nail|50|2500.0|Relaxing pedicure treatment|true
+S005|Bridal Makeup|Skin|120|10000.0|Professional bridal makeup service|trueSV002|Hair Cut|Hair|20|2000.0|erefn d fdb f|true
+SV005|Hair Cut|Hair|20|2000.0|erefn d fdb f|true
