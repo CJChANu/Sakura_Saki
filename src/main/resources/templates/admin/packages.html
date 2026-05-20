@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packages — Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
+</head>
+<body class="admin-body">
+<canvas id="sakura-canvas"></canvas>
+
+<aside class="admin-sidebar">
+    <div class="sidebar-brand"><h1>🌸 Sakura Saki</h1><p>Admin Panel</p></div>
+    <nav class="sidebar-nav">
+        <a th:href="@{/admin/dashboard}"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+        <a th:href="@{/admin/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
+        <a th:href="@{/admin/packages}" class="active"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
+        <a th:href="@{/admin/staff}"><span class="material-symbols-outlined">badge</span> Staff</a>
+        <a th:href="@{/admin/appointments}"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
+        <a th:href="@{/admin/reviews}"><span class="material-symbols-outlined">reviews</span> Reviews</a>
+        <a th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span> Users</a>
+        <a th:href="@{/admin/manage}"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
+        <a th:href="@{/admin/reports}"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
+        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+    </nav>
+</aside>
+
+<main class="admin-main">
+    <header class="page-header">
+        <div><span class="kicker">Bundles</span><h2>Service Packages</h2></div>
+        <div class="header-actions">
+            <a th:href="@{/admin/packages/new}" class="btn-sakura btn-sakura-primary" style="text-decoration:none;">
+                <span class="material-symbols-outlined" style="font-size:1rem;">add</span> New Package
+            </a>
+        </div>
+    </header>
+
+    <div class="content-card glass-pane clay-lift">
+        <table class="sakura-table">
+            <thead>
+            <tr>
+                <th>Package Name</th>
+                <th>Included Services</th>
+                <th>Base Price</th>
+                <th>Discount</th>
+                <th>Final Price</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th style="text-align:right;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${packages}">
+                <td th:text="${p.name}">Bundle</td>
+                <td>
+                    <span th:each="s,it : ${p.services}" th:text="${s.name + (it.last ? '' : ', ')}" style="font-size:0.8rem; color:var(--outline);">Treatment</span>
+                </td>
+                <td th:text="'Rs. ' + ${#numbers.formatDecimal(p.price,1,2)}">Rs. 0</td>
+                <td th:text="${p.discount} + '%'">10%</td>
+                <td style="font-weight:700; color:var(--primary);" th:text="'Rs. ' + ${#numbers.formatDecimal(p.getDiscountedPrice(),1,2)}">Rs. 0</td>
+                <td th:text="${p.totalDuration} + ' min'">min</td>
+                <td>
+                    <span class="badge-pill badge-active" th:if="${p.active}">Active</span>
+                    <span class="badge-pill badge-inactive" th:if="${!p.active}">Inactive</span>
+                </td>
+                <td style="text-align:right;">
+                    <div style="display:flex; gap:0.4rem; justify-content:flex-end;">
+                        <a th:href="@{'/admin/packages/edit/' + ${p.id}}" class="btn-sakura btn-sakura-primary btn-sakura-sm" style="text-decoration:none;">Edit</a>
+                        <a th:href="@{'/admin/packages/delete/' + ${p.id}}" class="btn-sakura btn-sakura-outline btn-sakura-sm" style="color:var(--error); border-color:#fecdd3; text-decoration:none;" onclick="return confirm('Delete this package?');">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(packages)}">
+                <td colspan="8" style="text-align:center; padding:3rem; color:var(--outline);">No bundles curated yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script th:src="@{/js/sakura-petals.js}"></script>
+</body>
+</html>
