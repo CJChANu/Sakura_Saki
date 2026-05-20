@@ -20,6 +20,7 @@
         <a th:href="@{/admin/appointments}"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
         <a th:href="@{/admin/reviews}"><span class="material-symbols-outlined">reviews</span> Reviews</a>
         <a th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span> Users</a>
+        <a th:href="@{/admin/customers}"><span class="material-symbols-outlined">person_search</span> Customers</a>
         <a th:href="@{/admin/manage}"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
         <a th:href="@{/admin/reports}"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
         <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
@@ -34,20 +35,20 @@
     <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
     <div class="content-card glass-pane clay-lift">
         <table class="sakura-table">
-            <thead><tr><th>Name</th><th>Type</th><th>Specialization</th><th>Email</th><th>Working Days</th><th>Hours</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
+            <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Phone</th><th>Working Days</th><th>Hours</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
             <tbody>
                 <tr th:each="s : ${staffList}">
-                    <td th:text="${s.firstName + ' ' + s.lastName}">Name</td>
-                    <td><span class="badge-pill badge-active" th:text="${s.staffType}">General</span></td>
-                    <td th:text="${s.specialization ?: '—'}">Spec</td>
+                    <td th:text="${s.name}">Name</td>
+                    <td><span class="badge-pill badge-active" th:text="${s.role}">General</span></td>
                     <td th:text="${s.email}">email</td>
+                    <td th:text="${s.phone ?: '—'}">phone</td>
                     <td th:text="${s.workingDays ?: '—'}">MON-FRI</td>
-                    <td th:text="${s.startTime != null ? (s.startTime + ' - ' + s.endTime) : '—'}">9-5</td>
+                    <td th:text="${s.timeSlot ?: '—'}">9-5</td>
                     <td><span class="badge-pill badge-active" th:if="${s.active}">Active</span><span class="badge-pill badge-inactive" th:if="${!s.active}">Inactive</span></td>
                     <td style="text-align:right;">
                         <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
-                            <button class="btn-sakura btn-sakura-outline btn-sakura-sm" data-bs-toggle="modal" th:data-bs-target="'#editStaff' + ${s.id}"><span class="material-symbols-outlined" style="font-size:0.9rem;">edit</span></button>
-                            <form th:action="@{'/admin/staff/' + ${s.id} + '/toggle-active'}" method="post" style="display:inline;"><button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm" th:text="${s.active} ? 'Disable' : 'Enable'">T</button></form>
+                            <button class="btn-sakura btn-sakura-outline btn-sakura-sm" data-bs-toggle="modal" th:data-bs-target="'#editStaff' + ${s.staffId}"><span class="material-symbols-outlined" style="font-size:0.9rem;">edit</span></button>
+                            <form th:action="@{'/admin/staff/' + ${s.staffId} + '/toggle-active'}" method="post" style="display:inline;"><button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm" th:text="${s.active} ? 'Disable' : 'Enable'">T</button></form>
                         </div>
                     </td>
                 </tr>
@@ -78,20 +79,19 @@
         </div><div class="modal-footer"><button type="submit" class="btn-sakura btn-sakura-primary">Register</button></div></form>
     </div></div></div>
     <!-- Edit Modals -->
-    <div th:each="s : ${staffList}" th:id="'editStaff' + ${s.id}" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content glass-pane">
+    <div th:each="s : ${staffList}" th:id="'editStaff' + ${s.staffId}" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content glass-pane">
         <div class="modal-header"><h5 class="modal-title">Edit Staff</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <form th:action="@{'/admin/staff/' + ${s.id} + '/update'}" method="post"><div class="modal-body">
+        <form th:action="@{'/admin/staff/' + ${s.staffId} + '/update'}" method="post"><div class="modal-body">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                <div class="form-group mb-3"><label>First Name</label><input name="firstName" class="input-recessed" th:value="${s.firstName}" required></div>
-                <div class="form-group mb-3"><label>Last Name</label><input name="lastName" class="input-recessed" th:value="${s.lastName}" required></div>
+                <div class="form-group mb-3"><label>First Name</label><input name="firstName" class="input-recessed" th:value="${s.name != null ? s.name.split(' ')[0] : ''}" required></div>
+                <div class="form-group mb-3"><label>Last Name</label><input name="lastName" class="input-recessed" th:value="${s.name != null && s.name.contains(' ') ? s.name.substring(s.name.indexOf(' ') + 1) : ''}" required></div>
             </div>
             <div class="form-group mb-3"><label>Email</label><input name="email" type="email" class="input-recessed" th:value="${s.email}" required></div>
             <div class="form-group mb-3"><label>Phone</label><input name="phone" class="input-recessed" th:value="${s.phone}"></div>
-            <div class="form-group mb-3"><label>Specialization</label><input name="specialization" class="input-recessed" th:value="${s.specialization}"></div>
             <div class="form-group mb-3"><label>Working Days</label><input name="workingDays" class="input-recessed" th:value="${s.workingDays}"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                <div class="form-group mb-3"><label>Start</label><input name="startTime" type="time" class="input-recessed" th:value="${s.startTime}"></div>
-                <div class="form-group mb-3"><label>End</label><input name="endTime" type="time" class="input-recessed" th:value="${s.endTime}"></div>
+                <div class="form-group mb-3"><label>Start</label><input name="startTime" type="time" class="input-recessed" th:value="${s.timeSlot != null && s.timeSlot.contains('-') ? s.timeSlot.split('-')[0] : '09:00'}"></div>
+                <div class="form-group mb-3"><label>End</label><input name="endTime" type="time" class="input-recessed" th:value="${s.timeSlot != null && s.timeSlot.contains('-') ? s.timeSlot.split('-')[1] : '17:00'}"></div>
             </div>
         </div><div class="modal-footer"><button type="submit" class="btn-sakura btn-sakura-primary">Save</button></div></form>
     </div></div></div>

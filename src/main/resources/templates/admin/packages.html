@@ -20,6 +20,7 @@
         <a th:href="@{/admin/appointments}"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
         <a th:href="@{/admin/reviews}"><span class="material-symbols-outlined">reviews</span> Reviews</a>
         <a th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span> Users</a>
+        <a th:href="@{/admin/customers}"><span class="material-symbols-outlined">person_search</span> Customers</a>
         <a th:href="@{/admin/manage}"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
         <a th:href="@{/admin/reports}"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
         <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
@@ -34,19 +35,15 @@
     <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
     <div class="content-card glass-pane clay-lift">
         <table class="sakura-table">
-            <thead><tr><th>Name</th><th>Services</th><th>Total Price</th><th>Discount</th><th>Final Price</th><th>Duration</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
+            <thead><tr><th>Name</th><th>Included Services</th><th>Total Price</th><th>Discount</th><th>Final Price</th><th>Description</th></tr></thead>
             <tbody>
                 <tr th:each="p : ${packages}">
-                    <td th:text="${p.name}">Pkg</td>
-                    <td><span th:each="s,it : ${p.services}" th:text="${s.name + (it.last ? '' : ', ')}">svc</span></td>
-                    <td th:text="'Rs. ' + ${#numbers.formatDecimal(p.totalPrice,1,2)}">Rs.</td>
-                    <td th:text="${p.discountPercent} + '%'">10%</td>
-                    <td style="font-weight:700;color:var(--primary);" th:text="'Rs. ' + ${#numbers.formatDecimal(p.discountedPrice,1,2)}">Rs.</td>
-                    <td th:text="${p.totalDuration} + ' min'">min</td>
-                    <td><span class="badge-pill badge-active" th:if="${p.active}">Active</span><span class="badge-pill badge-inactive" th:if="${!p.active}">Inactive</span></td>
-                    <td style="text-align:right;">
-                        <form th:action="@{'/admin/packages/' + ${p.id} + '/toggle-active'}" method="post" style="display:inline;"><button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm" th:text="${p.active} ? 'Disable' : 'Enable'">Toggle</button></form>
-                    </td>
+                    <td th:text="${p.packageName}">Pkg</td>
+                    <td th:text="${p.includedServices ?: '—'}">services</td>
+                    <td th:text="'Rs. ' + ${p.totalPrice}">Rs.</td>
+                    <td th:text="'Rs. ' + ${p.discount}">Rs.</td>
+                    <td style="font-weight:700;color:var(--primary);" th:text="'Rs. ' + ${p.finalPrice}">Rs.</td>
+                    <td th:text="${p.description ?: '—'}">desc</td>
                 </tr>
             </tbody>
         </table>
@@ -60,12 +57,12 @@
             <div class="form-group mb-3"><label>Discount (%)</label><input name="discountPercent" type="number" step="0.5" class="input-recessed" value="10" required></div>
             <div class="form-group mb-3"><label>Select Services</label>
                 <select name="serviceIds" class="input-recessed" multiple style="min-height:120px;">
-                    <option th:each="s : ${allServices}" th:value="${s.id}" th:text="${s.name + ' — Rs.' + s.price}">svc</option>
+                    <option th:each="s : ${allServices}" th:value="${s.serviceId}" th:text="${s.name + ' — Rs.' + s.price}">svc</option>
                 </select>
             </div>
         </div><div class="modal-footer"><button type="submit" class="btn-sakura btn-sakura-primary">Create Package</button></div></form>
     </div></div></div>
-    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS</span></footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/sakura-petals.js}"></script>

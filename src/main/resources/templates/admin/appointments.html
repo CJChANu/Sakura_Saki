@@ -20,6 +20,7 @@
         <a th:href="@{/admin/appointments}" class="active"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
         <a th:href="@{/admin/reviews}"><span class="material-symbols-outlined">reviews</span> Reviews</a>
         <a th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span> Users</a>
+        <a th:href="@{/admin/customers}"><span class="material-symbols-outlined">person_search</span> Customers</a>
         <a th:href="@{/admin/manage}"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
         <a th:href="@{/admin/reports}"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
         <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
@@ -31,7 +32,7 @@
         <div class="header-actions" style="display:flex;gap:0.5rem;">
             <form th:action="@{/admin/appointments}" method="get" style="display:flex;gap:0.5rem;">
                 <input name="date" type="date" class="input-recessed" th:value="${filterDate}" style="width:160px;">
-                <select name="status" class="input-recessed" style="width:140px;"><option value="">All Status</option><option value="SCHEDULED" th:selected="${filterStatus == 'SCHEDULED'}">Scheduled</option><option value="COMPLETED" th:selected="${filterStatus == 'COMPLETED'}">Completed</option><option value="CANCELLED" th:selected="${filterStatus == 'CANCELLED'}">Cancelled</option></select>
+                <select name="status" class="input-recessed" style="width:140px;"><option value="">All Status</option><option value="PENDING" th:selected="${filterStatus == 'PENDING'}">Pending</option><option value="CONFIRMED" th:selected="${filterStatus == 'CONFIRMED'}">Confirmed</option><option value="COMPLETED" th:selected="${filterStatus == 'COMPLETED'}">Completed</option><option value="CANCELLED" th:selected="${filterStatus == 'CANCELLED'}">Cancelled</option></select>
                 <button type="submit" class="btn-sakura btn-sakura-outline"><span class="material-symbols-outlined" style="font-size:1rem;">filter_alt</span> Filter</button>
             </form>
         </div>
@@ -40,26 +41,33 @@
     <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
     <div class="content-card glass-pane clay-lift">
         <table class="sakura-table">
-            <thead><tr><th>Customer</th><th>Service</th><th>Staff</th><th>Date</th><th>Time</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
+            <thead><tr><th>Customer ID</th><th>Service ID</th><th>Staff ID</th><th>Date</th><th>Time</th><th>Duration</th><th>Amount</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
             <tbody>
                 <tr th:each="a : ${appointments}">
-                    <td th:text="${a.customer.firstName + ' ' + a.customer.lastName}">Customer</td>
-                    <td th:text="${a.service.name}">Service</td>
-                    <td th:text="${a.staff != null ? a.staff.firstName + ' ' + a.staff.lastName : '—'}">Staff</td>
+                    <td th:text="${a.userId}">User</td>
+                    <td th:text="${a.serviceId ?: (a.packageId ?: '—')}">Service</td>
+                    <td th:text="${a.staffId ?: '—'}">Staff</td>
                     <td th:text="${a.appointmentDate}">Date</td>
                     <td th:text="${a.appointmentTime}">Time</td>
+                    <td th:text="${a.durationMinutes + ' min'}">30 min</td>
+                    <td th:text="'Rs. ' + ${a.totalAmount}">Rs. 0</td>
                     <td>
-                        <span class="badge-pill badge-scheduled" th:if="${a.status == 'SCHEDULED'}">Scheduled</span>
-                        <span class="badge-pill badge-completed" th:if="${a.status == 'COMPLETED'}">Completed</span>
-                        <span class="badge-pill badge-cancelled" th:if="${a.status == 'CANCELLED'}">Cancelled</span>
+                        <span class="badge-pill" style="background:#fef3c7;color:#92400e;" th:if="${a.status == 'PENDING'}">Pending</span>
+                        <span class="badge-pill" style="background:#dbeafe;color:#1e40af;" th:if="${a.status == 'CONFIRMED'}">Confirmed</span>
+                        <span class="badge-pill badge-active" th:if="${a.status == 'COMPLETED'}">Completed</span>
+                        <span class="badge-pill badge-inactive" th:if="${a.status == 'CANCELLED'}">Cancelled</span>
                     </td>
                     <td style="text-align:right;">
-                        <div style="display:flex;gap:0.5rem;justify-content:flex-end;" th:if="${a.status == 'SCHEDULED'}">
-                            <form th:action="@{'/admin/appointments/' + ${a.id} + '/status'}" method="post" style="display:inline;">
+                        <div style="display:flex;gap:0.5rem;justify-content:flex-end;" th:if="${a.status == 'PENDING' || a.status == 'CONFIRMED'}">
+                            <form th:if="${a.status == 'PENDING'}" th:action="@{'/admin/appointments/' + ${a.appointmentId} + '/status'}" method="post" style="display:inline;">
+                                <input type="hidden" name="status" value="CONFIRMED">
+                                <button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm" style="color:#1e40af;border-color:#dbeafe;">✓ Confirm</button>
+                            </form>
+                            <form th:action="@{'/admin/appointments/' + ${a.appointmentId} + '/status'}" method="post" style="display:inline;">
                                 <input type="hidden" name="status" value="COMPLETED">
                                 <button type="submit" class="btn-sakura btn-sakura-outline btn-sakura-sm" style="color:#065f46;border-color:#d1fae5;">✓ Complete</button>
                             </form>
-                            <form th:action="@{'/admin/appointments/' + ${a.id} + '/status'}" method="post" style="display:inline;">
+                            <form th:action="@{'/admin/appointments/' + ${a.appointmentId} + '/status'}" method="post" style="display:inline;">
                                 <input type="hidden" name="status" value="CANCELLED">
                                 <button type="submit" class="btn-sakura btn-sakura-danger btn-sakura-sm" onclick="return confirm('Cancel this appointment?');">✕ Cancel</button>
                             </form>
@@ -69,7 +77,7 @@
             </tbody>
         </table>
     </div>
-    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
+    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS</span></footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/sakura-petals.js}"></script>
