@@ -3,6 +3,8 @@ package com.cjcc.yakalabs.sakurasaki.controller;
 import com.cjcc.yakalabs.sakurasaki.model.Appointment;
 import com.cjcc.yakalabs.sakurasaki.model.Customer;
 import com.cjcc.yakalabs.sakurasaki.model.User;
+import com.cjcc.yakalabs.sakurasaki.repository.AppointmentRepository;
+import com.cjcc.yakalabs.sakurasaki.repository.ReviewRepository;
 import com.cjcc.yakalabs.sakurasaki.repository.CustomerRepository;
 import com.cjcc.yakalabs.sakurasaki.repository.UserRepository;
 import com.cjcc.yakalabs.sakurasaki.service.AppointmentService;
@@ -29,17 +31,23 @@ public class CustomerDashboardController {
     private final AppointmentService appointmentService;
     private final CustomerService customerService;
     private final PasswordEncoder passwordEncoder;
+    private final AppointmentRepository appointmentRepo;
+    private final ReviewRepository reviewRepo;
 
     public CustomerDashboardController(UserRepository userRepo,
                                         CustomerRepository customerRepo,
                                         AppointmentService appointmentService,
                                         CustomerService customerService,
-                                        PasswordEncoder passwordEncoder) {
+                                        PasswordEncoder passwordEncoder,
+                                        AppointmentRepository appointmentRepo,
+                                        ReviewRepository reviewRepo) {
         this.userRepo = userRepo;
         this.customerRepo = customerRepo;
         this.appointmentService = appointmentService;
         this.customerService = customerService;
         this.passwordEncoder = passwordEncoder;
+        this.appointmentRepo = appointmentRepo;
+        this.reviewRepo = reviewRepo;
     }
 
     private Customer getCustomer(Authentication auth) {
@@ -151,5 +159,20 @@ public class CustomerDashboardController {
         userRepo.save(user);
         redirectAttributes.addFlashAttribute("success", "Password changed successfully!");
         return "redirect:/customer/settings";
+    }
+
+    @PostMapping("/settings/delete-account")
+    public String deleteAccount(Authentication auth, jakarta.servlet.http.HttpServletRequest request) throws jakarta.servlet.ServletException {
+        User user = userRepo.findByUsername(auth.getName()).orElse(null);
+        if (user != null) {
+            // Hard delete: delete related appointments and reviews first
+            appointmentRepo.deleteAll(appointmentRepo.findByCustomerId(user.getId()));
+            reviewRepo.deleteAll(reviewRepo.findByCustomerId(user.getId()));
+            
+            // Now safe to hard delete the user
+            userRepo.delete(user);
+        }
+        request.logout();
+        return "redirect:/?deleted=true";
     }
 }

@@ -13,7 +13,7 @@ import jakarta.persistence.Entity;
 public class Customer extends User {
 
     @Column(name = "loyalty_points")
-    private int loyaltyPoints = 0;
+    private Integer loyaltyPoints = 0;
 
     @Column(name = "membership_tier")
     private String membershipTier = "Bronze";
@@ -29,11 +29,11 @@ public class Customer extends User {
         this.setEnabled(true);
     }
 
-    public int getLoyaltyPoints() {
+    public Integer getLoyaltyPoints() {
         return loyaltyPoints;
     }
 
-    public void setLoyaltyPoints(int loyaltyPoints) {
+    public void setLoyaltyPoints(Integer loyaltyPoints) {
         this.loyaltyPoints = loyaltyPoints;
     }
 
