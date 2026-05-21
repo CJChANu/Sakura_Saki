@@ -21,6 +21,8 @@ import com.cjcc.yakalabs.sakurasaki.service.CustomerService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/customer")
@@ -86,7 +88,16 @@ public class CustomerDashboardController {
         model.addAttribute("customer", customer);
 
         if (customer != null) {
-            model.addAttribute("appointments", appointmentService.findByCustomer(customer.getId()));
+            List<Appointment> appointments = appointmentService.findByCustomer(customer.getId());
+            model.addAttribute("appointments", appointments);
+
+            // Collect IDs of appointments that already have a review
+            Set<Long> reviewedIds = appointments.stream()
+                    .filter(a -> "COMPLETED".equals(a.getStatus()))
+                    .filter(a -> reviewRepo.existsByAppointmentId(a.getId()))
+                    .map(Appointment::getId)
+                    .collect(Collectors.toSet());
+            model.addAttribute("reviewedIds", reviewedIds);
         }
 
         return "customer/bookings";

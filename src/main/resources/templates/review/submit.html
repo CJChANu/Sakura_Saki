@@ -28,11 +28,39 @@
 <main class="admin-main">
     <header class="page-header"><div><span class="kicker">Feedback</span><h2>Submit a Review</h2></div></header>
     <div th:if="${error}" class="sakura-alert sakura-alert-error" th:text="${error}"></div>
-    <div th:if="${existingReview != null}" class="content-card glass-pane clay-lift" style="max-width:600px;text-align:center;">
-        <p style="color:var(--outline);padding:1rem;">You have already submitted a review for this appointment.</p>
-        <div><span th:each="i : ${#numbers.sequence(1, existingReview.rating)}">⭐</span></div>
-        <p th:text="${existingReview.comment}" style="margin-top:.5rem;color:var(--on-surface);"></p>
-        <a th:href="@{/my-appointments}" class="btn-sakura btn-sakura-outline" style="margin-top:1rem;">← Back to Appointments</a>
+    <div th:if="${existingReview != null}" class="content-card glass-pane clay-lift" style="max-width:600px;">
+        <div style="margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(0,0,0,.06);">
+            <p style="color:var(--outline);font-size:.85rem;">Edit your review for:</p>
+            <h3 style="margin:.25rem 0;" th:text="${appointment.service.name}">Service</h3>
+            <p style="color:var(--outline);font-size:.9rem;">with <strong th:text="${appointment.staff != null ? appointment.staff.firstName + ' ' + appointment.staff.lastName : 'Staff'}">Staff</strong> on <span th:text="${appointment.appointmentDate}">Date</span></p>
+        </div>
+        <form th:action="@{/reviews/{id}/edit(id=${existingReview.id})}" method="post">
+            <div class="form-group" style="margin-bottom:1.25rem;">
+                <label>Rating</label>
+                <div class="star-rating">
+                    <input type="radio" id="estar5" name="rating" value="5" th:checked="${existingReview.rating == 5}"><label for="estar5">★</label>
+                    <input type="radio" id="estar4" name="rating" value="4" th:checked="${existingReview.rating == 4}"><label for="estar4">★</label>
+                    <input type="radio" id="estar3" name="rating" value="3" th:checked="${existingReview.rating == 3}"><label for="estar3">★</label>
+                    <input type="radio" id="estar2" name="rating" value="2" th:checked="${existingReview.rating == 2}"><label for="estar2">★</label>
+                    <input type="radio" id="estar1" name="rating" value="1" th:checked="${existingReview.rating == 1}"><label for="estar1">★</label>
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom:1.25rem;">
+                <label>Comment</label>
+                <textarea name="comment" class="input-recessed" rows="4" placeholder="Update your experience..." th:text="${existingReview.comment}"></textarea>
+            </div>
+            <button type="submit" class="btn-sakura btn-sakura-primary" style="width:100%;justify-content:center;">
+                <span class="material-symbols-outlined" style="font-size:1rem;">edit</span> Update Review
+            </button>
+        </form>
+        <div style="display:flex;gap:.75rem;margin-top:1rem;">
+            <a th:href="@{/customer/bookings}" class="btn-sakura btn-sakura-outline" style="flex:1;justify-content:center;text-decoration:none;">← Back</a>
+            <form th:action="@{/reviews/{id}/delete(id=${existingReview.id})}" method="post" style="flex:1;" onsubmit="return confirm('Are you sure you want to delete this review?');">
+                <button type="submit" class="btn-sakura" style="width:100%;justify-content:center;background:#ef4444;color:#fff;border:none;">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">delete</span> Delete Review
+                </button>
+            </form>
+        </div>
     </div>
     <div th:if="${existingReview == null}" class="content-card glass-pane clay-lift" style="max-width:600px;">
         <div style="margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(0,0,0,.06);">
