@@ -67,8 +67,13 @@ public class ServiceManagementController {
     }
 
     @PostMapping("/{id}/delete")
-    public String deleteService(@PathVariable Long id) {
-        salonServiceService.delete(id);
+    public String deleteService(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            salonServiceService.delete(id);
+            redirectAttributes.addFlashAttribute("success", "Service deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to delete service: " + e.getMessage());
+        }
         return "redirect:/admin/services";
     }
 }

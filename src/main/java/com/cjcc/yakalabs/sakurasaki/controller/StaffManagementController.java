@@ -76,4 +76,15 @@ public class StaffManagementController {
         staffService.toggleActive(id);
         return "redirect:/admin/staff";
     }
+
+    @PostMapping("/{id}/delete")
+    public String deleteStaff(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            staffService.delete(id);
+            redirectAttributes.addFlashAttribute("success", "Staff member deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to delete staff: " + e.getMessage());
+        }
+        return "redirect:/admin/staff";
+    }
 }

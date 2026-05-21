@@ -3,9 +3,12 @@ package com.cjcc.yakalabs.sakurasaki.service;
 import com.cjcc.yakalabs.sakurasaki.model.Staff;
 import com.cjcc.yakalabs.sakurasaki.model.Stylist;
 import com.cjcc.yakalabs.sakurasaki.model.Therapist;
+import com.cjcc.yakalabs.sakurasaki.repository.AppointmentRepository;
+import com.cjcc.yakalabs.sakurasaki.repository.ReviewRepository;
 import com.cjcc.yakalabs.sakurasaki.repository.StaffRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -16,10 +19,15 @@ public class StaffService {
 
     private final StaffRepository staffRepo;
     private final PasswordEncoder passwordEncoder;
+    private final AppointmentRepository appointmentRepo;
+    private final ReviewRepository reviewRepo;
 
-    public StaffService(StaffRepository staffRepo, PasswordEncoder passwordEncoder) {
+    public StaffService(StaffRepository staffRepo, PasswordEncoder passwordEncoder,
+                        AppointmentRepository appointmentRepo, ReviewRepository reviewRepo) {
         this.staffRepo = staffRepo;
         this.passwordEncoder = passwordEncoder;
+        this.appointmentRepo = appointmentRepo;
+        this.reviewRepo = reviewRepo;
     }
 
     /**
@@ -102,7 +110,18 @@ public class StaffService {
         staffRepo.save(s);
     }
 
+    @Transactional
     public void delete(Long id) {
-        staffRepo.deleteById(id);
+        Staff staff = staffRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Staff not found with id: " + id));
+
+        // 1. Delete all reviews referencing this staff
+        reviewRepo.deleteAll(reviewRepo.findByStaffId(id));
+
+        // 2. Delete all appointments referencing this staff
+        appointmentRepo.deleteAll(appointmentRepo.findByStaffId(id));
+
+        // 3. Delete the staff itself
+        staffRepo.delete(staff);
     }
 }
