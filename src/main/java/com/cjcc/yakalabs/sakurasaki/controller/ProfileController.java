@@ -1,5 +1,6 @@
 package com.cjcc.yakalabs.sakurasaki.controller;
 
+import com.cjcc.yakalabs.sakurasaki.model.Admin;
 import com.cjcc.yakalabs.sakurasaki.model.Customer;
 import com.cjcc.yakalabs.sakurasaki.model.Staff;
 import com.cjcc.yakalabs.sakurasaki.model.User;
@@ -34,10 +35,11 @@ public class ProfileController {
         User user = userRepo.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user instanceof Staff staffMember) {
-            if (staffMember.getStaffType().equalsIgnoreCase("ADMIN")) {
-                return "redirect:/admin/dashboard";
-            }
+        if (user instanceof Admin) {
+            return "redirect:/admin/dashboard";
+        }
+
+        if (user instanceof Staff) {
             return "redirect:/staff/dashboard";
         }
 

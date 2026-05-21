@@ -47,7 +47,7 @@ public class ReviewController {
         } catch (Exception e) {
             ra.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/my-appointments";
+        return "redirect:/customer/bookings";
     }
 
     @GetMapping("/service/{serviceId}")
@@ -72,6 +72,22 @@ public class ReviewController {
         } catch (Exception e) {
             ra.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/my-appointments";
+        return "redirect:/customer/bookings";
+    }
+    @PostMapping("/{id}/edit")
+    public String editReview(@PathVariable Long id,
+                             @RequestParam int rating,
+                             @RequestParam(required = false) String comment,
+                             Authentication auth,
+                             RedirectAttributes ra) {
+        try {
+            User user = userRepo.findByUsername(auth.getName()).orElseThrow();
+            Customer customer = customerService.findByEmail(user.getEmail()).orElseThrow();
+            reviewService.editReview(id, customer.getId(), rating, comment);
+            ra.addFlashAttribute("success", "Review updated successfully!");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/customer/bookings";
     }
 }
