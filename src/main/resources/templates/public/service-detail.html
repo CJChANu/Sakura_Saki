@@ -5,6 +5,34 @@
     <title th:text="${service.name + ' — Sakura Saki'}">Service Detail</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#ffd9df", "outline": "#837375", "error": "#ba1a1a",
+                        "primary": "#864e5a", "inverse-primary": "#fbb3c1",
+                        "surface-container-low": "#f3f3f3", "on-error": "#ffffff",
+                        "surface-container": "#eeeeee", "on-primary-container": "#7b4551",
+                        "background": "#f9f9f9", "on-background": "#1a1c1c",
+                        "surface-container-highest": "#e2e2e2", "on-tertiary": "#ffffff",
+                        "surface": "#f9f9f9", "tertiary": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff", "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6", "secondary": "#70585b",
+                        "on-primary": "#ffffff", "primary-container": "#ffb7c5",
+                        "on-surface": "#1a1c1c", "surface-container-high": "#e8e8e8",
+                        "surface-variant": "#e2e2e2", "surface-bright": "#f9f9f9",
+                        "on-surface-variant": "#514345", "outline-variant": "#d6c2c4"
+                    },
+                    "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                    "fontFamily": { "headline": ["Noto Serif"], "body": ["Manrope"], "label": ["Manrope"] }
+                }
+            }
+        }
+    </script>
     <link th:href="@{/css/admin-style.css}" rel="stylesheet">
     <style>
         body{margin:0;font-family:var(--font-body);color:var(--on-surface);background:var(--surface);}
@@ -35,9 +63,9 @@
     </style>
 </head>
 <body style="display:flex;flex-direction:column;min-height:100vh;">
-<canvas id="sakura-canvas"></canvas>
+<canvas class="fixed inset-0 pointer-events-none w-full h-full -z-[1]" id="sakura-canvas"></canvas>
 
-<main style="flex:1;">
+<main style="flex:1; position: relative; z-index: 1;">
 <div th:replace="~{layout/fragments :: topnav('services')}"></div>
 
 <div class="container">
@@ -85,11 +113,7 @@
             <div class="form-group" style="margin-bottom:1.5rem;">
                 <label>Select Staff Member</label>
                 <div class="staff-grid" id="staffList">
-                    <div th:each="s : ${staffList}" class="staff-card" th:data-id="${s.id}" onclick="selectStaff(this)">
-                        <div style="font-weight:600;" th:text="${s.firstName + ' ' + s.lastName}">Staff Name</div>
-                        <div class="outline-text" th:text="${s.specialization ?: s.staffType}">Specialization</div>
-                    </div>
-                    <p th:if="${staffList == null or staffList.isEmpty()}" style="color:var(--outline);grid-column:1/-1;">No staff available currently.</p>
+                    <p style="color:var(--outline);grid-column:1/-1;">Please select a date and time to see available staff.</p>
                 </div>
             </div>
 
@@ -186,6 +210,7 @@
                     this.value = '';
                 } else {
                     clearTimeError();
+                    loadAvailableStaff();
                 }
             });
         }
@@ -198,10 +223,53 @@
                 if (this.value === today && timeInput && timeInput.value && timeInput.value <= getCurrentTimeStr()) {
                     timeInput.value = '';
                     showTimeError('The selected time has already passed. Please choose a later time for today.');
+                } else {
+                    loadAvailableStaff();
                 }
             });
         }
     });
+
+    async function loadAvailableStaff() {
+        var dateInput = document.getElementById('bookingDate');
+        var timeInput = document.getElementById('bookingTime');
+        var duration = document.querySelector('div.detail-meta .item:nth-child(2) .val').textContent.trim() || '60';
+        
+        if (!dateInput.value || !timeInput.value) return;
+
+        var container = document.getElementById('staffList');
+        container.innerHTML = '<p style="color:var(--outline);grid-column:1/-1;">Loading available staff...</p>';
+        document.getElementById('selectedStaffId').value = '';
+        document.getElementById('submitBookingBtn').disabled = true;
+        document.getElementById('submitBookingBtn').style.opacity = '0.5';
+        document.getElementById('submitBookingBtn').style.cursor = 'not-allowed';
+
+        try {
+            const resp = await fetch(`/booking/available-staff?date=${dateInput.value}&time=${timeInput.value}&durationMinutes=${duration}`);
+            const staffList = await resp.json();
+
+            container.innerHTML = '';
+            
+            if (staffList.length === 0) {
+                container.innerHTML = '<p style="color:var(--outline);grid-column:1/-1;">No staff available at this time. Please try a different slot.</p>';
+                return;
+            }
+
+            staffList.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'staff-card';
+                card.setAttribute('data-id', s.id);
+                card.onclick = function() { selectStaff(this); };
+                card.innerHTML = `
+                    <div style="font-weight:600;">${s.firstName} ${s.lastName}</div>
+                    <div class="outline-text">${s.specialization || s.staffType || ''}</div>
+                `;
+                container.appendChild(card);
+            });
+        } catch (e) {
+            container.innerHTML = '<p style="color:var(--error);grid-column:1/-1;">Error loading staff. Please try again later.</p>';
+        }
+    }
 
     function showTimeError(msg) {
         clearTimeError();

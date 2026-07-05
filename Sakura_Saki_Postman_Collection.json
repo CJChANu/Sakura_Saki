@@ -1,0 +1,297 @@
+{
+  "info": {
+    "name": "Sakura Saki MVC API",
+    "description": "Postman collection for testing Sakura Saki endpoints. Note: Because this is a Spring MVC application using Thymeleaf, requests expect `x-www-form-urlencoded` data instead of JSON. You must first run the 'Auth - Login' request to receive a JSESSIONID cookie, which Postman will automatically save and use for subsequent authenticated requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "firstName", "value": "Test", "type": "text"},
+                {"key": "lastName", "value": "User", "type": "text"},
+                {"key": "username", "value": "testuser", "type": "text"},
+                {"key": "email", "value": "test@example.com", "type": "text"},
+                {"key": "phone", "value": "0712345678", "type": "text"},
+                {"key": "password", "value": "Password@123", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": ["{{base_url}}"],
+              "path": ["register"]
+            }
+          }
+        },
+        {
+          "name": "Login (Sets Cookie)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "username", "value": "admin", "type": "text"},
+                {"key": "password", "value": "Admin@123", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/do-login",
+              "host": ["{{base_url}}"],
+              "path": ["do-login"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": ["{{base_url}}"],
+              "path": ["logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Admin - Services",
+      "item": [
+        {
+          "name": "Create Service",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "name", "value": "Luxury Facial", "type": "text"},
+                {"key": "description", "value": "Deep cleansing and relaxation.", "type": "text"},
+                {"key": "price", "value": "5000", "type": "text"},
+                {"key": "durationMinutes", "value": "60", "type": "text"},
+                {"key": "category", "value": "Skincare", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/services/create",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "services", "create"]
+            }
+          }
+        },
+        {
+          "name": "Toggle Service Status",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/services/1/toggle-active",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "services", "1", "toggle-active"]
+            }
+          }
+        },
+        {
+          "name": "Delete Service",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/services/1/delete",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "services", "1", "delete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Admin - Staff",
+      "item": [
+        {
+          "name": "Create Staff",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "firstName", "value": "Jane", "type": "text"},
+                {"key": "lastName", "value": "Doe", "type": "text"},
+                {"key": "email", "value": "jane@sakurasaki.com", "type": "text"},
+                {"key": "phone", "value": "0771234567", "type": "text"},
+                {"key": "staffType", "value": "STYLIST", "type": "text"},
+                {"key": "specialization", "value": "Hair Styling", "type": "text"},
+                {"key": "workingDays", "value": "MON,TUE,WED", "type": "text"},
+                {"key": "startTime", "value": "09:00", "type": "text"},
+                {"key": "endTime", "value": "17:00", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/staff/create",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "staff", "create"]
+            }
+          }
+        },
+        {
+          "name": "Delete Staff",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/staff/1/delete",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "staff", "1", "delete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Customer - Booking & Reviews",
+      "item": [
+        {
+          "name": "Book Appointment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "serviceId", "value": "1", "type": "text"},
+                {"key": "staffId", "value": "1", "type": "text"},
+                {"key": "appointmentDate", "value": "2024-12-01", "type": "text"},
+                {"key": "appointmentTime", "value": "10:00", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/booking/book",
+              "host": ["{{base_url}}"],
+              "path": ["booking", "book"]
+            }
+          }
+        },
+        {
+          "name": "Submit Review",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "appointmentId", "value": "1", "type": "text"},
+                {"key": "rating", "value": "5", "type": "text"},
+                {"key": "comment", "value": "Excellent service!", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/reviews/submit",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "submit"]
+            }
+          }
+        },
+        {
+          "name": "Edit Review",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "rating", "value": "4", "type": "text"},
+                {"key": "comment", "value": "Great, but started late.", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/reviews/1/edit",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "1", "edit"]
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reviews/1/delete",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "1", "delete"]
+            }
+          }
+        },
+        {
+          "name": "Self-Delete Account (Customer)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/customer/account/delete",
+              "host": ["{{base_url}}"],
+              "path": ["customer", "account", "delete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Staff & Admin - Appointment Management",
+      "item": [
+        {
+          "name": "Update Appointment Status",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "status", "value": "COMPLETED", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/appointments/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "appointments", "1", "status"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}

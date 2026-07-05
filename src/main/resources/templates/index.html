@@ -5,6 +5,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Sakura Saki | Digital Serenity</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
@@ -139,22 +140,51 @@
             
             <!-- 3D Glassmorphism Centerpiece -->
             <div class="relative flex justify-center items-center h-[500px] lg:h-full">
-                <div class="glass-panel w-full max-w-md aspect-[4/5] rounded-xl relative z-20 overflow-hidden shadow-2xl flex flex-col items-center justify-center p-8 group">
-                    <div class="absolute inset-0 -z-10">
-                        <img alt="Interior of a luxury spa with cherry blossom branches and soft high-key lighting" class="w-full h-full object-cover opacity-30 scale-110 group-hover:scale-100 transition-transform duration-[2000ms]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkbKR7PNv2z0Ao9G1c1NLMl4T74kL10Gm9IuT345a-Gcfo12jYIBtrn8jihoH2xgurlF8I0bU-bt0a1tt_PeMqm0BtVjmFJ9CSeqk_tZCHNtGKfJZ6lfM0toMH-henqIJE33-xDG_BWSt_SkPBPEbuDEVhwFpEZXso7L--XIbFE07aTiFoQdTXzEjIXXiKkibi8tVivBJvaH2HCcUX1UibFxhNd1keXptT_uGfzFYt3xJus-pg00g-f8e2_ccMZB9u8pjTlY6XWEFU"/>
-                    </div>
-                    <div class="w-48 h-48 relative mb-8">
-                        <div class="absolute inset-0 bg-primary-container/40 rounded-full blur-xl scale-125"></div>
-                        <img alt="Macro photography of a delicate cherry blossom petal with crystalline dew drops" class="w-full h-full object-cover rounded-full shadow-inner border-4 border-white/40 relative z-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNooYEtdTIDbwDNHvzdG_78UsrA0C8I46Zt2F7DlxId4YJMAjjMpZh2izNeipx5tt6iJMXd133rut49wQOO_r3wawlPPBu7tNXLk6hDEW7Ct7mnH_hLeJK8pXm-GaSXOsm3JWW5NUB6O7AYk7UQq9y_NfbXIj-LnQ7c12TRMbwrKr9S7bTo3pos9Xhw2hAnqu50H9aGWtsM4NYObOgYifsymtQ1AOMeIzoDSQOrD-HtBwvdEiDd7NzCT_ruKiSvHA433V9RpFKP3tr"/>
-                    </div>
-                    <div class="text-center space-y-4">
-                        <h3 class="font-serif text-2xl font-bold text-on-primary-container">Skin Rituals</h3>
-                        <p class="text-sm font-medium text-on-secondary-fixed-variant max-w-[240px]">Tailored treatments infused with Sakura extracts for a translucent glow.</p>
-                        <div class="flex justify-center gap-2 pt-2">
-                            <span class="w-2 h-2 rounded-full bg-primary"></span>
-                            <span class="w-2 h-2 rounded-full bg-primary/30"></span>
-                            <span class="w-2 h-2 rounded-full bg-primary/30"></span>
+                <div class="glass-panel w-full max-w-md aspect-[4/5] rounded-xl relative z-20 overflow-hidden shadow-2xl flex flex-col items-center justify-center p-8 group"
+                     x-data="{ activeSlide: 0, 
+                               slides: [
+                                   { title: 'Skin Rituals', desc: 'Tailored treatments infused with Sakura extracts for a translucent glow.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCNooYEtdTIDbwDNHvzdG_78UsrA0C8I46Zt2F7DlxId4YJMAjjMpZh2izNeipx5tt6iJMXd133rut49wQOO_r3wawlPPBu7tNXLk6hDEW7Ct7mnH_hLeJK8pXm-GaSXOsm3JWW5NUB6O7AYk7UQq9y_NfbXIj-LnQ7c12TRMbwrKr9S7bTo3pos9Xhw2hAnqu50H9aGWtsM4NYObOgYifsymtQ1AOMeIzoDSQOrD-HtBwvdEiDd7NzCT_ruKiSvHA433V9RpFKP3tr', bg: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAkbKR7PNv2z0Ao9G1c1NLMl4T74kL10Gm9IuT345a-Gcfo12jYIBtrn8jihoH2xgurlF8I0bU-bt0a1tt_PeMqm0BtVjmFJ9CSeqk_tZCHNtGKfJZ6lfM0toMH-henqIJE33-xDG_BWSt_SkPBPEbuDEVhwFpEZXso7L--XIbFE07aTiFoQdTXzEjIXXiKkibi8tVivBJvaH2HCcUX1UibFxhNd1keXptT_uGfzFYt3xJus-pg00g-f8e2_ccMZB9u8pjTlY6XWEFU' },
+                                   { title: 'Hair Rituals', desc: 'Deep nourishing therapy to restore your hair\'s natural vitality and shine.', img: 'https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=600&auto=format&fit=crop', bg: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=800&auto=format&fit=crop' },
+                                   { title: 'Body Rituals', desc: 'Holistic massage and body wellness to relax your mind and soothe your soul.', img: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=600&auto=format&fit=crop', bg: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?q=80&w=800&auto=format&fit=crop' }
+                               ],
+                               init() {
+                                   setInterval(() => {
+                                       this.activeSlide = (this.activeSlide + 1) % this.slides.length;
+                                   }, 5000);
+                               }
+                             }">
+                    
+                    <template x-for="(slide, index) in slides" :key="index">
+                        <div x-show="activeSlide === index" 
+                             x-transition:enter="transition ease-out duration-700" 
+                             x-transition:enter-start="opacity-0 translate-x-8" 
+                             x-transition:enter-end="opacity-100 translate-x-0" 
+                             x-transition:leave="transition ease-in duration-700 absolute inset-0" 
+                             x-transition:leave-start="opacity-100 translate-x-0" 
+                             x-transition:leave-end="opacity-0 -translate-x-8"
+                             class="absolute inset-0 flex flex-col items-center justify-center p-8">
+                            
+                            <div class="absolute inset-0 -z-10">
+                                <img :alt="slide.title" class="w-full h-full object-cover opacity-30 scale-110 group-hover:scale-100 transition-transform duration-[2000ms]" :src="slide.bg"/>
+                            </div>
+                            <div class="w-48 h-48 relative mb-8">
+                                <div class="absolute inset-0 bg-primary-container/40 rounded-full blur-xl scale-125"></div>
+                                <img :alt="slide.title" class="w-full h-full object-cover rounded-full shadow-inner border-4 border-white/40 relative z-10" :src="slide.img"/>
+                            </div>
+                            <div class="text-center space-y-4 relative z-10">
+                                <h3 class="font-serif text-2xl font-bold text-on-primary-container" x-text="slide.title"></h3>
+                                <p class="text-sm font-medium text-on-secondary-fixed-variant max-w-[240px]" x-text="slide.desc"></p>
+                            </div>
                         </div>
+                    </template>
+                    
+                    <!-- Navigation Dots -->
+                    <div class="absolute bottom-8 flex justify-center gap-2 pt-2 z-20">
+                        <template x-for="(_, index) in slides" :key="index">
+                            <button @click="activeSlide = index" 
+                                    class="w-2 h-2 rounded-full transition-all duration-300 border-none cursor-pointer"
+                                    :class="activeSlide === index ? 'bg-primary w-4' : 'bg-primary/30 hover:bg-primary/50'"></button>
+                        </template>
                     </div>
                 </div>
                 <!-- Decorative Layered Blobs -->

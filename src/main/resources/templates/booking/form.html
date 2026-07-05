@@ -5,6 +5,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Book Your Experience | Sakura Saki</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
@@ -47,7 +48,7 @@
     <!-- TopNavBar -->
     <div th:replace="~{layout/fragments :: topnav('booking')}"></div>
 
-    <main class="pt-32 pb-20 px-4 md:px-8 max-w-[1600px] mx-auto relative min-h-screen">
+    <main class="pt-32 pb-16 mb-8 px-4 md:px-8 max-w-[1600px] mx-auto relative min-h-screen">
         <div class="absolute -top-10 -left-20 w-64 h-64 bg-primary-container/20 rounded-full blur-3xl -z-10"></div>
         <div class="absolute top-1/2 -right-20 w-96 h-96 bg-secondary-container/30 rounded-full blur-3xl -z-10"></div>
 
@@ -283,6 +284,20 @@
         let currentStep = 1;
         const totalSteps = 3;
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const dateParam = params.get('date');
+            if (dateParam) {
+                document.getElementById('dateInput').value = dateParam;
+            }
+            
+            // serviceId parsing already exists via Thymeleaf logic (or it relies on user click)
+            // But we check if serviceId was provided in query params and maybe auto-advance to step 2?
+            if (params.get('serviceId') || params.get('date')) {
+                // If they came with a specific service or date intent, we might want to guide them.
+            }
+        });
+
         function goToStep(step) {
             // Validation
             if (step === 2 && !document.getElementById('input-serviceId').value) {
@@ -447,7 +462,10 @@
             const initialService = document.getElementById('input-serviceId').value;
             if (initialService) {
                 const el = document.querySelector(`.service-card[data-id="${initialService}"]`);
-                if (el) selectService(el);
+                if (el) {
+                    selectService(el);
+                    setTimeout(() => nextStep(2), 300);
+                }
             }
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('dateInput').setAttribute('min', today);

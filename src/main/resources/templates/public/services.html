@@ -5,6 +5,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Sakura Saki | Service Catalog</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
@@ -101,7 +102,7 @@
     <!-- Top Navigation Shell -->
     <div th:replace="~{layout/fragments :: topnav('services')}"></div>
 
-    <main class="pt-32 pb-12 px-6 max-w-7xl mx-auto relative z-10 mb-8">
+    <main class="pt-32 pb-2 px-6 max-w-7xl mx-auto relative z-10 mb-8">
         <!-- Hero Header -->
         <header class="mb-16 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div class="max-w-2xl">
@@ -194,10 +195,146 @@
 
     <footer th:replace="~{layout/fragments :: site-footer}"></footer>
 
-    <!-- FAB -->
-    <a th:href="@{/booking}" class="fixed bottom-10 right-10 w-16 h-16 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center transition-all duration-400 hover:scale-110 active:scale-95 z-50 clay-shadow" style="text-decoration:none;">
-        <span class="material-symbols-outlined">calendar_month</span>
-    </a>
+    <!-- Quick Book FAB & Modal -->
+    <div x-data="quickBookCalendar()" class="relative z-[60]">
+        <!-- The Floating Action Button -->
+        <button @click="openCalendar()" class="fixed bottom-10 right-10 w-16 h-16 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center transition-all duration-400 hover:scale-110 active:scale-95 clay-shadow border-none cursor-pointer">
+            <span class="material-symbols-outlined text-2xl">calendar_month</span>
+        </button>
+
+        <!-- The Pop-up Calendar Widget (positioned above the FAB) -->
+        <div x-show="isOpen" @click.away="isOpen = false" class="fixed bottom-32 right-10 z-[100]" style="display: none;"
+             x-transition:enter="transition ease-out duration-300 transform origin-bottom-right"
+             x-transition:enter-start="opacity-0 scale-90 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200 transform origin-bottom-right"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-90 translate-y-4">
+            
+            <div class="bg-white/95 backdrop-blur-2xl rounded-3xl p-6 w-[320px] shadow-2xl border border-rose-100/50 flex flex-col relative">
+                
+                <button @click="isOpen = false" class="absolute top-3 right-3 material-symbols-outlined text-slate-400 hover:text-rose-600 transition-colors bg-transparent border-none cursor-pointer text-sm">close</button>
+                
+                <div class="text-center mb-4 mt-2">
+                    <span class="material-symbols-outlined text-3xl text-primary mb-1">calendar_add_on</span>
+                    <h3 class="text-lg font-headline font-bold text-rose-900">Select Date</h3>
+                </div>
+
+                <!-- Calendar Header -->
+                <div class="flex items-center justify-between mb-3 bg-surface-container-lowest p-2 rounded-2xl border border-rose-50">
+                    <button @click="prevMonth" class="w-8 h-8 rounded-full flex items-center justify-center text-rose-900 hover:bg-rose-50 transition-colors cursor-pointer border-none bg-transparent">
+                        <span class="material-symbols-outlined text-sm">chevron_left</span>
+                    </button>
+                    <h4 class="font-headline text-sm font-bold text-rose-900" x-text="monthName + ' ' + year"></h4>
+                    <button @click="nextMonth" class="w-8 h-8 rounded-full flex items-center justify-center text-rose-900 hover:bg-rose-50 transition-colors cursor-pointer border-none bg-transparent">
+                        <span class="material-symbols-outlined text-sm">chevron_right</span>
+                    </button>
+                </div>
+                
+                <!-- Calendar Grid -->
+                <div class="grid grid-cols-7 gap-y-1 gap-x-1 text-center font-body text-sm mb-2">
+                    <template x-for="day in ['Su','Mo','Tu','We','Th','Fr','Sa']">
+                        <div class="text-slate-400 font-label text-[10px] uppercase tracking-wider pb-1" x-text="day"></div>
+                    </template>
+                    
+                    <template x-for="blank in blanks">
+                        <div class="text-transparent w-8 h-8"></div>
+                    </template>
+                    
+                    <template x-for="date in daysInMonth" :key="date">
+                        <div class="flex items-center justify-center">
+                            <button @click="selectDate(date)" 
+                                    :disabled="isPastDate(date)"
+                                    class="w-8 h-8 rounded-full flex items-center justify-center transition-colors text-xs border-none cursor-pointer"
+                                    :class="{
+                                        'text-slate-300 cursor-not-allowed bg-transparent': isPastDate(date),
+                                        'hover:bg-primary hover:text-white text-rose-900 bg-transparent': !isPastDate(date) && !isToday(date),
+                                        'bg-rose-100 text-primary font-bold': isToday(date)
+                                    }"
+                                    x-text="date"></button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('quickBookCalendar', () => ({
+                isOpen: false,
+                month: new Date().getMonth(),
+                year: new Date().getFullYear(),
+                daysInMonth: [],
+                blanks: [],
+                monthName: '',
+                
+                openCalendar() {
+                    this.isOpen = true;
+                    this.calculateDays();
+                },
+                
+                calculateDays() {
+                    let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
+                    let dayOfWeek = new Date(this.year, this.month, 1).getDay();
+                    let blankdaysArray = [];
+                    for (var i = 1; i <= dayOfWeek; i++) {
+                        blankdaysArray.push(i);
+                    }
+                    let daysArray = [];
+                    for (var i = 1; i <= daysInMonth; i++) {
+                        daysArray.push(i);
+                    }
+                    this.blanks = blankdaysArray;
+                    this.daysInMonth = daysArray;
+                    
+                    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                    this.monthName = monthNames[this.month];
+                },
+                
+                prevMonth() {
+                    if (this.month == 0) {
+                        this.year--;
+                        this.month = 11;
+                    } else {
+                        this.month--;
+                    }
+                    this.calculateDays();
+                },
+                
+                nextMonth() {
+                    if (this.month == 11) {
+                        this.year++;
+                        this.month = 0;
+                    } else {
+                        this.month++;
+                    }
+                    this.calculateDays();
+                },
+                
+                isToday(date) {
+                    const today = new Date();
+                    const d = new Date(this.year, this.month, date);
+                    return today.toDateString() === d.toDateString();
+                },
+                
+                isPastDate(date) {
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    const d = new Date(this.year, this.month, date);
+                    return d < today;
+                },
+                
+                selectDate(date) {
+                    const d = new Date(this.year, this.month, date);
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    window.location.href = `/booking?date=${year}-${month}-${day}`;
+                }
+            }));
+        });
+    </script>
 
     <script>
         const canvas = document.getElementById('sakura-canvas');
