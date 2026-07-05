@@ -742,3 +742,22 @@ body:not(.admin-body) {
     background: #dcfce7;
     color: #166534;
 }
+
+/* ---------- Quick Access Cards ---------- */
+a.content-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(134, 78, 90, 0.12),
+                inset 2px 2px 0px rgba(255,255,255,1);
+}
+
+/* ---------- Responsive: stats-grid 5 cols ---------- */
+@media (max-width: 1200px) {
+    .stats-grid[style*="repeat(5"] {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+@media (max-width: 768px) {
+    .stats-grid[style*="repeat(5"] {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}

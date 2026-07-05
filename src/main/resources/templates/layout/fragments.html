@@ -7,6 +7,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title th:text="${title}">Sakura Saki</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
@@ -79,7 +80,24 @@
         }
     </script>
     <style>
-        body { font-family: 'Manrope', sans-serif; background-color: #f9f9f9; }
+        html { min-height: 100%; }
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Manrope', sans-serif;
+            background-color: #f9f9f9;
+        }
+        .sakura-site-footer {
+            background: rgba(250, 250, 249, 0.92) !important;
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border-top: 1px solid rgba(255, 183, 197, 0.35) !important;
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.06);
+            padding: 0.7rem 0 !important;
+            width: 100%;
+            margin-top: auto;
+        }
         .font-serif { font-family: 'Noto Serif', serif; }
         .glass-panel {
             background: rgba(255, 255, 255, 0.6);
@@ -133,6 +151,9 @@
 
 <!-- ===== SAKURA PETALS JS ===== -->
 <th:block th:fragment="sakura-js">
+    <!-- Optional: external libs if needed -->
+    <script th:src="@{/js/sakura-petals.js}"></script>
+    <script th:src="@{/js/admin-modals.js}"></script>
 <script>
     const canvas = document.getElementById('sakura-canvas');
     if (canvas) {
@@ -207,133 +228,236 @@
         }
         animate();
     }
+    
+    // Mobile Sidebar Toggle Logic
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtns = document.querySelectorAll('.mobile-menu-btn');
+        const sidebar = document.getElementById('app-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (toggleBtns.length > 0 && sidebar) {
+            toggleBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    sidebar.classList.toggle('-translate-x-full');
+                    if(overlay) overlay.classList.toggle('hidden');
+                });
+            });
+            
+            if(overlay) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                });
+            }
+        }
+    });
 </script>
 </th:block>
 
 <!-- ===== TOP NAVBAR (Public Pages) ===== -->
 <nav th:fragment="topnav(activePage)" class="fixed top-0 w-full z-50 rounded-b-[2rem] bg-white/60 backdrop-blur-xl border-b border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.06)]">
-    <div class="flex justify-between items-center px-8 h-20 max-w-7xl mx-auto w-full">
-        <a th:href="@{/}" class="text-2xl font-serif font-bold text-rose-900 tracking-tight" style="text-decoration:none;">Sakura Saki</a>
-        <div class="hidden md:flex items-center gap-10 font-serif text-slate-800 tracking-tight">
-            <a th:href="@{/}" th:classappend="${activePage == 'home'} ? 'text-rose-900 border-b-2 border-rose-400 pb-1' : 'text-slate-500 hover:text-rose-400'" class="transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Home</a>
-            <a th:href="@{/services}" th:classappend="${activePage == 'services'} ? 'text-rose-900 border-b-2 border-rose-400 pb-1' : 'text-slate-500 hover:text-rose-400'" class="transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Services</a>
-            <a th:href="@{/booking}" th:classappend="${activePage == 'booking'} ? 'text-rose-900 border-b-2 border-rose-400 pb-1' : 'text-slate-500 hover:text-rose-400'" class="transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Bookings</a>
-        </div>
-        <div class="flex items-center gap-6">
-            <div class="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-full scale-95 duration-200">
-                <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
-                <input class="bg-transparent border-none focus:ring-0 text-sm w-32 font-medium" placeholder="Search services..." type="text"/>
+    <div class="flex justify-between items-center px-8 h-20 max-w-[1600px] mx-auto w-full">
+        <a th:href="@{/}" class="text-2xl font-serif font-bold text-rose-900 tracking-tight shrink-0" style="text-decoration:none;">Sakura Saki</a>
+        <div class="flex items-center gap-8">
+            <div class="hidden md:flex items-center gap-8 font-serif tracking-tight">
+                <a th:href="@{/}" th:classappend="${activePage == 'home'} ? 'text-rose-900 border-b-2 border-rose-400 pb-1' : 'text-slate-500 hover:text-rose-400'" class="transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Home</a>
+                <a th:href="@{/services}" th:classappend="${activePage == 'services'} ? 'text-rose-900 border-b-2 border-rose-400 pb-1' : 'text-slate-500 hover:text-rose-400'" class="transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Services</a>
+                <a th:href="@{/booking}" th:classappend="${activePage == 'booking'} ? 'text-rose-900 border-b-2 border-rose-400 pb-1' : 'text-slate-500 hover:text-rose-400'" class="transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Bookings</a>
             </div>
+            <form th:action="@{/services}" method="get" class="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-full">
+                <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+                <input name="q" th:value="${search}" class="bg-transparent border-none focus:ring-0 text-sm w-32 font-medium" placeholder="Search services..." type="text"/>
+                <input th:if="${activeCategory != null}" type="hidden" name="category" th:value="${activeCategory}" />
+            </form>
             <div class="flex items-center gap-4">
                 <a th:if="${!isLoggedIn}" th:href="@{/login}" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition-all duration-400 ease-out" style="text-decoration:none;">SIGN IN</a>
                 <a th:if="${isAdmin}" th:href="@{/admin/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Admin Dashboard">dashboard</a>
                 <a th:if="${isStaff}" th:href="@{/staff/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Staff Dashboard">dashboard</a>
-                <a th:if="${isLoggedIn}" th:href="@{/customer/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="My Dashboard">account_circle</a>
-                <a th:if="${isLoggedIn}" th:href="@{/logout}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Logout">logout</a>
+                <a th:if="${isLoggedIn}" th:href="@{/profile}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="My Dashboard">account_circle</a>
+                <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post" class="inline m-0 p-0">
+                   <button type="submit" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer bg-transparent border-none p-0" title="Logout">logout</button>
+               </form>
             </div>
         </div>
     </div>
 </nav>
 
 <!-- ===== ADMIN SIDEBAR ===== -->
-<aside th:fragment="admin-sidebar(activePage)" class="h-screen w-72 rounded-r-[3rem] sticky left-0 top-0 bg-stone-50 flex flex-col py-8 gap-2 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.05)] z-50 shrink-0">
+<aside id="app-sidebar" th:fragment="admin-sidebar(activePage)" class="fixed md:fixed top-0 left-0 h-screen w-72 rounded-r-xl bg-stone-50 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.05)] flex flex-col py-8 gap-2 z-50 shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out self-start">
     <div class="px-8 mb-10">
-        <h1 class="text-lg font-serif text-rose-800 tracking-tight">Admin Portal</h1>
-        <p class="font-sans text-sm font-medium tracking-wide text-slate-400">Sakura Saki Management</p>
+        <a th:href="@{/}" style="text-decoration:none;" class="block group">
+            <h1 class="text-lg font-serif text-rose-800 tracking-tight group-hover:text-rose-600 transition-colors">Sakura Saki</h1>
+            <p class="font-sans text-sm text-slate-400 group-hover:text-slate-500 transition-colors">Admin Portal</p>
+        </a>
     </div>
-    <nav class="flex-1 space-y-2 overflow-y-auto">
-        <a th:href="@{/admin/dashboard}" th:classappend="${activePage == 'dashboard'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">dashboard</span> Overview</a>
-        <a th:href="@{/admin/services}" th:classappend="${activePage == 'services'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">content_cut</span> Services</a>
-        <a th:href="@{/admin/packages}" th:classappend="${activePage == 'packages'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
-        <a th:href="@{/admin/staff}" th:classappend="${activePage == 'staff'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">badge</span> Staff</a>
-        <a th:href="@{/admin/appointments}" th:classappend="${activePage == 'appointments'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
-        <a th:href="@{/admin/reviews}" th:classappend="${activePage == 'reviews'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">reviews</span> Reviews</a>
-        <a th:href="@{/admin/customers}" th:classappend="${activePage == 'customers'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">group</span> Clients</a>
-        <a th:href="@{/admin/reports}" th:classappend="${activePage == 'reports'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
-        <a th:href="@{/admin/manage}" th:classappend="${activePage == 'manage'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
+    <nav class="flex flex-col gap-2 flex-grow overflow-y-auto">
+        <a th:href="@{/admin/dashboard}" th:classappend="${activePage == 'dashboard'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">dashboard</span><span>Overview</span></a>
+        <a th:href="@{/admin/users}" th:classappend="${activePage == 'users'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">group</span><span>Users</span></a>
+        <a th:href="@{/admin/services}" th:classappend="${activePage == 'services'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">content_cut</span><span>Services</span></a>
+        <a th:href="@{/admin/packages}" th:classappend="${activePage == 'packages'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">inventory_2</span><span>Packages</span></a>
+        <a th:href="@{/admin/staff}" th:classappend="${activePage == 'staff'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">badge</span><span>Staff</span></a>
+        <a th:href="@{/admin/appointments}" th:classappend="${activePage == 'appointments'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">calendar_month</span><span>Appointments</span></a>
+        <a th:href="@{/admin/reviews}" th:classappend="${activePage == 'reviews'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">reviews</span><span>Reviews</span></a>
+        <a th:href="@{/admin/customers}" th:classappend="${activePage == 'customers'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">person</span><span>Clients</span></a>
+        <a th:href="@{/admin/reports}" th:classappend="${activePage == 'reports'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">bar_chart</span><span>Reports</span></a>
+        <a th:href="@{/admin/manage}" th:classappend="${activePage == 'manage'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">admin_panel_settings</span><span>Admins</span></a>
     </nav>
-    <div class="px-8 mt-auto">
-        <a th:href="@{/booking}" class="block w-full py-4 px-6 bg-primary text-center text-on-primary rounded-full font-label text-xs uppercase tracking-[0.1em] shadow-lg hover:scale-105 transition-all duration-400" style="text-decoration:none;">New Booking</a>
-        <div class="mt-6 flex items-center gap-3 p-2 bg-stone-100 rounded-full">
-            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">AD</div>
+    <div class="px-8 pt-6 border-t border-rose-100/50">
+        <div class="flex items-center gap-3 p-2 bg-white rounded-full shadow-sm mb-4 border border-rose-100/50">
+            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xs" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">AD</div>
             <div class="flex flex-col">
-                <span class="text-xs font-bold text-on-surface" th:text="${username}">admin</span>
-                <span class="text-[10px] text-slate-500 uppercase tracking-tighter">Administrator</span>
+                <span class="text-xs font-bold text-rose-900" th:text="${username}">admin</span>
+                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-label">Administrator</span>
             </div>
         </div>
-        <a th:href="@{/logout}" class="flex items-center gap-3 text-slate-400 px-4 py-2 mt-4 hover:text-rose-600 transition-colors font-sans text-xs" style="text-decoration:none;"><span class="material-symbols-outlined text-sm">logout</span> Logout</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="flex items-center gap-3 text-slate-400 px-2 py-2 hover:text-rose-600 transition-colors font-sans text-xs w-full text-left cursor-pointer" style="background:none; border:none;"><span class="material-symbols-outlined text-sm">logout</span> Logout</button>
+        </form>
     </div>
 </aside>
 
 <!-- ===== STAFF SIDEBAR ===== -->
-<aside th:fragment="staff-sidebar(activePage)" class="hidden md:flex flex-col h-full py-8 px-4 bg-surface-container-low/70 backdrop-blur-2xl fixed left-0 top-0 w-72 rounded-r-lg shadow-2xl shadow-on-surface/5 z-40">
-    <div class="mb-10 px-4 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center">
-            <span class="material-symbols-outlined text-primary">spa</span>
-        </div>
-        <div>
-            <h1 class="font-headline text-xl text-primary font-bold">Sakura Saki</h1>
-            <p class="font-body text-xs tracking-wider uppercase text-on-surface-variant">Staff Portal</p>
-        </div>
+<aside id="app-sidebar" th:fragment="staff-sidebar(activePage)" class="fixed md:fixed top-0 left-0 h-screen w-72 rounded-r-xl bg-stone-50 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.05)] flex flex-col py-8 gap-2 z-50 shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out self-start">
+    <div class="px-8 mb-10">
+        <a th:href="@{/}" style="text-decoration:none;" class="block group">
+            <h1 class="text-lg font-serif text-rose-800 tracking-tight group-hover:text-rose-600 transition-colors">Sakura Saki</h1>
+            <p class="font-sans text-sm text-slate-400 group-hover:text-slate-500 transition-colors">Staff Portal</p>
+        </a>
     </div>
-    <nav class="flex-1 space-y-2">
-        <a th:href="@{/staff/dashboard}" th:classappend="${activePage == 'today'} ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'" class="flex items-center gap-4 rounded-full px-6 py-3 my-1 hover:scale-[1.02] transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">event_note</span><span class="font-body text-xs tracking-wider uppercase font-semibold">Today</span></a>
-        <a th:href="@{/staff/calendar}" th:classappend="${activePage == 'calendar'} ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'" class="flex items-center gap-4 rounded-full px-6 py-3 my-1 hover:scale-[1.02] transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">calendar_month</span><span class="font-body text-xs tracking-wider uppercase">Calendar</span></a>
-        <a th:href="@{/staff/clients}" th:classappend="${activePage == 'clients'} ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'" class="flex items-center gap-4 rounded-full px-6 py-3 my-1 hover:scale-[1.02] transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">face_6</span><span class="font-body text-xs tracking-wider uppercase">Clients</span></a>
-        <a th:href="@{/staff/inventory}" th:classappend="${activePage == 'inventory'} ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'" class="flex items-center gap-4 rounded-full px-6 py-3 my-1 hover:scale-[1.02] transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">inventory_2</span><span class="font-body text-xs tracking-wider uppercase">Inventory</span></a>
-        <a th:href="@{/staff/performance}" th:classappend="${activePage == 'performance'} ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'" class="flex items-center gap-4 rounded-full px-6 py-3 my-1 hover:scale-[1.02] transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">analytics</span><span class="font-body text-xs tracking-wider uppercase">Performance</span></a>
+    <nav class="flex flex-col gap-2 flex-grow">
+        <a th:href="@{/staff/dashboard}" th:classappend="${activePage == 'today'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">event_note</span><span>Today</span></a>
+        <a th:href="@{/staff/calendar}" th:classappend="${activePage == 'calendar'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">calendar_month</span><span>Calendar</span></a>
+        <a th:href="@{/staff/clients}" th:classappend="${activePage == 'clients'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">face_6</span><span>Clients</span></a>
+        <a th:href="@{/staff/inventory}" th:classappend="${activePage == 'inventory'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">inventory_2</span><span>Inventory</span></a>
+        <a th:href="@{/staff/performance}" th:classappend="${activePage == 'performance'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">analytics</span><span>Performance</span></a>
+        <a th:href="@{/profile}" th:classappend="${activePage == 'profile'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">person</span><span>Profile</span></a>
     </nav>
-    <div class="mt-auto border-t border-outline-variant/20 pt-4 space-y-2">
-        <a th:href="@{/profile}" class="flex items-center gap-4 text-on-surface-variant px-6 py-3 my-1 hover:bg-surface-container-high rounded-full transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">person</span><span class="font-body text-xs tracking-wider uppercase">Profile</span></a>
-        <a th:href="@{/logout}" class="flex items-center gap-4 text-on-surface-variant px-6 py-3 my-1 hover:bg-surface-container-high rounded-full transition-all duration-400" style="text-decoration:none;"><span class="material-symbols-outlined">logout</span><span class="font-body text-xs tracking-wider uppercase">Logout</span></a>
+    <div class="px-8 mt-4 pt-6 border-t border-rose-100/50">
+        <div class="flex items-center gap-3 p-2 bg-white rounded-full shadow-sm mb-4 border border-rose-100/50">
+            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xs" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">ST</div>
+            <div class="flex flex-col">
+                <span class="text-xs font-bold text-rose-900" th:text="${username}">staff</span>
+                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-label">Staff Member</span>
+            </div>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="flex items-center gap-3 text-slate-400 px-2 py-2 hover:text-rose-600 transition-colors font-sans text-xs w-full text-left cursor-pointer" style="background:none; border:none;"><span class="material-symbols-outlined text-sm">logout</span> Logout</button>
+        </form>
     </div>
 </aside>
 
 <!-- ===== CUSTOMER SIDEBAR ===== -->
-<aside th:fragment="customer-sidebar(activePage)" class="h-screen w-72 rounded-r-xl sticky left-0 top-0 bg-stone-50 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.05)] flex flex-col py-8 gap-2 z-40 shrink-0">
+<aside id="app-sidebar" th:fragment="customer-sidebar(activePage)" class="fixed md:fixed top-0 left-0 h-screen w-72 rounded-r-xl bg-stone-50 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.05)] flex flex-col py-8 gap-2 z-50 shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out self-start">
     <div class="px-8 mb-10">
-        <h1 class="text-lg font-serif text-rose-800 tracking-tight">My Dashboard</h1>
-        <p class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">Sakura Saki</p>
+        <a th:href="@{/}" style="text-decoration:none;" class="block group">
+            <h1 class="text-lg font-serif text-rose-800 tracking-tight group-hover:text-rose-600 transition-colors">Sakura Saki</h1>
+            <p class="font-sans text-sm text-slate-400 group-hover:text-slate-500 transition-colors">Customer Portal</p>
+        </a>
     </div>
     <nav class="flex flex-col gap-2 flex-grow">
         <a th:href="@{/customer/dashboard}" th:classappend="${activePage == 'overview'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">dashboard</span><span>Overview</span></a>
         <a th:href="@{/customer/bookings}" th:classappend="${activePage == 'bookings'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">calendar_month</span><span>My Bookings</span></a>
-        <a th:href="@{/customer/loyalty}" th:classappend="${activePage == 'loyalty'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">stars</span><span>Sakura Circle</span></a>
         <a th:href="@{/customer/rituals}" th:classappend="${activePage == 'rituals'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">self_improvement</span><span>Rituals</span></a>
+        <a th:href="@{/customer/loyalty}" th:classappend="${activePage == 'loyalty'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">verified</span><span>Sakura Circle</span></a>
         <a th:href="@{/customer/settings}" th:classappend="${activePage == 'settings'} ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-400 hover:bg-rose-50 hover:text-rose-600'" class="flex items-center gap-3 rounded-full px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" style="text-decoration:none;"><span class="material-symbols-outlined">settings</span><span>Settings</span></a>
     </nav>
     <div class="px-8 pt-6 border-t border-rose-100/50">
-        <a th:href="@{/booking}" class="block w-full bg-primary text-on-primary text-center py-4 rounded-full clay-lift hover:scale-[1.02] transition-all duration-400 font-label text-xs uppercase tracking-widest" style="text-decoration:none;">New Booking</a>
+        <a th:href="@{/booking}" class="block w-full bg-primary text-on-primary text-center py-4 rounded-full clay-lift hover:scale-[1.02] transition-all duration-400 font-label text-xs uppercase tracking-widest" style="text-decoration:none;">Book Now</a>
     </div>
     <div class="px-8 mt-4">
-        <a th:href="@{/logout}" class="flex items-center gap-3 text-slate-400 px-2 py-2 hover:text-rose-600 transition-colors font-sans text-xs" style="text-decoration:none;"><span class="material-symbols-outlined text-sm">logout</span> Logout</a>
+        <div class="flex items-center gap-3 p-2 bg-white rounded-full shadow-sm mb-4 border border-rose-100/50">
+            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xs" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">CU</div>
+            <div class="flex flex-col">
+                <span class="text-xs font-bold text-rose-900" th:text="${username}">user</span>
+                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-label">Customer</span>
+            </div>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="flex items-center gap-3 text-slate-400 px-2 py-2 hover:text-rose-600 transition-colors font-sans text-xs w-full text-left cursor-pointer" style="background:none; border:none;"><span class="material-symbols-outlined text-sm">logout</span> Logout</button>
+        </form>
     </div>
 </aside>
 
 <!-- ===== FOOTER (Public) ===== -->
-<footer th:fragment="footer" class="bg-stone-50 w-full py-12 border-t border-rose-100/50">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-8 gap-8">
-        <div class="flex flex-col items-center md:items-start gap-4">
-            <div class="text-xl font-serif font-bold text-rose-900">Sakura Saki</div>
-            <p class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">© 2024 Sakura Saki Beauty. All rights reserved.</p>
+<footer th:fragment="site-footer" class="sakura-site-footer w-full py-3 border-t border-rose-100/50 dark:border-zinc-800/50 mt-auto"
+        style="background:rgba(250,250,249,.92);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);border-top:1px solid rgba(255,183,197,.35);box-shadow:0 -8px 32px rgba(0,0,0,.06);padding:.7rem 0;">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-8 gap-4"
+         style="max-width:80rem;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+        <div class="flex flex-col items-center md:items-start gap-1" style="display:flex;flex-direction:column;gap:.25rem;">
+            <div class="text-base font-serif font-bold text-rose-900" style="font-family:'Noto Serif',serif;font-size:1rem;font-weight:700;color:#881337;">Sakura Saki</div>
+            <p class="font-sans text-[10px] uppercase tracking-[0.1em] text-slate-400" style="margin:0;font-family:'Manrope',sans-serif;font-size:.625rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;">© 2024 Sakura Saki Beauty. All rights reserved.</p>
         </div>
-        <div class="flex gap-10">
-            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Privacy</a>
-            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Terms</a>
-            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Contact</a>
-            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Careers</a>
+        <div class="flex gap-6" style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;">
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Privacy</a>
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Terms</a>
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Contact</a>
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Careers</a>
+        </div>
+        <div class="flex gap-4" style="display:flex;gap:1rem;color:#f9a8d4;">
+            <span class="material-symbols-outlined text-rose-300 cursor-pointer hover:text-rose-500 transition-colors" data-icon="share" style="color:#f9a8d4;">share</span>
+            <span class="material-symbols-outlined text-rose-300 cursor-pointer hover:text-rose-500 transition-colors" data-icon="location_on" style="color:#f9a8d4;">location_on</span>
         </div>
     </div>
 </footer>
 
 <!-- ===== DASHBOARD FOOTER ===== -->
-<footer th:fragment="dashboard-footer" class="mt-auto w-full py-12 border-t border-rose-100/50 flex flex-col md:flex-row justify-between items-center px-4">
-    <span class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">© 2024 Sakura Saki Beauty. All rights reserved.</span>
-    <div class="flex gap-8 mt-6 md:mt-0">
-        <a class="text-slate-400 hover:text-rose-500 font-sans text-xs uppercase tracking-[0.1em] transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Privacy</a>
-        <a class="text-slate-400 hover:text-rose-500 font-sans text-xs uppercase tracking-[0.1em] transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Terms</a>
-        <a class="text-slate-400 hover:text-rose-500 font-sans text-xs uppercase tracking-[0.1em] transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Contact</a>
-    </div>
+<footer th:fragment="dashboard-footer" class="w-full py-5 px-8 md:pl-[calc(18rem+2rem)] text-center border-t border-rose-100/20 relative z-10 shrink-0"
+        style="background:rgba(255,255,255,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">
+    <span class="font-sans text-[0.65rem] uppercase tracking-[0.12em] text-slate-400">© 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS</span>
 </footer>
+
+<!-- ===== MINIMAL FOOTER (NO SIDEBAR) ===== -->
+<footer th:fragment="minimal-footer" class="w-full py-5 px-8 text-center border-t border-rose-100/20 relative z-10 shrink-0"
+        style="width: 100%; padding: 1.25rem 2rem; text-align: center; border-top: 1px solid rgba(255,228,230,0.2); background: rgba(255,255,255,0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: relative; z-index: 10; flex-shrink: 0;">
+    <span class="font-sans text-[0.65rem] uppercase tracking-[0.12em] text-slate-400"
+          style="font-family: sans-serif; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: #94a3b8;">
+        © 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS
+    </span>
+</footer>
+
+<!-- ===== PAGINATION CONTROLS ===== -->
+<th:block th:fragment="pagination-controls(page, url)">
+    <div class="flex flex-col sm:flex-row items-center justify-between py-4 border-t border-rose-100/30 mt-4 px-2 gap-4" th:if="${page.totalPages > 0}">
+        <!-- Rows per page selector -->
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-label uppercase tracking-wider text-slate-500">Rows per page:</span>
+            <form th:action="@{${url}}" method="get" class="inline-block" x-data>
+                <select name="size" class="text-xs font-medium text-slate-700 bg-surface-container rounded-md border-none py-1 pl-2 pr-8 cursor-pointer focus:ring-1 focus:ring-primary"
+                        onchange="this.form.submit()">
+                    <option value="10" th:selected="${page.size == 10}">10</option>
+                    <option value="20" th:selected="${page.size == 20}">20</option>
+                    <option value="50" th:selected="${page.size == 50}">50</option>
+                </select>
+                <!-- Preserve existing query parameters -->
+                <input type="hidden" name="search" th:if="${param.search != null}" th:value="${param.search}"/>
+                <input type="hidden" name="status" th:if="${param.status != null}" th:value="${param.status}"/>
+            </form>
+        </div>
+        
+        <!-- Pagination Nav -->
+        <div class="flex items-center gap-4">
+            <div class="text-xs font-label uppercase tracking-wider text-slate-500">
+                <span th:text="${page.number * page.size + 1}"></span>-<span th:text="${page.isLast() ? page.totalElements : (page.number + 1) * page.size}"></span> of <span th:text="${page.totalElements}"></span>
+            </div>
+            <div class="flex items-center gap-1">
+                <!-- Previous Button -->
+                <a th:href="@{${url}(page=${page.number - 1}, size=${page.size}, search=${param.search}, status=${param.status})}"
+                   th:classappend="${page.first ? 'opacity-50 pointer-events-none' : 'hover:bg-rose-50 hover:text-primary'}"
+                   class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 transition-colors"
+                   style="text-decoration: none;">
+                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                </a>
+                
+                <!-- Next Button -->
+                <a th:href="@{${url}(page=${page.number + 1}, size=${page.size}, search=${param.search}, status=${param.status})}"
+                   th:classappend="${page.last ? 'opacity-50 pointer-events-none' : 'hover:bg-rose-50 hover:text-primary'}"
+                   class="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 transition-colors"
+                   style="text-decoration: none;">
+                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</th:block>
 
 </html>

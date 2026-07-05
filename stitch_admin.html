@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sakura Saki | Admin Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#574144",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "primary-fixed": "#ffd9df",
+                        "outline": "#837375",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#555555",
+                        "on-primary-fixed-variant": "#6b3743",
+                        "on-secondary-fixed": "#281719",
+                        "surface-tint": "#864e5a",
+                        "tertiary-fixed-dim": "#c8c6c6",
+                        "on-surface-variant": "#514345",
+                        "primary": "#864e5a",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#fbb3c1",
+                        "outline-variant": "#d6c2c4",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-dim": "#dadada",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-primary-container": "#7b4551",
+                        "background": "#f9f9f9",
+                        "secondary-fixed": "#fbdbde",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-container": "#755d5f",
+                        "surface-container-highest": "#e2e2e2",
+                        "secondary-container": "#f8d8db",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "tertiary": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#e4e2e1",
+                        "inverse-on-surface": "#f1f1f1",
+                        "error-container": "#ffdad6",
+                        "secondary": "#70585b",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-container": "#cccaca",
+                        "secondary-fixed-dim": "#debfc2",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#ffb7c5",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-high": "#e8e8e8",
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "primary-fixed-dim": "#fbb3c1",
+                        "on-primary-fixed": "#360c19",
+                        "surface-variant": "#e2e2e2",
+                        "surface-bright": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .clay-lift {
+            box-shadow: 0 40px 60px -15px rgba(26, 28, 28, 0.06), inset 2px 2px 0px rgba(255, 255, 255, 1);
+        }
+        .glass-pane {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(214, 194, 196, 0.15);
+        }
+        .recessed {
+            background: #e8e8e8;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen flex">
+<canvas class="fixed inset-0 pointer-events-none z-0 w-full h-full" id="sakura-canvas"></canvas>
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-72 rounded-r-[3rem] sticky left-0 top-0 bg-stone-50 flex flex-col py-8 gap-2 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.05)] z-50">
+<div class="px-8 mb-10">
+<h1 class="text-lg font-serif text-rose-800 tracking-tight">Admin Portal</h1>
+<p class="font-sans text-sm font-medium tracking-wide text-slate-400">Sakura Saki Management</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 bg-white text-rose-600 rounded-full shadow-sm px-6 py-3 ml-4 transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Overview
+            </a>
+<a class="flex items-center gap-3 text-slate-400 px-6 py-3 ml-4 hover:bg-rose-50 hover:text-rose-600 rounded-full transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+                Calendar
+            </a>
+<a class="flex items-center gap-3 text-slate-400 px-6 py-3 ml-4 hover:bg-rose-50 hover:text-rose-600 rounded-full transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">group</span>
+                Clients
+            </a>
+<a class="flex items-center gap-3 text-slate-400 px-6 py-3 ml-4 hover:bg-rose-50 hover:text-rose-600 rounded-full transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">content_cut</span>
+                Staff
+            </a>
+<a class="flex items-center gap-3 text-slate-400 px-6 py-3 ml-4 hover:bg-rose-50 hover:text-rose-600 rounded-full transition-transform duration-300 hover:translate-x-1 font-sans text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="px-8 mt-auto">
+<button class="w-full py-4 px-6 bg-primary text-on-primary rounded-full font-label text-xs uppercase tracking-[0.1em] shadow-lg hover:scale-105 transition-all duration-400">
+                New Booking
+            </button>
+<div class="mt-8 flex items-center gap-3 p-2 bg-stone-100 rounded-full">
+<img alt="Salon Admin Profile" class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Professional portrait of a salon administrator in a bright, modern corporate setting with warm lighting and soft focus background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfgei95mzERmwjGp_nMn3Ro8cz9gPrnzzG5rGzgIN7tpU5w1iRoUYScXwPKjUh2J-X50WUPBR9WODxx3j0PATB2YQp3zVjkC68UX31SI-BUBdidQwKq79zLGPcSkwAURepcb_dGLXFUVH6eI6KuTLWLbWCZJOz1hjZLdbRYFol0bAdOogXY07BMCRGObNG21H8bo5U6E8pWOURPFVZtgJHOEXLgz_H3we0cLCLD4uaof3Utnba_0g5QRzzW9KbJ5Vh-kmih3eB0CHX"/>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-on-surface">Elena Saki</span>
+<span class="text-[10px] text-slate-500 uppercase tracking-tighter">Senior Manager</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 p-12 max-w-7xl mx-auto overflow-y-auto relative z-10">
+<!-- Header Section -->
+<header class="flex justify-between items-end mb-12">
+<div>
+<span class="font-label text-xs uppercase tracking-[0.2em] text-primary mb-2 block">Dashboard Overview</span>
+<h2 class="font-headline text-4xl text-on-surface font-bold tracking-tight">Welcome back, Elena.</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="recessed rounded-full px-6 py-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm font-medium text-on-surface-variant w-48" placeholder="Search data..." type="text"/>
+</div>
+<div class="w-12 h-12 glass-pane rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined">notifications</span>
+</div>
+</div>
+</header>
+<!-- Metrics Grid (Bento Style) -->
+<div class="grid grid-cols-12 gap-8 mb-12">
+<!-- Monthly Revenue Chart -->
+<div class="col-span-12 lg:col-span-8 glass-pane rounded-lg p-8 clay-lift">
+<div class="flex justify-between items-center mb-10">
+<h3 class="font-headline text-xl font-bold">Monthly Revenue</h3>
+<div class="flex items-center gap-2 text-xs font-label uppercase tracking-wider text-slate-500">
+<span>Last 6 Months</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+</div>
+<!-- Visualizing Revenue (Mock Chart) -->
+<div class="h-64 flex items-end justify-between gap-4 px-4">
+<div class="flex-1 flex flex-col items-center gap-4">
+<div class="w-full bg-primary-container rounded-t-full h-[40%] relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold">$12k</div>
+</div>
+<span class="text-[10px] uppercase font-bold text-slate-400">Jan</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-4">
+<div class="w-full bg-primary-container rounded-t-full h-[65%] relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold">$18k</div>
+</div>
+<span class="text-[10px] uppercase font-bold text-slate-400">Feb</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-4">
+<div class="w-full bg-primary rounded-t-full h-[85%] relative shadow-[0_-10px_20px_rgba(134,78,90,0.2)]">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold text-primary">$24k</div>
+</div>
+<span class="text-[10px] uppercase font-bold text-primary">Mar</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-4">
+<div class="w-full bg-primary-container rounded-t-full h-[55%] relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold">$16k</div>
+</div>
+<span class="text-[10px] uppercase font-bold text-slate-400">Apr</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-4">
+<div class="w-full bg-primary-container rounded-t-full h-[75%] relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold">$21k</div>
+</div>
+<span class="text-[10px] uppercase font-bold text-slate-400">May</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-4">
+<div class="w-full bg-primary-container rounded-t-full h-[95%] relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold">$28k</div>
+</div>
+<span class="text-[10px] uppercase font-bold text-slate-400">Jun</span>
+</div>
+</div>
+</div>
+<!-- Staff Performance Kicker -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-8">
+<div class="bg-primary-container text-on-primary-container rounded-lg p-8 clay-lift flex-1 flex flex-col justify-between">
+<div>
+<span class="font-label text-[10px] uppercase tracking-widest block opacity-70 mb-1">Top Performer</span>
+<h4 class="font-headline text-2xl font-bold">Yumi Tanaka</h4>
+</div>
+<div class="flex items-end justify-between">
+<div>
+<span class="text-4xl font-serif font-bold italic">98%</span>
+<span class="text-[10px] block opacity-70">Client Satisfaction</span>
+</div>
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white/50">
+<img alt="Staff Member" class="w-full h-full object-cover" data-alt="Close-up of a smiling Japanese beauty specialist with artistic make-up in a soft pastel studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByWguDl8SQtoVzAPyPojlE217MtXP6bFujPaI5BpFpxiW2EEA4q52ewMZSgK31BfiT78o1ix4DXE6viZHZW2S4w-gwUXxFv0eUJQsa0bV0F_yzTlS5CHYr8wg-f3O6zNC5PhUVFJiYq8lJqBr49EPRe3dfZeK0Q_CD-zuzX9WgO58UXmWt7xGchA39UqP9pzC20J50tQuiFGcHVfI8mayijXn-f1W8lAM0duG4ifGUfnZ3d3B1j2G6rOk7TLo8W39dumwmHHpnGau1"/>
+</div>
+</div>
+</div>
+<div class="glass-pane rounded-lg p-8 clay-lift flex-1">
+<h3 class="font-label text-[10px] uppercase tracking-widest text-slate-400 mb-4">Quick Stats</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium">New Clients</span>
+<span class="text-sm font-bold text-primary">+24%</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[74%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-center mt-4">
+<span class="text-sm font-medium">Repeat Rate</span>
+<span class="text-sm font-bold text-primary">82%</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[82%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Appointment Trends & Table Row -->
+<div class="grid grid-cols-12 gap-8 items-start">
+<!-- Appointment Trends -->
+<div class="col-span-12 lg:col-span-5 glass-pane rounded-lg p-8 clay-lift h-full">
+<h3 class="font-headline text-xl font-bold mb-8">Appointment Trends</h3>
+<div class="relative h-64 w-full">
+<!-- Placeholder for Line Chart with SVG for 3D effect -->
+<svg class="w-full h-full" viewbox="0 0 400 200">
+<defs>
+<lineargradient id="lineGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#864e5a" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#864e5a" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,150 Q50,140 100,80 T200,60 T300,100 T400,40" fill="transparent" stroke="#864e5a" stroke-linecap="round" stroke-width="4"></path>
+<path d="M0,150 Q50,140 100,80 T200,60 T300,100 T400,40 V200 H0 Z" fill="url(#lineGrad)"></path>
+<circle cx="200" cy="60" fill="#864e5a" r="6"></circle>
+<circle cx="200" cy="60" fill="#864e5a" fill-opacity="0.2" r="12"></circle>
+</svg>
+<div class="absolute top-8 right-0 text-right">
+<span class="text-3xl font-serif font-bold italic text-primary">142</span>
+<span class="text-[10px] block font-label uppercase text-slate-400">Total Bookings Today</span>
+</div>
+</div>
+<div class="mt-8 flex justify-between">
+<div class="text-center">
+<span class="text-xs text-slate-400 font-label uppercase">Spa</span>
+<span class="block font-bold">42</span>
+</div>
+<div class="text-center">
+<span class="text-xs text-slate-400 font-label uppercase">Nails</span>
+<span class="block font-bold">68</span>
+</div>
+<div class="text-center">
+<span class="text-xs text-slate-400 font-label uppercase">Hair</span>
+<span class="block font-bold">32</span>
+</div>
+</div>
+</div>
+<!-- Upcoming Appointments Table -->
+<div class="col-span-12 lg:col-span-7 glass-pane rounded-lg p-8 clay-lift">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline text-xl font-bold">Upcoming Appointments</h3>
+<button class="text-primary font-label text-xs uppercase tracking-widest hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-separate border-spacing-y-4">
+<thead>
+<tr class="text-slate-400 font-label text-[10px] uppercase tracking-widest">
+<th class="pb-2 pl-4">Client</th>
+<th class="pb-2">Service</th>
+<th class="pb-2">Time</th>
+<th class="pb-2">Status</th>
+<th class="pb-2 pr-4 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="bg-surface-container-lowest rounded-lg shadow-sm">
+<td class="py-4 pl-4 rounded-l-lg">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-[10px]">MK</div>
+<span class="font-semibold">Miko Tanaka</span>
+</div>
+</td>
+<td class="py-4">Sakura Facial</td>
+<td class="py-4">14:30 PM</td>
+<td class="py-4">
+<span class="px-3 py-1 bg-primary-container text-on-primary-container text-[10px] font-bold rounded-full uppercase tracking-tighter">Booked</span>
+</td>
+<td class="py-4 pr-4 rounded-r-lg text-right">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">more_horiz</span>
+</td>
+</tr>
+<tr class="bg-surface-container-lowest rounded-lg shadow-sm">
+<td class="py-4 pl-4 rounded-l-lg">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-stone-600 font-bold text-[10px]">HW</div>
+<span class="font-semibold">Hana Watanabe</span>
+</div>
+</td>
+<td class="py-4">Silk Manicure</td>
+<td class="py-4">12:15 PM</td>
+<td class="py-4">
+<span class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full uppercase tracking-tighter">Completed</span>
+</td>
+<td class="py-4 pr-4 rounded-r-lg text-right">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">more_horiz</span>
+</td>
+</tr>
+<tr class="bg-surface-container-lowest rounded-lg shadow-sm">
+<td class="py-4 pl-4 rounded-l-lg">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-stone-600 font-bold text-[10px]">SA</div>
+<span class="font-semibold">Sora Aoki</span>
+</div>
+</td>
+<td class="py-4">Zen Massage</td>
+<td class="py-4">11:00 AM</td>
+<td class="py-4">
+<span class="px-3 py-1 bg-error-container text-on-error-container text-[10px] font-bold rounded-full uppercase tracking-tighter">Cancelled</span>
+</td>
+<td class="py-4 pr-4 rounded-r-lg text-right">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">more_horiz</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Footer Shell -->
+<footer class="mt-20 w-full py-12 border-t border-rose-100/50 flex flex-col md:flex-row justify-between items-center">
+<span class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">© 2024 Sakura Saki Beauty. All rights reserved.</span>
+<div class="flex gap-8 mt-6 md:mt-0">
+<a class="text-slate-400 hover:text-rose-500 font-sans text-xs uppercase tracking-[0.1em] transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Privacy</a>
+<a class="text-slate-400 hover:text-rose-500 font-sans text-xs uppercase tracking-[0.1em] transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Terms</a>
+<a class="text-slate-400 hover:text-rose-500 font-sans text-xs uppercase tracking-[0.1em] transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Contact</a>
+<a class="text-slate-400 hover:text-rose-500 font-sans text-xs uppercase tracking-[0.1em] transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Careers</a>
+</div>
+</footer>
+</main>
+<!-- Floating Decoration (As per Design System) -->
+<div class="fixed bottom-10 right-10 w-32 h-32 opacity-20 pointer-events-none z-0">
+<svg viewbox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<path d="M44.7,-76.4C58.1,-69.2,69.5,-57.4,77.3,-43.8C85.1,-30.2,89.2,-15.1,87.6,-0.9C86,13.3,78.7,26.5,70.1,38.8C61.5,51.1,51.6,62.4,39.4,70.1C27.2,77.8,13.6,81.8,-0.7,83.1C-15,84.3,-30,82.8,-43.3,76C-56.6,69.2,-68.2,57.1,-76.3,43.3C-84.4,29.5,-89,14.7,-88.7,0.2C-88.4,-14.3,-83.1,-28.6,-74.6,-41.2C-66.1,-53.8,-54.3,-64.7,-41,-72C-27.7,-79.3,-13.8,-83.1,0.6,-84.1C15,-85.1,31.3,-83.5,44.7,-76.4Z" fill="#864e5a" transform="translate(100 100)"></path>
+</svg>
+</div>
+<script>
+    const canvas = document.getElementById('sakura-canvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const petals = [];
+    const numPetals = 45;
+    let mouseX = -1000;
+    let mouseY = -1000;
+
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    class Petal {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height - height;
+            this.size = Math.random() * 12 + 8;
+            this.speedY = Math.random() * 1.5 + 0.5;
+            this.speedX = Math.random() * 2 - 1;
+            this.angle = Math.random() * 360;
+            this.spin = Math.random() * 0.05 - 0.025;
+            this.opacity = Math.random() * 0.6 + 0.2;
+        }
+
+        update() {
+            this.y += this.speedY;
+            this.x += this.speedX;
+            this.angle += this.spin;
+
+            const dx = mouseX - this.x;
+            const dy = mouseY - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 120) {
+                const force = (120 - dist) / 120;
+                this.x -= (dx / dist) * force * 3;
+                this.y -= (dy / dist) * force * 3;
+            }
+
+            if (this.y > height + this.size) {
+                this.y = -this.size;
+                this.x = Math.random() * width;
+            }
+            if (this.x > width + this.size) this.x = -this.size;
+            if (this.x < -this.size) this.x = width + this.size;
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.quadraticCurveTo(this.size * 0.8, -this.size * 0.8, this.size * 1.2, 0);
+            ctx.quadraticCurveTo(this.size * 0.8, this.size * 0.8, 0, 0);
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    for (let i = 0; i < numPetals; i++) {
+        petals.push(new Petal());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        petals.forEach(petal => {
+            petal.update();
+            petal.draw();
+        });
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+</script>
+</body></html>

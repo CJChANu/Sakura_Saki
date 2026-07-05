@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html class="scroll-smooth light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Sakura Saki | Service Catalog</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#574144",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "primary-fixed": "#ffd9df",
+                        "outline": "#837375",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#555555",
+                        "on-primary-fixed-variant": "#6b3743",
+                        "on-secondary-fixed": "#281719",
+                        "surface-tint": "#864e5a",
+                        "tertiary-fixed-dim": "#c8c6c6",
+                        "on-surface-variant": "#514345",
+                        "primary": "#864e5a",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#fbb3c1",
+                        "outline-variant": "#d6c2c4",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-dim": "#dadada",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-primary-container": "#7b4551",
+                        "background": "#f9f9f9",
+                        "secondary-fixed": "#fbdbde",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-container": "#755d5f",
+                        "surface-container-highest": "#e2e2e2",
+                        "secondary-container": "#f8d8db",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "tertiary": "#5f5e5e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#e4e2e1",
+                        "inverse-on-surface": "#f1f1f1",
+                        "error-container": "#ffdad6",
+                        "secondary": "#70585b",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-container": "#cccaca",
+                        "secondary-fixed-dim": "#debfc2",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#ffb7c5",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-high": "#e8e8e8",
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "primary-fixed-dim": "#fbb3c1",
+                        "on-primary-fixed": "#360c19",
+                        "surface-variant": "#e2e2e2",
+                        "surface-bright": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(255, 255, 255, 0.3);
+        }
+        .clay-shadow {
+            box-shadow: 0 40px 60px -15px rgba(26, 28, 28, 0.06), inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+        }
+        .service-card:hover {
+            transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased relative overflow-x-hidden">
+    <!-- Sakura Canvas -->
+    <canvas class="fixed inset-0 pointer-events-none z-0 opacity-70" id="sakura-canvas"></canvas>
+
+    <!-- Top Navigation Shell -->
+    <nav class="fixed top-0 w-full z-50 rounded-b-[2rem] bg-white/60 backdrop-blur-xl border-b border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.06)]">
+    <div class="flex justify-between items-center px-8 h-20 max-w-[1600px] mx-auto w-full">
+        <a href="/" class="text-2xl font-serif font-bold text-rose-900 tracking-tight shrink-0" style="text-decoration:none;">Sakura Saki</a>
+        <div class="flex items-center gap-8">
+            <div class="hidden md:flex items-center gap-8 font-serif tracking-tight">
+                <a href="/" class="transition-all duration-400 ease-out hover:scale-105 text-slate-500 hover:text-rose-400" style="text-decoration:none;">Home</a>
+                <a href="/services" class="transition-all duration-400 ease-out hover:scale-105 text-rose-900 border-b-2 border-rose-400 pb-1" style="text-decoration:none;">Services</a>
+                <a href="/booking" class="transition-all duration-400 ease-out hover:scale-105 text-slate-500 hover:text-rose-400" style="text-decoration:none;">Bookings</a>
+            </div>
+            <form action="/services" method="get" class="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-full">
+                <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+                <input name="q" value="" class="bg-transparent border-none focus:ring-0 text-sm w-32 font-medium" placeholder="Search services..." type="text"/>
+                
+            </form>
+            <div class="flex items-center gap-4">
+                <a href="/login" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition-all duration-400 ease-out" style="text-decoration:none;">SIGN IN</a>
+                
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+    <main class="pt-32 pb-24 px-6 max-w-7xl mx-auto relative z-10">
+        <!-- Hero Header -->
+        <header class="mb-16 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div class="max-w-2xl">
+                <span class="font-label text-primary uppercase tracking-[0.15em] text-xs font-bold mb-4 block">Artisanal Beauty</span>
+                <h1 class="font-headline text-5xl md:text-7xl text-on-surface font-bold tracking-tight leading-none mb-6">Service Catalog</h1>
+                <p class="text-tertiary text-lg max-w-lg leading-relaxed">Experience the delicate harmony of Japanese aesthetics and modern wellness. Each treatment is a ritual designed for your serenity.</p>
+            </div>
+            <div class="flex flex-wrap justify-center md:justify-end gap-3">
+                <a href="/booking" class="px-8 py-3 rounded-full bg-primary text-white font-label text-sm uppercase tracking-widest transition-all duration-400 hover:scale-105 clay-shadow block text-center" style="text-decoration:none;">Book Now</a>
+            </div>
+        </header>
+
+        <!-- Filters Section -->
+        <section class="mb-12">
+            <div class="flex overflow-x-auto pb-4 gap-4 no-scrollbar items-center">
+                <a href="/services" class="flex-shrink-0 px-6 py-3 rounded-full font-label text-xs uppercase tracking-widest transition-all duration-300 bg-primary text-white" style="text-decoration:none;">All Rituals</a>
+                <a href="/services?category=Bridal" class="flex-shrink-0 px-6 py-3 rounded-full font-label text-xs uppercase tracking-widest transition-all duration-300 bg-white text-primary border border-primary-container shadow-sm" style="text-decoration:none;">Bridal</a><a href="/services?category=Hair" class="flex-shrink-0 px-6 py-3 rounded-full font-label text-xs uppercase tracking-widest transition-all duration-300 bg-white text-primary border border-primary-container shadow-sm" style="text-decoration:none;">Hair</a><a href="/services?category=Nails" class="flex-shrink-0 px-6 py-3 rounded-full font-label text-xs uppercase tracking-widest transition-all duration-300 bg-white text-primary border border-primary-container shadow-sm" style="text-decoration:none;">Nails</a><a href="/services?category=Skin" class="flex-shrink-0 px-6 py-3 rounded-full font-label text-xs uppercase tracking-widest transition-all duration-300 bg-white text-primary border border-primary-container shadow-sm" style="text-decoration:none;">Skin</a><a href="/services?category=Spa" class="flex-shrink-0 px-6 py-3 rounded-full font-label text-xs uppercase tracking-widest transition-all duration-300 bg-white text-primary border border-primary-container shadow-sm" style="text-decoration:none;">Spa</a>
+            </div>
+        </section>
+
+        <!-- Service Grid (Bento Style Layout) -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card md:col-span-8">
+                
+                <div class="overflow-hidden relative aspect-[16/9]">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeWpC51Otw39WPnoS34IVa4m2qD_lkkaonTo27UAlp1HljleGuSy1fzEbD1d_vwHYqREtBmKCvxjy4mjpAKi2mHGJi0JR3SKacUnAeqvrurLcI7dey-llIlvd-w82kSbI7P2E37iDiQH7zxw7uJL_3Ysb8R-3wDj1FvP-KG7q5huXT6of0B_5h6Vll0FZvXxfjq41oCC9bfI6Y9s6uVLRxpCTK3RBpr5_yUpJQu0kuWdpbP9SOFxIswnY0usT-KlHGrfq6VY5avhBw" />
+                </div>
+                
+                <div class="p-8 md:p-12 relative z-10">
+                    <div>
+                        <span class="font-label text-primary text-xs uppercase tracking-widest font-bold">Hair</span>
+                        <h3 class="font-headline text-3xl md:text-4xl text-on-surface mt-2 font-bold mb-4">Signature Haircut</h3>
+                        <p class="text-tertiary max-w-xl mb-10 leading-relaxed">Precision cut, wash, blow dry, and soft finish.</p>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-2xl font-serif text-primary">Rs.1800.00</span>
+                            <span class="text-xs text-tertiary uppercase">45 min</span>
+                        </div>
+                        
+                        
+                        
+                        <div class="flex items-center gap-6">
+                            <a href="/services/1" class="group/btn flex items-center gap-3 text-primary font-label text-sm uppercase tracking-widest" style="text-decoration:none;">
+                                View Details 
+                                <span class="h-[1px] w-8 bg-primary transition-all duration-300 group-hover/btn:w-12"></span>
+                            </a>
+                            <a href="/booking?serviceId=1" class="px-6 py-2 rounded-full border border-primary text-primary font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400" style="text-decoration:none;">Quick Book</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-primary-container/20 rounded-full blur-3xl pointer-events-none"></div>
+            </div>
+            <div class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card md:col-span-4 flex flex-col">
+                
+                <div class="overflow-hidden relative aspect-square">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0AttB9AKJdcFHymHLvxLMcnsWWiUu9q9Dmf3FOJzdB-GHCiudo-HUIX7WWq6UifQutO0Y3LAJm8Dx5wn2umlIGautxIZl3ZiXueCmerOTGlPQ2nv2AZi-Gp36ttMdxUxwHPd2WkS922CY8r6ddIGKuMfajsp__W3YI53WtQ3zdKb9XGGxL4kgv1EhlVkhbpMJWSNTr7xPcZNXu1wpNhYbMwdrL1YWPiysO5DGl8x66HewLHzSz3Hb7B_VdQqBobRF5m-qOFl9zswR" />
+                </div>
+                
+                <div class="p-8 flex-grow flex flex-col justify-between">
+                    <div>
+                        <span class="font-label text-primary text-xs uppercase tracking-widest font-bold">Hair</span>
+                        <h3 class="font-headline text-xl text-on-surface mt-2 font-bold mb-4">Gloss Color Ritual</h3>
+                        
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-lg font-serif text-primary">Rs.5200.00</span>
+                            <span class="text-xs text-tertiary uppercase">105 min</span>
+                        </div>
+                        
+                        <a href="/services/2" class="block w-full py-3 rounded-full bg-surface-container-high text-on-surface font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400 text-center" style="text-decoration:none;">View Details</a>
+                        
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+            <div class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card md:col-span-4">
+                
+                <div class="overflow-hidden relative aspect-[4/3]">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWRC_taj5s-TU98jH53tRoaoaFwtaUPmFBTgtplLVqC_8KTYYkK_9KK835QjzEkE4GmFh4v1t4o_b9CkjmmzjjyaDDJmxmKvz0sGqU9SVVSn7fT7CqAGTml_UtdUEveEHWuhYvGxTIkdg7s3NjJoDvmZFXuOrzN6MCDmKnl0GrEgXjTU47KW6vQ4F7Ig5cDZzw5nYnOKv5LLL4RjIiCSsm6spSoMLqVJfWGR_6CiDyVmBfKgMaH4Lwc6eYSn1q0WE27E-AbiINlHwa" />
+                </div>
+                
+                <div class="p-8">
+                    <div>
+                        <span class="font-label text-primary text-xs uppercase tracking-widest font-bold">Skin</span>
+                        <h3 class="font-headline text-xl text-on-surface mt-2 font-bold mb-4">Sakura Radiance Facial</h3>
+                        
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-lg font-serif text-primary">Rs.3600.00</span>
+                            <span class="text-xs text-tertiary uppercase">70 min</span>
+                        </div>
+                        
+                        <a href="/services/3" class="block w-full py-3 rounded-full bg-surface-container-high text-on-surface font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400 text-center" style="text-decoration:none;">View Details</a>
+                        
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+            <div class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card md:col-span-4">
+                
+                <div class="overflow-hidden relative aspect-[4/3]">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWRC_taj5s-TU98jH53tRoaoaFwtaUPmFBTgtplLVqC_8KTYYkK_9KK835QjzEkE4GmFh4v1t4o_b9CkjmmzjjyaDDJmxmKvz0sGqU9SVVSn7fT7CqAGTml_UtdUEveEHWuhYvGxTIkdg7s3NjJoDvmZFXuOrzN6MCDmKnl0GrEgXjTU47KW6vQ4F7Ig5cDZzw5nYnOKv5LLL4RjIiCSsm6spSoMLqVJfWGR_6CiDyVmBfKgMaH4Lwc6eYSn1q0WE27E-AbiINlHwa" />
+                </div>
+                
+                <div class="p-8">
+                    <div>
+                        <span class="font-label text-primary text-xs uppercase tracking-widest font-bold">Skin</span>
+                        <h3 class="font-headline text-xl text-on-surface mt-2 font-bold mb-4">Hydration Facial</h3>
+                        
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-lg font-serif text-primary">Rs.3200.00</span>
+                            <span class="text-xs text-tertiary uppercase">60 min</span>
+                        </div>
+                        
+                        <a href="/services/4" class="block w-full py-3 rounded-full bg-surface-container-high text-on-surface font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400 text-center" style="text-decoration:none;">View Details</a>
+                        
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+            <div class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card md:col-span-4">
+                
+                <div class="overflow-hidden relative aspect-[4/3]">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWRC_taj5s-TU98jH53tRoaoaFwtaUPmFBTgtplLVqC_8KTYYkK_9KK835QjzEkE4GmFh4v1t4o_b9CkjmmzjjyaDDJmxmKvz0sGqU9SVVSn7fT7CqAGTml_UtdUEveEHWuhYvGxTIkdg7s3NjJoDvmZFXuOrzN6MCDmKnl0GrEgXjTU47KW6vQ4F7Ig5cDZzw5nYnOKv5LLL4RjIiCSsm6spSoMLqVJfWGR_6CiDyVmBfKgMaH4Lwc6eYSn1q0WE27E-AbiINlHwa" />
+                </div>
+                
+                <div class="p-8">
+                    <div>
+                        <span class="font-label text-primary text-xs uppercase tracking-widest font-bold">Nails</span>
+                        <h3 class="font-headline text-xl text-on-surface mt-2 font-bold mb-4">Botanical Manicure</h3>
+                        
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-lg font-serif text-primary">Rs.1500.00</span>
+                            <span class="text-xs text-tertiary uppercase">45 min</span>
+                        </div>
+                        
+                        <a href="/services/5" class="block w-full py-3 rounded-full bg-surface-container-high text-on-surface font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400 text-center" style="text-decoration:none;">View Details</a>
+                        
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+            <div class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card md:col-span-8">
+                
+                <div class="overflow-hidden relative aspect-[16/9]">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeWpC51Otw39WPnoS34IVa4m2qD_lkkaonTo27UAlp1HljleGuSy1fzEbD1d_vwHYqREtBmKCvxjy4mjpAKi2mHGJi0JR3SKacUnAeqvrurLcI7dey-llIlvd-w82kSbI7P2E37iDiQH7zxw7uJL_3Ysb8R-3wDj1FvP-KG7q5huXT6of0B_5h6Vll0FZvXxfjq41oCC9bfI6Y9s6uVLRxpCTK3RBpr5_yUpJQu0kuWdpbP9SOFxIswnY0usT-KlHGrfq6VY5avhBw" />
+                </div>
+                
+                <div class="p-8 md:p-12 relative z-10">
+                    <div>
+                        <span class="font-label text-primary text-xs uppercase tracking-widest font-bold">Nails</span>
+                        <h3 class="font-headline text-3xl md:text-4xl text-on-surface mt-2 font-bold mb-4">Gel Pedicure</h3>
+                        <p class="text-tertiary max-w-xl mb-10 leading-relaxed">Foot soak, exfoliation, gel polish, and heel care.</p>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-2xl font-serif text-primary">Rs.2400.00</span>
+                            <span class="text-xs text-tertiary uppercase">60 min</span>
+                        </div>
+                        
+                        
+                        
+                        <div class="flex items-center gap-6">
+                            <a href="/services/6" class="group/btn flex items-center gap-3 text-primary font-label text-sm uppercase tracking-widest" style="text-decoration:none;">
+                                View Details 
+                                <span class="h-[1px] w-8 bg-primary transition-all duration-300 group-hover/btn:w-12"></span>
+                            </a>
+                            <a href="/booking?serviceId=6" class="px-6 py-2 rounded-full border border-primary text-primary font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400" style="text-decoration:none;">Quick Book</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-primary-container/20 rounded-full blur-3xl pointer-events-none"></div>
+            </div>
+            <div class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card md:col-span-4 flex flex-col">
+                
+                <div class="overflow-hidden relative aspect-square">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0AttB9AKJdcFHymHLvxLMcnsWWiUu9q9Dmf3FOJzdB-GHCiudo-HUIX7WWq6UifQutO0Y3LAJm8Dx5wn2umlIGautxIZl3ZiXueCmerOTGlPQ2nv2AZi-Gp36ttMdxUxwHPd2WkS922CY8r6ddIGKuMfajsp__W3YI53WtQ3zdKb9XGGxL4kgv1EhlVkhbpMJWSNTr7xPcZNXu1wpNhYbMwdrL1YWPiysO5DGl8x66HewLHzSz3Hb7B_VdQqBobRF5m-qOFl9zswR" />
+                </div>
+                
+                <div class="p-8 flex-grow flex flex-col justify-between">
+                    <div>
+                        <span class="font-label text-primary text-xs uppercase tracking-widest font-bold">Spa</span>
+                        <h3 class="font-headline text-xl text-on-surface mt-2 font-bold mb-4">Aromatherapy Massage</h3>
+                        
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-lg font-serif text-primary">Rs.5600.00</span>
+                            <span class="text-xs text-tertiary uppercase">75 min</span>
+                        </div>
+                        
+                        <a href="/services/7" class="block w-full py-3 rounded-full bg-surface-container-high text-on-surface font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400 text-center" style="text-decoration:none;">View Details</a>
+                        
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+            <div class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card md:col-span-4">
+                
+                <div class="overflow-hidden relative aspect-[4/3]">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWRC_taj5s-TU98jH53tRoaoaFwtaUPmFBTgtplLVqC_8KTYYkK_9KK835QjzEkE4GmFh4v1t4o_b9CkjmmzjjyaDDJmxmKvz0sGqU9SVVSn7fT7CqAGTml_UtdUEveEHWuhYvGxTIkdg7s3NjJoDvmZFXuOrzN6MCDmKnl0GrEgXjTU47KW6vQ4F7Ig5cDZzw5nYnOKv5LLL4RjIiCSsm6spSoMLqVJfWGR_6CiDyVmBfKgMaH4Lwc6eYSn1q0WE27E-AbiINlHwa" />
+                </div>
+                
+                <div class="p-8">
+                    <div>
+                        <span class="font-label text-primary text-xs uppercase tracking-widest font-bold">Bridal</span>
+                        <h3 class="font-headline text-xl text-on-surface mt-2 font-bold mb-4">Bridal Glow Makeup</h3>
+                        
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-lg font-serif text-primary">Rs.9500.00</span>
+                            <span class="text-xs text-tertiary uppercase">135 min</span>
+                        </div>
+                        
+                        <a href="/services/8" class="block w-full py-3 rounded-full bg-surface-container-high text-on-surface font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400 text-center" style="text-decoration:none;">View Details</a>
+                        
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+            <div class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card md:col-span-4">
+                
+                <div class="overflow-hidden relative aspect-[4/3]">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWRC_taj5s-TU98jH53tRoaoaFwtaUPmFBTgtplLVqC_8KTYYkK_9KK835QjzEkE4GmFh4v1t4o_b9CkjmmzjjyaDDJmxmKvz0sGqU9SVVSn7fT7CqAGTml_UtdUEveEHWuhYvGxTIkdg7s3NjJoDvmZFXuOrzN6MCDmKnl0GrEgXjTU47KW6vQ4F7Ig5cDZzw5nYnOKv5LLL4RjIiCSsm6spSoMLqVJfWGR_6CiDyVmBfKgMaH4Lwc6eYSn1q0WE27E-AbiINlHwa" />
+                </div>
+                
+                <div class="p-8">
+                    <div>
+                        <span class="font-label text-primary text-xs uppercase tracking-widest font-bold">Hair</span>
+                        <h3 class="font-headline text-xl text-on-surface mt-2 font-bold mb-4">Brow Shaping</h3>
+                        
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-lg font-serif text-primary">Rs.900.00</span>
+                            <span class="text-xs text-tertiary uppercase">25 min</span>
+                        </div>
+                        
+                        <a href="/services/9" class="block w-full py-3 rounded-full bg-surface-container-high text-on-surface font-label text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all duration-400 text-center" style="text-decoration:none;">View Details</a>
+                        
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+
+        <!-- Special Promotion Section (Packages) -->
+        <section class="mt-24 grid md:grid-cols-2 gap-12 items-center bg-primary-container/20 rounded-xl p-8 md:p-16 relative overflow-hidden">
+            <div class="relative z-10">
+                <span class="font-label text-primary text-xs uppercase tracking-[0.2em] font-bold mb-6 block">Seasonal Curations</span>
+                <h2 class="font-headline text-4xl md:text-5xl text-on-surface font-bold mb-6 leading-tight">Bridal Bliss</h2>
+                <p class="text-on-primary-container/80 text-lg mb-10 leading-relaxed">Makeup, glow facial, hair finish, and nails for wedding day prep.</p>
+                <div class="flex gap-4 items-center">
+                    <span class="font-headline text-3xl text-primary font-bold">Rs.13940.00</span>
+                    <span class="text-outline line-through text-sm">Rs.16400.00</span>
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <a href="/services/package/1" class="px-10 py-4 rounded-full bg-primary text-white font-label text-sm uppercase tracking-widest clay-shadow hover:scale-105 transition-all duration-400 text-center inline-block" style="text-decoration:none;">Learn More</a>
+                </div>
+            </div>
+            <div class="relative flex justify-center items-center z-10">
+                <div class="w-full max-w-md aspect-square rounded-full overflow-hidden border-[12px] border-white/50 clay-shadow">
+                    <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBBhfxDdZdWR4jBjuYw_UGeBeBFafI1jPTIcOxX5neL-1VBdAfMR532TDMaykst9-aJx8nFa_vxxiZCPZFuoEWSEz2ICAbbUsI2JmXIxolE2sYo1GLty5Pcs4fyNHbt-m02P3so7qcW3_5b7EqL8zEmUccgu4RihvzMKg-ibr_p-llp_YW11u_K_s2iLtC6K8CfIvc6g9GJLxSBIaFFkrQGXiutt-G7zp03ajSfSAA1JBbDY8VSoduveo9lkXxLzejyd8EV-3V6cQG"/>
+                </div>
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/40 backdrop-blur-xl rounded-full border border-white/60 clay-shadow flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary scale-150">spa</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="sakura-site-footer w-full py-3 border-t border-rose-100/50 dark:border-zinc-800/50 mt-auto"
+        style="background:rgba(250,250,249,.92);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);border-top:1px solid rgba(255,183,197,.35);box-shadow:0 -8px 32px rgba(0,0,0,.06);padding:.7rem 0;">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-8 gap-4"
+         style="max-width:80rem;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+        <div class="flex flex-col items-center md:items-start gap-1" style="display:flex;flex-direction:column;gap:.25rem;">
+            <div class="text-base font-serif font-bold text-rose-900" style="font-family:'Noto Serif',serif;font-size:1rem;font-weight:700;color:#881337;">Sakura Saki</div>
+            <p class="font-sans text-[10px] uppercase tracking-[0.1em] text-slate-400" style="margin:0;font-family:'Manrope',sans-serif;font-size:.625rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;">© 2024 Sakura Saki Beauty. All rights reserved.</p>
+        </div>
+        <div class="flex gap-6" style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;">
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Privacy</a>
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Terms</a>
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Contact</a>
+            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Careers</a>
+        </div>
+        <div class="flex gap-4" style="display:flex;gap:1rem;color:#f9a8d4;">
+            <span class="material-symbols-outlined text-rose-300 cursor-pointer hover:text-rose-500 transition-colors" data-icon="share" style="color:#f9a8d4;">share</span>
+            <span class="material-symbols-outlined text-rose-300 cursor-pointer hover:text-rose-500 transition-colors" data-icon="location_on" style="color:#f9a8d4;">location_on</span>
+        </div>
+    </div>
+</footer>
+
+    <!-- FAB -->
+    <a href="/booking" class="fixed bottom-10 right-10 w-16 h-16 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center transition-all duration-400 hover:scale-110 active:scale-95 z-50 clay-shadow" style="text-decoration:none;">
+        <span class="material-symbols-outlined">calendar_month</span>
+    </a>
+
+    <script>
+        const canvas = document.getElementById('sakura-canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const petals = [];
+        const numPetals = 45;
+        let mouseX = -1000;
+        let mouseY = -1000;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        class Petal {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height - height;
+                this.size = Math.random() * 12 + 8;
+                this.speedY = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 2 - 1;
+                this.angle = Math.random() * 360;
+                this.spin = Math.random() * 0.05 - 0.025;
+                this.opacity = Math.random() * 0.6 + 0.2;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.spin;
+
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 120) {
+                    const force = (120 - dist) / 120;
+                    this.x -= (dx / dist) * force * 3;
+                    this.y -= (dy / dist) * force * 3;
+                }
+
+                if (this.y > height + this.size) {
+                    this.y = -this.size;
+                    this.x = Math.random() * width;
+                }
+                if (this.x > width + this.size) this.x = -this.size;
+                if (this.x < -this.size) this.x = width + this.size;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.fillStyle = `rgba(255, 183, 197, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.quadraticCurveTo(this.size * 0.8, -this.size * 0.8, this.size * 1.2, 0);
+                ctx.quadraticCurveTo(this.size * 0.8, this.size * 0.8, 0, 0);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < numPetals; i++) {
+            petals.push(new Petal());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            petals.forEach(petal => {
+                petal.update();
+                petal.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

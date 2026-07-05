@@ -3,6 +3,9 @@ package com.cjcc.yakalabs.sakurasaki.controller;
 import com.cjcc.yakalabs.sakurasaki.model.*;
 import com.cjcc.yakalabs.sakurasaki.service.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -57,12 +60,16 @@ public class AdminController {
     // ======================================================================
 
     @GetMapping("/users")
-    public String users(@RequestParam(required = false) String search, Authentication auth, Model model) {
-        List<User> users;
+    public String users(@RequestParam(required = false) String search, 
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") int size,
+                        Authentication auth, Model model) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users;
         if (search != null && !search.isBlank()) {
-            users = adminService.searchUsers(search);
+            users = adminService.searchUsers(search, pageable);
         } else {
-            users = userService.findAll();
+            users = userService.findAll(pageable);
         }
         model.addAttribute("username", auth.getName());
         model.addAttribute("users", users);
@@ -71,8 +78,13 @@ public class AdminController {
     }
 
     @PostMapping("/users/{id}/make-admin")
-    public String makeAdmin(@PathVariable Long id) {
-        userService.makeAdmin(id);
+    public String makeAdmin(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.makeAdmin(id);
+            redirectAttributes.addFlashAttribute("success", "User promoted to Admin.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
         return "redirect:/admin/users";
     }
 
@@ -91,9 +103,12 @@ public class AdminController {
     // ======================================================================
 
     @GetMapping("/manage")
-    public String manageAdmins(Authentication auth, Model model) {
+    public String manageAdmins(@RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "10") int size,
+                               Authentication auth, Model model) {
+        Pageable pageable = PageRequest.of(page, size);
         model.addAttribute("username", auth.getName());
-        model.addAttribute("admins", adminService.listAdmins());
+        model.addAttribute("admins", adminService.listAdmins(pageable));
         return "admin/manage";
     }
 
@@ -101,11 +116,16 @@ public class AdminController {
     public String createAdmin(@RequestParam String username,
                               @RequestParam String password,
                               @RequestParam String email,
+                              @RequestParam String adminLevel,
                               RedirectAttributes redirectAttributes) {
         try {
-            adminService.createAdmin(username, password, email);
+            adminService.createAdmin(username, password, email, adminLevel);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Failed to create admin: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("prevUsername", username);
+            redirectAttributes.addFlashAttribute("prevEmail", email);
+            redirectAttributes.addFlashAttribute("prevAdminLevel", adminLevel);
+            redirectAttributes.addFlashAttribute("openModal", "createAdminModal");
         }
         return "redirect:/admin/manage";
     }

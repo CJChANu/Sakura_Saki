@@ -1,18 +1,34 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head th:replace="~{layout/fragments :: head('Staff Portal — Sakura Saki')}"></head>
-<body class="bg-background text-on-surface font-body overflow-x-hidden">
+<body class="bg-background text-on-surface font-body">
 <th:block th:replace="~{layout/fragments :: sakura-canvas}" />
 
-<div class="flex h-screen w-full relative z-10">
+<div class="flex min-h-screen w-full relative z-10 md:pl-72">
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-40 hidden md:hidden"></div>
     <aside th:replace="~{layout/fragments :: staff-sidebar('today')}"></aside>
 
-    <main class="flex-1 ml-0 md:ml-72 p-6 md:p-10 lg:p-14 overflow-y-auto min-h-screen pb-24 md:pb-14 relative flex flex-col">
-        <!-- Header Section -->
+    <main class="flex-1 p-6 md:p-10 lg:p-14 relative flex flex-col">
+        <div class="max-w-[1600px] mx-auto w-full flex flex-col flex-1">
+            <!-- Mobile TopAppBar -->
+            <header class="md:hidden flex justify-between items-center w-full bg-surface-container-lowest/60 backdrop-blur-xl shadow-sm sticky top-0 z-30 -mt-6 mb-8 -mx-6 px-6 py-4" style="width: calc(100% + 3rem);">
+                <div class="flex items-center gap-3">
+                    <button class="material-symbols-outlined text-primary mobile-menu-btn bg-transparent border-none p-0 cursor-pointer">menu</button>
+                    <h1 class="font-headline text-2xl font-bold tracking-tight text-primary">Sakura Saki</h1>
+                </div>
+                <div class="flex items-center gap-4 text-primary">
+                    <span class="material-symbols-outlined scale-95">notifications</span>
+                </div>
+            </header>
+
+            <!-- Header Section -->
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <div>
-                <h2 class="font-headline text-3xl md:text-4xl text-tertiary tracking-tight font-bold">Staff Portal</h2>
-                <p class="font-body text-body-lg text-on-surface-variant mt-2">Welcome Back, <span class="font-semibold text-primary" th:text="${staff != null ? staff.firstName + ' ' + staff.lastName : username}">Name</span></p>
+                <p class="font-label text-sm uppercase tracking-widest text-primary mb-2">Welcome Back</p>
+                <h1 class="font-headline text-4xl lg:text-5xl text-tertiary font-medium tracking-tight">
+                    Good morning, <span th:text="${staff != null ? staff.firstName : username}">Name</span>.
+                </h1>
             </div>
             <div class="w-full md:w-80 relative">
                 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
@@ -160,9 +176,12 @@
                 </section>
             </div>
         </div>
-        <footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
+        
+        </div>
     </main>
 </div>
+
+<footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
 
 <th:block th:replace="~{layout/fragments :: sakura-js}" />
 </body>

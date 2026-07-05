@@ -1,122 +1,128 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports — Sakura Saki Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <link th:href="@{/css/admin-style.css}" rel="stylesheet">
-</head>
-<body class="admin-body">
-<canvas id="sakura-canvas"></canvas>
+<head th:replace="~{layout/fragments :: head('Reports — Sakura Saki Admin')}"></head>
+<body class="bg-surface text-on-surface font-body">
+<th:block th:replace="~{layout/fragments :: sakura-canvas}" />
 
-<!-- ========== SIDEBAR ========== -->
-<aside class="admin-sidebar">
-    <div class="sidebar-brand">
-        <h1>🌸 Admin Portal</h1>
-        <p>Sakura Saki Management</p>
-    </div>
-    <nav class="sidebar-nav">
-        <a th:href="@{/admin/dashboard}"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
-        <a th:href="@{/admin/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
-        <a th:href="@{/admin/packages}"><span class="material-symbols-outlined">inventory_2</span> Packages</a>
-        <a th:href="@{/admin/staff}"><span class="material-symbols-outlined">badge</span> Staff</a>
-        <a th:href="@{/admin/appointments}"><span class="material-symbols-outlined">calendar_month</span> Appointments</a>
-        <a th:href="@{/admin/reviews}"><span class="material-symbols-outlined">reviews</span> Reviews</a>
-        <a th:href="@{/admin/users}"><span class="material-symbols-outlined">group</span> Users</a>
-        <a th:href="@{/admin/customers}"><span class="material-symbols-outlined">person_search</span> Customers</a>
-        <a th:href="@{/admin/manage}"><span class="material-symbols-outlined">admin_panel_settings</span> Admins</a>
-        <a th:href="@{/admin/reports}" class="active"><span class="material-symbols-outlined">bar_chart</span> Reports</a>
-        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
-    </nav>
-    <div class="sidebar-footer">
-        <div class="sidebar-profile">
-            <div class="avatar" th:text="${#strings.toUpperCase(#strings.substring(username, 0, 2))}">AD</div>
-            <div class="info">
-                <span class="name" th:text="${username}">admin</span>
-                <span class="role">Administrator</span>
-            </div>
-        </div>
-    </div>
-</aside>
+<div class="flex min-h-screen w-full relative z-10 md:pl-72">
+    <!-- Sidebar -->
+    <aside th:replace="~{layout/fragments :: admin-sidebar('reports')}"></aside>
 
-<!-- ========== MAIN CONTENT ========== -->
-<main class="admin-main">
+    <!-- Main Content -->
+    <main class="flex-1 p-6 md:p-10 lg:p-14 relative flex flex-col">
+        <!-- Page Header -->
+        <header class="flex justify-between items-end mb-12 flex-wrap gap-4">
+            <div>
+                <span class="text-primary font-label text-xs font-bold tracking-[0.2em] uppercase block mb-2">Analytical Reports</span>
+                <h1 class="font-headline text-4xl text-tertiary font-bold">Salon Performance</h1>
+            </div>
+        </header>
 
-    <!-- Page Header -->
-    <header class="page-header">
-        <div>
-            <span class="kicker">Analytical Reports</span>
-            <h2>Salon Performance</h2>
-        </div>
-    </header>
-
-    <!-- Quick Stats Row -->
-    <div class="stats-grid" style="margin-bottom: 2.5rem;">
-        <div class="stat-card glass-pane clay-lift">
-            <div class="stat-icon">
-                <span class="material-symbols-outlined">group</span>
+        <!-- Quick Stats Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="glass-pane bg-surface-container-lowest rounded-3xl p-6 clay-lift border border-outline-variant/30 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity group-hover:scale-110 duration-300">
+                    <span class="material-symbols-outlined text-6xl text-primary">group</span>
+                </div>
+                <div class="relative z-10">
+                    <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-xl">group</span>
+                    </div>
+                    <div class="font-label text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">Total Customers</div>
+                    <div class="font-headline text-4xl font-bold text-on-surface" th:text="${summary.totalCustomers}">0</div>
+                </div>
             </div>
-            <div class="stat-label">Total Customers</div>
-            <div class="stat-value" th:text="${summary.totalCustomers}">0</div>
-        </div>
-        <div class="stat-card glass-pane clay-lift">
-            <div class="stat-icon">
-                <span class="material-symbols-outlined">content_cut</span>
+            
+            <div class="glass-pane bg-surface-container-lowest rounded-3xl p-6 clay-lift border border-outline-variant/30 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity group-hover:scale-110 duration-300">
+                    <span class="material-symbols-outlined text-6xl text-secondary">content_cut</span>
+                </div>
+                <div class="relative z-10">
+                    <div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-xl">content_cut</span>
+                    </div>
+                    <div class="font-label text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">Salon Services</div>
+                    <div class="font-headline text-4xl font-bold text-on-surface" th:text="${summary.totalServices}">0</div>
+                </div>
             </div>
-            <div class="stat-label">Salon Services</div>
-            <div class="stat-value" th:text="${summary.totalServices}">0</div>
-        </div>
-        <div class="stat-card glass-pane clay-lift">
-            <div class="stat-icon">
-                <span class="material-symbols-outlined">badge</span>
+            
+            <div class="glass-pane bg-surface-container-lowest rounded-3xl p-6 clay-lift border border-outline-variant/30 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity group-hover:scale-110 duration-300">
+                    <span class="material-symbols-outlined text-6xl text-tertiary">badge</span>
+                </div>
+                <div class="relative z-10">
+                    <div class="w-12 h-12 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-xl">badge</span>
+                    </div>
+                    <div class="font-label text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">Total Staff</div>
+                    <div class="font-headline text-4xl font-bold text-on-surface" th:text="${summary.totalStaff}">0</div>
+                </div>
             </div>
-            <div class="stat-label">Total Staff</div>
-            <div class="stat-value" th:text="${summary.totalStaff}">0</div>
-        </div>
-        <div class="stat-card glass-pane clay-lift highlight">
-            <div class="stat-icon">
-                <span class="material-symbols-outlined">calendar_today</span>
-            </div>
-            <div class="stat-label">Today's Appointments</div>
-            <div class="stat-value" th:text="${summary.todayAppointments}">0</div>
-        </div>
-    </div>
-
-    <!-- Charts Grid -->
-    <div class="grid-2">
-
-        <!-- Appointments Per Day -->
-        <div class="content-card glass-pane clay-lift">
-            <h3>Appointments Per Day</h3>
-            <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;">
-                <input type="date" id="appFrom" class="input-recessed" style="width: auto; padding: 0.5rem 1rem; font-size: 0.75rem;">
-                <input type="date" id="appTo" class="input-recessed" style="width: auto; padding: 0.5rem 1rem; font-size: 0.75rem;">
-                <button onclick="loadAppointmentReport()" class="btn-sakura btn-sakura-primary btn-sakura-sm">Update</button>
-            </div>
-            <div class="chart-container">
-                <canvas id="appointmentsChart"></canvas>
+            
+            <div class="glass-pane bg-primary-container text-on-primary-container rounded-3xl p-6 clay-lift border border-primary/20 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity group-hover:scale-110 duration-300">
+                    <span class="material-symbols-outlined text-6xl">calendar_today</span>
+                </div>
+                <div class="relative z-10">
+                    <div class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-xl">calendar_today</span>
+                    </div>
+                    <div class="font-label text-xs font-bold text-primary-fixed-variant uppercase tracking-wider mb-1">Today's Appointments</div>
+                    <div class="font-headline text-4xl font-bold text-primary-fixed-variant" th:text="${summary.todayAppointments}">0</div>
+                </div>
             </div>
         </div>
 
-        <!-- Most Booked Services -->
-        <div class="content-card glass-pane clay-lift">
-            <h3>Most Booked Services</h3>
-            <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;">
-                <input type="date" id="svcFrom" class="input-recessed" style="width: auto; padding: 0.5rem 1rem; font-size: 0.75rem;">
-                <input type="date" id="svcTo" class="input-recessed" style="width: auto; padding: 0.5rem 1rem; font-size: 0.75rem;">
-                <button onclick="loadServiceReport()" class="btn-sakura btn-sakura-primary btn-sakura-sm">Update</button>
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8 flex-1">
+            
+            <!-- Appointments Per Day -->
+            <div class="glass-pane bg-surface-container-lowest rounded-[2rem] p-6 lg:p-8 clay-lift border border-outline-variant/30 flex flex-col min-h-[400px]">
+                <h3 class="font-headline text-xl font-bold text-tertiary mb-6">Appointments Per Day</h3>
+                <div class="flex flex-wrap items-center gap-3 mb-8">
+                    <div class="flex items-center gap-2">
+                        <span class="font-label text-xs font-bold text-on-surface-variant uppercase tracking-wider">From</span>
+                        <input type="date" id="appFrom" class="px-4 py-2 rounded-full bg-surface-container-high border-none font-body text-xs text-on-surface focus:ring-2 focus:ring-primary/30 shadow-inner">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-label text-xs font-bold text-on-surface-variant uppercase tracking-wider">To</span>
+                        <input type="date" id="appTo" class="px-4 py-2 rounded-full bg-surface-container-high border-none font-body text-xs text-on-surface focus:ring-2 focus:ring-primary/30 shadow-inner">
+                    </div>
+                    <button onclick="loadAppointmentReport()" class="bg-primary text-on-primary px-4 py-2 rounded-full font-label text-xs font-bold uppercase tracking-wider hover:bg-primary-fixed-variant transition-colors shadow-sm ml-auto">Update</button>
+                </div>
+                <div class="flex-1 relative w-full min-h-[250px]">
+                    <canvas id="appointmentsChart"></canvas>
+                </div>
             </div>
-            <div class="chart-container">
-                <canvas id="servicesChart"></canvas>
+
+            <!-- Most Booked Services -->
+            <div class="glass-pane bg-surface-container-lowest rounded-[2rem] p-6 lg:p-8 clay-lift border border-outline-variant/30 flex flex-col min-h-[400px]">
+                <h3 class="font-headline text-xl font-bold text-tertiary mb-6">Most Booked Services</h3>
+                <div class="flex flex-wrap items-center gap-3 mb-8">
+                    <div class="flex items-center gap-2">
+                        <span class="font-label text-xs font-bold text-on-surface-variant uppercase tracking-wider">From</span>
+                        <input type="date" id="svcFrom" class="px-4 py-2 rounded-full bg-surface-container-high border-none font-body text-xs text-on-surface focus:ring-2 focus:ring-primary/30 shadow-inner">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-label text-xs font-bold text-on-surface-variant uppercase tracking-wider">To</span>
+                        <input type="date" id="svcTo" class="px-4 py-2 rounded-full bg-surface-container-high border-none font-body text-xs text-on-surface focus:ring-2 focus:ring-primary/30 shadow-inner">
+                    </div>
+                    <button onclick="loadServiceReport()" class="bg-primary text-on-primary px-4 py-2 rounded-full font-label text-xs font-bold uppercase tracking-wider hover:bg-primary-fixed-variant transition-colors shadow-sm ml-auto">Update</button>
+                </div>
+                <div class="flex-1 relative w-full min-h-[250px] flex items-center justify-center pb-4">
+                    <canvas id="servicesChart"></canvas>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Footer -->
-    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
-</main>
+        <!-- Footer -->
+        
+    </main>
+</div>
+
+<footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
+
+<th:block th:replace="~{layout/fragments :: sakura-js}" />
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -227,6 +233,5 @@
         loadServiceReport();
     });
 </script>
-<script th:src="@{/js/sakura-petals.js}"></script>
 </body>
 </html>

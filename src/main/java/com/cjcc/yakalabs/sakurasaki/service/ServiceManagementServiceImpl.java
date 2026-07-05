@@ -4,6 +4,8 @@ import com.cjcc.yakalabs.sakurasaki.model.SalonService;
 import com.cjcc.yakalabs.sakurasaki.model.ServicePackage;
 import com.cjcc.yakalabs.sakurasaki.repository.SalonServiceRepository;
 import com.cjcc.yakalabs.sakurasaki.repository.ServicePackageRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,11 @@ public class ServiceManagementServiceImpl implements ServiceManagementService {
     @Override
     public List<SalonService> getAllServices() {
         return salonServiceRepository.findAll();
+    }
+
+    @Override
+    public Page<SalonService> getAllServices(Pageable pageable) {
+        return salonServiceRepository.findAll(pageable);
     }
 
     @Override

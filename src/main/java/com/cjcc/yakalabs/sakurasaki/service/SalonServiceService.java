@@ -9,6 +9,8 @@ import com.cjcc.yakalabs.sakurasaki.repository.ServicePackageRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,17 +32,27 @@ public class SalonServiceService {
         this.packageRepo = packageRepo;
     }
 
-    public SalonService create(String name, String description, double price, int durationMinutes, String category) {
+    public SalonService create(String name, String description, double price, int durationMinutes, String category, String imageUrl) {
         SalonService s = new SalonService(name, description, price, durationMinutes, category);
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            s.setImageUrl(imageUrl);
+        }
         return serviceRepo.save(s);
     }
+
 
     public List<SalonService> findAll() {
         return serviceRepo.findAll();
     }
+    public Page<SalonService> findAll(Pageable pageable) {
+        return serviceRepo.findAll(pageable);
+    }
 
     public List<SalonService> findActive() {
         return serviceRepo.findByActive(true);
+    }
+    public Page<SalonService> findActive(Pageable pageable) {
+        return serviceRepo.findByActive(true, pageable);
     }
 
     public Optional<SalonService> findById(Long id) {
@@ -50,8 +62,17 @@ public class SalonServiceService {
     public List<SalonService> searchByName(String keyword) {
         return serviceRepo.findByNameContainingIgnoreCase(keyword);
     }
+    public Page<SalonService> searchByName(String keyword, Pageable pageable) {
+        return serviceRepo.findByNameContainingIgnoreCase(keyword, pageable);
+    }
 
-    public SalonService update(Long id, String name, String description, double price, int durationMinutes, String category) {
+    public Page<SalonService> findByNameAndCategory(String name, String category, Pageable pageable) {
+        String nameFilter = (name != null && !name.isBlank()) ? name : null;
+        String categoryFilter = (category != null && !category.isBlank()) ? category : null;
+        return serviceRepo.findByNameAndCategory(nameFilter, categoryFilter, pageable);
+    }
+
+    public SalonService update(Long id, String name, String description, double price, int durationMinutes, String category, String imageUrl) {
         SalonService s = serviceRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Service not found with id: " + id));
         if (name != null && !name.isBlank()) s.setName(name);
@@ -59,6 +80,7 @@ public class SalonServiceService {
         s.setPrice(price);
         s.setDurationMinutes(durationMinutes);
         if (category != null) s.setCategory(category);
+        if (imageUrl != null) s.setImageUrl(imageUrl.isBlank() ? null : imageUrl);
         return serviceRepo.save(s);
     }
 
@@ -70,21 +92,26 @@ public class SalonServiceService {
     }
 
     /**
-     * Hard-delete a service along with all related reviews, appointments,
-     * and package associations to avoid foreign key constraint violations.
+     * Delete a service. Throws an error if there are existing appointments.
+     * Reviews are preserved with nullified service reference.
      */
     @Transactional
     public void delete(Long id) {
         SalonService service = serviceRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Service not found with id: " + id));
 
-        // 1. Delete all reviews referencing this service
-        reviewRepo.deleteAll(reviewRepo.findByServiceId(id));
+        // Check if there are any appointments for this service
+        if (!appointmentRepo.findByServiceId(id).isEmpty()) {
+            throw new RuntimeException("Cannot delete service: there are existing appointments associated with it.");
+        }
 
-        // 2. Delete all appointments referencing this service
-        appointmentRepo.deleteAll(appointmentRepo.findByServiceId(id));
+        // 1. Nullify service reference in reviews to preserve historical data
+        reviewRepo.findByServiceId(id).forEach(review -> {
+            review.setService(null);
+            reviewRepo.save(review);
+        });
 
-        // 3. Remove this service from any packages (ManyToMany join table)
+        // 2. Remove this service from any packages (ManyToMany join table)
         List<ServicePackage> packages = packageRepo.findAll();
         for (ServicePackage pkg : packages) {
             if (pkg.getServices().remove(service)) {
@@ -92,7 +119,7 @@ public class SalonServiceService {
             }
         }
 
-        // 4. Delete the service itself
+        // 3. Delete the service itself
         serviceRepo.delete(service);
     }
 }

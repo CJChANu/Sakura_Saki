@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head th:replace="~{layout/fragments :: head('Profile Settings — Sakura Saki')}"></head>
-<body class="bg-surface text-on-surface overflow-x-hidden">
+<body class="bg-surface text-on-surface">
 <th:block th:replace="~{layout/fragments :: sakura-canvas}" />
 
-<div class="flex min-h-screen">
+<div class="flex min-h-screen w-full relative z-10 md:pl-72">
     <aside th:replace="~{layout/fragments :: customer-sidebar('settings')}"></aside>
 
-    <main class="flex-1 overflow-y-auto p-12 relative flex flex-col min-h-screen">
+    <main class="flex-1 pt-12 px-12 relative flex flex-col">
         <!-- Header -->
         <header class="mb-12">
             <span class="text-primary font-label text-xs font-extrabold tracking-[0.2em] uppercase block mb-2">Account</span>
@@ -107,9 +107,11 @@
             </div>
         </div>
 
-        <footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
+        
     </main>
 </div>
+
+<footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
 
 <th:block th:replace="~{layout/fragments :: sakura-js}" />
 </body>

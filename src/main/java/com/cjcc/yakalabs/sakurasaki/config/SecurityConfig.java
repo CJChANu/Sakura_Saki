@@ -46,9 +46,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/**") // REST APIs use AJAX, not forms
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**", "/videos/**", "/our-services", "/our-packages").permitAll()
+                        .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**", "/videos/**", "/uploads/**", "/our-services", "/our-packages").permitAll()
                         .requestMatchers("/staff", "/reviews/**", "/api/staff/**").permitAll()
                         .requestMatchers("/services", "/services/**").permitAll()
                         .requestMatchers("/packages", "/packages/**").hasRole("ADMIN")

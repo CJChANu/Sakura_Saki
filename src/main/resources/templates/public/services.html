@@ -94,37 +94,14 @@
         }
     </style>
 </head>
-<body class="bg-surface font-body text-on-surface antialiased relative overflow-x-hidden">
+<body class="bg-surface font-body text-on-surface antialiased relative">
     <!-- Sakura Canvas -->
     <canvas class="fixed inset-0 pointer-events-none z-0 opacity-70" id="sakura-canvas"></canvas>
 
     <!-- Top Navigation Shell -->
-    <nav class="fixed top-0 w-full z-50 rounded-b-[2rem] bg-white/60 backdrop-blur-xl border-b border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.06)]">
-        <div class="flex justify-between items-center px-8 h-20 max-w-7xl mx-auto w-full">
-            <a th:href="@{/}" class="text-2xl font-serif font-bold text-rose-900 tracking-tight shrink-0" style="text-decoration:none;">Sakura Saki</a>
-            <div class="flex items-center gap-8">
-                <div class="hidden md:flex items-center gap-8 font-serif tracking-tight">
-                    <a th:href="@{/}" class="text-slate-500 hover:text-rose-400 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Home</a>
-                    <a th:href="@{/services}" class="text-rose-900 border-b-2 border-rose-400 pb-1 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Services</a>
-                    <a th:href="@{/booking}" class="text-slate-500 hover:text-rose-400 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Bookings</a>
-                </div>
-                <form th:action="@{/services}" method="get" class="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-full">
-                    <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
-                    <input name="q" th:value="${search}" class="bg-transparent border-none focus:ring-0 text-sm w-32 font-medium" placeholder="Search services..." type="text"/>
-                    <input type="hidden" name="category" th:value="${activeCategory}" />
-                </form>
-                <div class="flex items-center gap-4">
-                    <a th:if="${!isLoggedIn}" th:href="@{/login}" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition-all duration-400 ease-out" style="text-decoration:none;">SIGN IN</a>
-                    <a th:if="${isAdmin}" th:href="@{/admin/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Admin Dashboard">dashboard</a>
-                    <a th:if="${isStaff}" th:href="@{/staff/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Staff Dashboard">dashboard</a>
-                    <a th:if="${isLoggedIn}" th:href="@{/profile}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Profile">account_circle</a>
-                    <a th:if="${isLoggedIn}" th:href="@{/logout}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Logout">logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <div th:replace="~{layout/fragments :: topnav('services')}"></div>
 
-    <main class="pt-32 pb-24 px-6 max-w-7xl mx-auto relative z-10">
+    <main class="pt-32 pb-12 px-6 max-w-7xl mx-auto relative z-10 mb-8">
         <!-- Hero Header -->
         <header class="mb-16 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div class="max-w-2xl">
@@ -151,18 +128,20 @@
                  th:classappend="${stat.index % 5 == 0} ? 'md:col-span-8' : (${stat.index % 5 == 1} ? 'md:col-span-4 flex flex-col' : 'md:col-span-4')"
                  class="group relative overflow-hidden rounded-lg service-card transition-all duration-500 clay-shadow glass-card">
                 
-                <div th:classappend="${stat.index % 5 == 0} ? 'aspect-[16/9]' : (${stat.index % 5 == 1} ? 'aspect-square' : 'aspect-[4/3]')" class="overflow-hidden relative">
+                <div th:classappend="${stat.index % 5 == 0 or stat.index % 5 == 1} ? 'h-64 sm:h-72 md:h-80 lg:h-96 xl:h-[452px] w-full' : 'aspect-[4/3]'" class="overflow-hidden relative shrink-0">
                     <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                         th:src="${stat.index % 5 == 0 ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuDeWpC51Otw39WPnoS34IVa4m2qD_lkkaonTo27UAlp1HljleGuSy1fzEbD1d_vwHYqREtBmKCvxjy4mjpAKi2mHGJi0JR3SKacUnAeqvrurLcI7dey-llIlvd-w82kSbI7P2E37iDiQH7zxw7uJL_3Ysb8R-3wDj1FvP-KG7q5huXT6of0B_5h6Vll0FZvXxfjq41oCC9bfI6Y9s6uVLRxpCTK3RBpr5_yUpJQu0kuWdpbP9SOFxIswnY0usT-KlHGrfq6VY5avhBw' : 
+                         th:src="${s.imageUrl != null and !s.imageUrl.isEmpty() ? s.imageUrl : (stat.index % 5 == 0 ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuDeWpC51Otw39WPnoS34IVa4m2qD_lkkaonTo27UAlp1HljleGuSy1fzEbD1d_vwHYqREtBmKCvxjy4mjpAKi2mHGJi0JR3SKacUnAeqvrurLcI7dey-llIlvd-w82kSbI7P2E37iDiQH7zxw7uJL_3Ysb8R-3wDj1FvP-KG7q5huXT6of0B_5h6Vll0FZvXxfjq41oCC9bfI6Y9s6uVLRxpCTK3RBpr5_yUpJQu0kuWdpbP9SOFxIswnY0usT-KlHGrfq6VY5avhBw' : 
                                   (stat.index % 5 == 1 ? 'https://lh3.googleusercontent.com/aida-public/AB6AXuA0AttB9AKJdcFHymHLvxLMcnsWWiUu9q9Dmf3FOJzdB-GHCiudo-HUIX7WWq6UifQutO0Y3LAJm8Dx5wn2umlIGautxIZl3ZiXueCmerOTGlPQ2nv2AZi-Gp36ttMdxUxwHPd2WkS922CY8r6ddIGKuMfajsp__W3YI53WtQ3zdKb9XGGxL4kgv1EhlVkhbpMJWSNTr7xPcZNXu1wpNhYbMwdrL1YWPiysO5DGl8x66HewLHzSz3Hb7B_VdQqBobRF5m-qOFl9zswR' : 
-                                  'https://lh3.googleusercontent.com/aida-public/AB6AXuDWRC_taj5s-TU98jH53tRoaoaFwtaUPmFBTgtplLVqC_8KTYYkK_9KK835QjzEkE4GmFh4v1t4o_b9CkjmmzjjyaDDJmxmKvz0sGqU9SVVSn7fT7CqAGTml_UtdUEveEHWuhYvGxTIkdg7s3NjJoDvmZFXuOrzN6MCDmKnl0GrEgXjTU47KW6vQ4F7Ig5cDZzw5nYnOKv5LLL4RjIiCSsm6spSoMLqVJfWGR_6CiDyVmBfKgMaH4Lwc6eYSn1q0WE27E-AbiINlHwa')}" />
+                                  'https://lh3.googleusercontent.com/aida-public/AB6AXuDWRC_taj5s-TU98jH53tRoaoaFwtaUPmFBTgtplLVqC_8KTYYkK_9KK835QjzEkE4GmFh4v1t4o_b9CkjmmzjjyaDDJmxmKvz0sGqU9SVVSn7fT7CqAGTml_UtdUEveEHWuhYvGxTIkdg7s3NjJoDvmZFXuOrzN6MCDmKnl0GrEgXjTU47KW6vQ4F7Ig5cDZzw5nYnOKv5LLL4RjIiCSsm6spSoMLqVJfWGR_6CiDyVmBfKgMaH4Lwc6eYSn1q0WE27E-AbiINlHwa'))}" />
                 </div>
                 
                 <div th:classappend="${stat.index % 5 == 0} ? 'p-8 md:p-12 relative z-10' : (${stat.index % 5 == 1} ? 'p-8 flex-grow flex flex-col justify-between' : 'p-8')">
                     <div>
                         <span class="font-label text-primary text-xs uppercase tracking-widest font-bold" th:text="${s.category ?: 'General'}">Category</span>
                         <h3 th:classappend="${stat.index % 5 == 0} ? 'font-headline text-3xl md:text-4xl text-on-surface mt-2 font-bold mb-4' : 'font-headline text-xl text-on-surface mt-2 font-bold mb-4'" th:text="${s.name}">Service Name</h3>
-                        <p th:if="${stat.index % 5 == 0}" class="text-tertiary max-w-xl mb-10 leading-relaxed" th:text="${s.description}">Description</p>
+                        <p th:if="${stat.index % 5 == 0 or stat.index % 5 == 1}" 
+                           th:classappend="${stat.index % 5 == 0} ? 'text-tertiary max-w-xl mb-10 leading-relaxed' : 'text-tertiary text-sm mb-6 leading-relaxed line-clamp-3'" 
+                           th:text="${s.description}">Description</p>
                     </div>
                     
                     <div>
@@ -188,7 +167,7 @@
         </div>
 
         <!-- Special Promotion Section (Packages) -->
-        <section th:if="${packages != null && !packages.isEmpty()}" class="mt-24 grid md:grid-cols-2 gap-12 items-center bg-primary-container/20 rounded-xl p-8 md:p-16 relative overflow-hidden" th:each="pkg, pkgStat : ${packages}" th:if="${pkgStat.index == 0}">
+        <section th:if="${packages != null && !packages.isEmpty()}" th:with="pkg=${packages[0]}" class="mt-24 grid md:grid-cols-2 gap-12 items-center bg-primary-container/20 rounded-xl p-8 md:p-16 relative overflow-hidden">
             <div class="relative z-10">
                 <span class="font-label text-primary text-xs uppercase tracking-[0.2em] font-bold mb-6 block">Seasonal Curations</span>
                 <h2 class="font-headline text-4xl md:text-5xl text-on-surface font-bold mb-6 leading-tight" th:text="${pkg.name}">The Blooming Autumn Retreat</h2>
@@ -213,19 +192,7 @@
 
     </main>
 
-    <!-- Footer Shell -->
-    <footer class="w-full py-12 border-t border-rose-100/50 dark:border-zinc-800/50 bg-stone-50 dark:bg-zinc-950 relative z-10">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-8">
-            <div class="mb-6 md:mb-0">
-                <span class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">© 2024 Sakura Saki Beauty. All rights reserved.</span>
-            </div>
-            <div class="flex gap-8">
-                <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Privacy</a>
-                <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Terms</a>
-                <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Contact</a>
-            </div>
-        </div>
-    </footer>
+    <footer th:replace="~{layout/fragments :: site-footer}"></footer>
 
     <!-- FAB -->
     <a th:href="@{/booking}" class="fixed bottom-10 right-10 w-16 h-16 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center transition-all duration-400 hover:scale-110 active:scale-95 z-50 clay-shadow" style="text-decoration:none;">

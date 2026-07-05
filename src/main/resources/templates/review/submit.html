@@ -22,7 +22,11 @@
         <a th:href="@{/services}"><span class="material-symbols-outlined">content_cut</span> Services</a>
         <a th:href="@{/booking}"><span class="material-symbols-outlined">calendar_add_on</span> Book Now</a>
         <a th:href="@{/my-appointments}"><span class="material-symbols-outlined">event_note</span> My Bookings</a>
-        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+        <form th:action="@{/logout}" method="post" style="margin:0;">
+            <button type="submit" style="display:flex;align-items:center;gap:.75rem;background:none;border:none;color:inherit;font:inherit;cursor:pointer;padding:.75rem 1rem;width:100%;text-align:left;">
+                <span class="material-symbols-outlined">logout</span> Logout
+            </button>
+        </form>
     </nav>
 </aside>
 <main class="admin-main">
@@ -89,7 +93,7 @@
             </button>
         </form>
     </div>
-    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
+    
 </main>
 <script th:src="@{/js/sakura-petals.js}"></script>
 </body>
