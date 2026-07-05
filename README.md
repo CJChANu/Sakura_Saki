@@ -1,4 +1,4 @@
-# 🌸 Sakura Saki — Salon & Spa Management System
+# 🌸 桜咲き Sakura Saki – Beauty Salon Appointment System
 
 Sakura Saki is a Spring Boot and Thymeleaf based web application for managing salon and spa operations. It provides public service browsing, customer appointment booking, staff dashboards, admin management tools, service/package management, review moderation, and a loyalty voucher system.
 
