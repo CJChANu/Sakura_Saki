@@ -23,6 +23,8 @@ public class SalonService {
 
     private String category; // Hair, Skin, Nails, Bridal, Spa
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String imageUrl;
 
     private boolean active = true;
