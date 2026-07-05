@@ -92,51 +92,39 @@
         .text-glow {
             text-shadow: 0 0 20px rgba(255, 183, 197, 0.4);
         }
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(calc(-50% - 1rem)); }
+        }
+        .animate-marquee {
+            animation: marquee 35s linear infinite;
+        }
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
     </style>
 </head>
-<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container">
     <canvas class="fixed inset-0 pointer-events-none z-[1] opacity-70" id="sakura-canvas"></canvas>
 
     <!-- TopNavBar -->
-    <nav class="fixed top-0 w-full z-50 rounded-b-[2rem] bg-white/60 backdrop-blur-xl border-b border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.06)]">
-        <div class="flex justify-between items-center px-8 h-20 max-w-7xl mx-auto w-full">
-            <a th:href="@{/}" class="text-2xl font-serif font-bold text-rose-900 tracking-tight shrink-0" style="text-decoration:none;">Sakura Saki</a>
-            <div class="flex items-center gap-8">
-                <div class="hidden md:flex items-center gap-8 font-serif tracking-tight">
-                    <a th:href="@{/}" class="text-rose-900 border-b-2 border-rose-400 pb-1 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Home</a>
-                    <a th:href="@{/services}" class="text-slate-500 hover:text-rose-400 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Services</a>
-                    <a th:href="@{/booking}" class="text-slate-500 hover:text-rose-400 transition-all duration-400 ease-out hover:scale-105" style="text-decoration:none;">Bookings</a>
-                </div>
-                <form action="/services" method="get" class="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-full">
-                    <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
-                    <input name="q" class="bg-transparent border-none focus:ring-0 text-sm w-32 font-medium" placeholder="Search services..." type="text"/>
-                </form>
-                <div class="flex items-center gap-4">
-                    <a th:if="${!isLoggedIn}" th:href="@{/login}" class="text-sm font-bold text-rose-500 hover:text-rose-700 transition-all duration-400 ease-out" style="text-decoration:none;">SIGN IN</a>
-                    <a th:if="${isAdmin}" th:href="@{/admin/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Admin Dashboard">dashboard</a>
-                    <a th:if="${isStaff}" th:href="@{/staff/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Staff Dashboard">dashboard</a>
-                    <a th:if="${isLoggedIn}" th:href="@{/profile}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Profile">account_circle</a>
-                    <a th:if="${isLoggedIn}" th:href="@{/logout}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Logout">logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <div th:replace="~{layout/fragments :: topnav('home')}"></div>
 
     <!-- Hero Section -->
     <header class="relative min-h-[972px] flex items-center justify-center pt-20 overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-container/30 to-surface z-0"></div>
         <div class="absolute top-1/4 -left-10 w-64 h-64 bg-primary-container/20 rounded-full blur-3xl opacity-60"></div>
         <div class="absolute bottom-1/4 -right-10 w-96 h-96 bg-secondary-container/20 rounded-full blur-3xl opacity-60"></div>
-        <div class="max-w-7xl mx-auto px-8 w-full relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
+        <div class="max-w-[1600px] mx-auto px-8 w-full relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
             <div class="space-y-8">
-                <div>
-                    <span class="text-primary font-label text-sm font-extrabold tracking-[0.2em] uppercase mb-4 block">Artisanal Beauty &amp; Wellness</span>
-                    <h1 class="font-headline text-6xl md:text-8xl text-on-surface leading-[1.05] tracking-tight font-bold">
+                <div class="drop-shadow-sm">
+                    <span class="text-primary font-label text-sm font-extrabold tracking-[0.2em] uppercase mb-4 block drop-shadow">Artisanal Beauty &amp; Wellness</span>
+                    <h1 class="font-headline text-6xl md:text-8xl text-on-surface leading-[1.05] tracking-tight font-bold drop-shadow-xl bg-white/30 backdrop-blur-sm p-4 rounded-3xl inline-block lg:bg-transparent lg:backdrop-blur-none lg:p-0">
                         Unveil Your <br/>
                         <span class="text-primary italic">Eternal Bloom</span>
                     </h1>
                 </div>
-                <p class="text-body text-lg text-secondary max-w-lg leading-relaxed">
+                <p class="text-body text-lg text-secondary max-w-lg leading-relaxed drop-shadow-sm bg-white/40 backdrop-blur-sm p-4 rounded-xl lg:bg-transparent lg:backdrop-blur-none lg:p-0">
                     A sensory journey where traditional Japanese precision meets modern aesthetic innovation. Experience beauty as a form of meditation.
                 </p>
                 <div class="flex flex-wrap gap-6 pt-4">
@@ -177,7 +165,7 @@
     </header>
 
     <!-- Services Bento Grid -->
-    <section class="py-32 px-8 max-w-7xl mx-auto">
+    <section class="py-32 px-8 max-w-[1600px] mx-auto">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div class="max-w-xl">
                 <span class="text-primary font-label text-xs font-extrabold tracking-[0.3em] uppercase mb-4 block">Curated Experience</span>
@@ -253,7 +241,7 @@
 
     <!-- CTA Section: Different for logged-in vs guest -->
     <section th:if="${!isLoggedIn}" class="py-32 px-8">
-        <div class="max-w-7xl mx-auto glass-panel rounded-xl p-12 md:p-24 relative overflow-hidden text-center shadow-inner">
+        <div class="max-w-[1600px] mx-auto glass-panel rounded-xl p-12 md:p-24 relative overflow-hidden text-center shadow-inner">
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 bg-[radial-gradient(circle_at_center,rgba(255,183,197,0.2)_0%,transparent_70%)]"></div>
             <div class="max-w-3xl mx-auto space-y-10">
                 <h2 class="font-headline text-4xl md:text-6xl text-on-surface font-bold leading-tight">Become a Sakura <br/>Circle Member</h2>
@@ -292,54 +280,48 @@
     </section>
 
     <!-- Reviews Section -->
-    <section class="py-24 px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <span class="text-primary font-label text-xs font-extrabold tracking-[0.3em] uppercase mb-4 block">Testimonials</span>
-                <h2 class="font-headline text-4xl md:text-5xl text-on-surface font-bold">What Our Clients Say</h2>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div th:each="review : ${recentReviews}" class="clay-card rounded-xl p-8 relative group hover:-translate-y-1 transition-all duration-400">
-                    <div class="flex items-center gap-1 mb-4">
-                        <span th:each="i : ${#numbers.sequence(1, review.rating)}" class="material-symbols-outlined text-amber-400 text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
-                        <span th:each="i : ${#numbers.sequence(review.rating + 1, 5)}" class="material-symbols-outlined text-slate-200 text-lg">star</span>
-                    </div>
-                    <p class="text-secondary text-sm leading-relaxed mb-6" th:text="${review.comment}">Great service!</p>
-                    <div class="flex items-center gap-3 pt-4 border-t border-rose-100/50">
-                        <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs" th:text="${review.customer != null ? #strings.substring(review.customer.firstName, 0, 1) + #strings.substring(review.customer.lastName, 0, 1) : '?'}">AB</div>
+    <section class="py-24 overflow-hidden">
+        <div class="text-center mb-16 px-8">
+            <span class="text-primary font-label text-xs font-extrabold tracking-[0.3em] uppercase mb-4 block">Testimonials</span>
+            <h2 class="font-headline text-4xl md:text-5xl text-on-surface font-bold">What Our Clients Say</h2>
+        </div>
+        
+        <div th:if="${not #lists.isEmpty(recentReviews)}" class="relative w-full flex">
+            <!-- Fade gradients -->
+            <div class="absolute left-0 top-0 bottom-0 w-16 md:w-48 bg-gradient-to-r from-surface to-transparent z-10 pointer-events-none"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-16 md:w-48 bg-gradient-to-l from-surface to-transparent z-10 pointer-events-none"></div>
+            
+            <div class="flex gap-8 w-max animate-marquee px-4">
+                <!-- Duplicate reviews for infinite scrolling -->
+                <th:block th:each="loop : ${#numbers.sequence(1, 2)}">
+                    <div th:each="review : ${recentReviews}" class="clay-card w-[350px] shrink-0 rounded-xl p-8 relative group hover:-translate-y-1 transition-all duration-400 whitespace-normal flex flex-col justify-between">
                         <div>
-                            <p class="text-sm font-bold text-on-surface" th:text="${review.customer != null ? review.customer.firstName + ' ' + review.customer.lastName : 'Anonymous'}">Customer</p>
-                            <p class="text-xs text-slate-400" th:text="${review.service != null ? review.service.name : ''}">Service</p>
+                            <div class="flex items-center gap-1 mb-4">
+                                <span th:if="${review.rating > 0}" th:each="i : ${#numbers.sequence(1, review.rating)}" class="material-symbols-outlined text-amber-400 text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span th:if="${review.rating < 5}" th:each="i : ${#numbers.sequence(review.rating + 1, 5)}" class="material-symbols-outlined text-slate-200 text-lg">star</span>
+                            </div>
+                            <p class="text-secondary text-sm leading-relaxed mb-6" th:text="${review.comment}">Great service!</p>
+                        </div>
+                        <div class="flex items-center gap-3 pt-4 border-t border-rose-100/50 mt-auto">
+                            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs shrink-0" th:text="${review.customer != null ? #strings.substring(review.customer.firstName, 0, 1) + #strings.substring(review.customer.lastName, 0, 1) : '?'}">AB</div>
+                            <div class="overflow-hidden">
+                                <p class="text-sm font-bold text-on-surface truncate" th:text="${review.customer != null ? review.customer.firstName + ' ' + review.customer.lastName : 'Anonymous'}">Customer</p>
+                                <p class="text-xs text-slate-400 truncate" th:text="${review.service != null ? review.service.name : ''}">Service</p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </th:block>
             </div>
-            <div th:if="${#lists.isEmpty(recentReviews)}" class="text-center py-12 text-slate-400">
-                <span class="material-symbols-outlined text-4xl mb-4 block">rate_review</span>
-                <p class="text-sm">No reviews yet — be the first to share your experience!</p>
-            </div>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(recentReviews)}" class="text-center py-12 text-slate-400 px-8">
+            <span class="material-symbols-outlined text-4xl mb-4 block">rate_review</span>
+            <p class="text-sm">No reviews yet — be the first to share your experience!</p>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-stone-50 dark:bg-zinc-950 w-full py-12 border-t border-rose-100/50 dark:border-zinc-800/50">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-8 gap-8">
-            <div class="flex flex-col items-center md:items-start gap-4">
-                <div class="text-xl font-serif font-bold text-rose-900">Sakura Saki</div>
-                <p class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400">© 2024 Sakura Saki Beauty. All rights reserved.</p>
-            </div>
-            <div class="flex gap-10">
-                <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Privacy</a>
-                <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Terms</a>
-                <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Contact</a>
-                <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#">Careers</a>
-            </div>
-            <div class="flex gap-6">
-                <span class="material-symbols-outlined text-rose-300 cursor-pointer hover:text-rose-500 transition-colors" data-icon="share">share</span>
-                <span class="material-symbols-outlined text-rose-300 cursor-pointer hover:text-rose-500 transition-colors" data-icon="location_on">location_on</span>
-            </div>
-        </div>
-    </footer>
+    <footer th:replace="~{layout/fragments :: site-footer}"></footer>
 
     <!-- Bottom Navigation for Mobile -->
     <div class="md:hidden fixed bottom-0 left-0 right-0 glass-panel h-20 z-50 flex items-center justify-around px-4 rounded-t-xl">

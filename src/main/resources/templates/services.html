@@ -18,8 +18,10 @@
         .section-title{text-align:center;margin-bottom:3rem;}
         .section-title h2{font-family:var(--font-headline);font-size:2.25rem;font-weight:700;margin-bottom:.5rem;}
         .section-title p{color:var(--outline);font-size:1rem;}
-        .pkg-grid,.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;max-width:1200px;margin:0 auto 4rem;padding:0 1rem;}
-        .pkg-card{background:rgba(255,255,255,.75);backdrop-filter:blur(16px);border-radius:var(--radius-lg);padding:2.5rem;border:.5px solid rgba(214,194,196,.15);position:relative;display:flex;flex-direction:column;justify-content:space-between;transition:transform .3s;}
+        .pkg-grid,.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;max-width:1600px;margin:0 auto 4rem;padding:0 1rem;}
+        .pkg-card{background:rgba(255,255,255,.75);backdrop-filter:blur(16px);border-radius:var(--radius-lg);border:.5px solid rgba(214,194,196,.15);position:relative;display:flex;flex-direction:column;transition:transform .3s;overflow:hidden;}
+        .pkg-card-img{width:100%;height:220px;object-fit:cover;}
+        .pkg-card-body{padding:2.5rem;display:flex;flex-direction:column;justify-content:space-between;flex:1;}
         .pkg-card:hover{transform:translateY(-6px);box-shadow:0 15px 30px -10px rgba(134,78,90,.1);}
         .pkg-badge{position:absolute;top:1rem;right:1rem;background:var(--primary);color:#fff;font-family:var(--font-label);font-size:.65rem;font-weight:600;padding:.25rem .75rem;border-radius:20px;text-transform:uppercase;letter-spacing:.1em;}
         .pkg-price{font-size:1.75rem;font-weight:700;color:var(--primary);margin:1.5rem 0;}
@@ -65,26 +67,28 @@
         </div>
         <div class="pkg-grid">
             <div th:each="p : ${packages}" class="pkg-card">
-                <span class="pkg-badge" th:text="${p.discountPercent} + '% off'">Package</span>
-                <div>
-                    <h3 style="font-family:var(--font-headline);font-size:1.35rem;margin:0 0 .5rem;" th:text="${p.name}">Name</h3>
-                    <p style="font-size:.875rem;color:var(--outline);margin-bottom:1rem;" th:text="${p.description}">Desc</p>
-                    <ul class="svc-list">
-                        <li th:each="s : ${p.services}">
-                            <span class="material-symbols-outlined">check_circle</span>
-                            <span th:text="${s.name}">Service</span>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <div class="pkg-price">
-                        <span th:text="'Rs. ' + ${#numbers.formatDecimal(p.discountedPrice,1,2)}">Rs.</span>
-                        <span th:text="'Rs. ' + ${#numbers.formatDecimal(p.totalPrice,1,2)}">Rs.</span>
+                <span class="pkg-badge" style="z-index:10;" th:text="${p.discountPercent} + '% off'">Package</span>
+                <div class="pkg-card-body">
+                    <div>
+                        <h3 style="font-family:var(--font-headline);font-size:1.35rem;margin:0 0 .5rem;" th:text="${p.name}">Name</h3>
+                        <p style="font-size:.875rem;color:var(--outline);margin-bottom:1rem;" th:text="${p.description}">Desc</p>
+                        <ul class="svc-list">
+                            <li th:each="s : ${p.services}">
+                                <span class="material-symbols-outlined">check_circle</span>
+                                <span th:text="${s.name}">Service</span>
+                            </li>
+                        </ul>
                     </div>
-                    <div style="display:flex;align-items:center;gap:1rem;font-size:.8rem;color:var(--outline);margin-bottom:1.5rem;">
-                        <span class="material-symbols-outlined" style="font-size:1rem;">schedule</span> <span th:text="${p.totalDuration} + ' minutes'">Duration</span>
+                    <div>
+                        <div class="pkg-price">
+                            <span th:text="'Rs. ' + ${#numbers.formatDecimal(p.discountedPrice,1,2)}">Rs.</span>
+                            <span th:text="'Rs. ' + ${#numbers.formatDecimal(p.totalPrice,1,2)}">Rs.</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:1rem;font-size:.8rem;color:var(--outline);margin-bottom:1.5rem;">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">schedule</span> <span th:text="${p.totalDuration} + ' minutes'">Duration</span>
+                        </div>
+                        <a th:href="@{/booking(select='PKG_' + ${p.id})}" class="btn-sakura btn-sakura-primary w-100 text-center" style="display:block;text-decoration:none;">Book Package</a>
                     </div>
-                    <a th:href="@{/booking(select='PKG_' + ${p.id})}" class="btn-sakura btn-sakura-primary w-100 text-center" style="display:block;text-decoration:none;">Book Package</a>
                 </div>
             </div>
         </div>
@@ -97,27 +101,28 @@
             <p>Select tailored services to meet your specific beauty needs.</p>
         </div>
         <div class="svc-grid">
-            <div th:each="s : ${services}" class="pkg-card" style="padding:2rem;">
-                <span class="pkg-badge" style="background:var(--primary-container);color:var(--on-primary-container);" th:text="${s.category}">Category</span>
-                <div>
-                    <h3 style="font-family:var(--font-headline);font-size:1.25rem;margin:0 0 .5rem;padding-right:3.5rem;" th:text="${s.name}">Service</h3>
-                    <p style="font-size:.85rem;color:var(--outline);min-height:40px;" th:text="${s.description}">Desc</p>
-                </div>
-                <div style="margin-top:1.5rem;">
-                    <div style="font-size:1.5rem;font-weight:700;color:var(--primary);margin-bottom:.5rem;" th:text="'Rs. ' + ${#numbers.formatDecimal(s.price,1,2)}">Rs.</div>
-                    <div style="display:flex;align-items:center;gap:1rem;font-size:.8rem;color:var(--outline);margin-bottom:1.5rem;">
-                        <span class="material-symbols-outlined" style="font-size:1rem;">schedule</span> <span th:text="${s.durationMinutes} + ' mins'">30 min</span>
+            <div th:each="s : ${services}" class="pkg-card">
+                <img th:if="${s.imageUrl != null and !s.imageUrl.isEmpty()}" th:src="${s.imageUrl}" class="pkg-card-img" alt="Service Image">
+                <span class="pkg-badge" style="background:var(--primary-container);color:var(--on-primary-container);z-index:10;" th:text="${s.category}">Category</span>
+                <div class="pkg-card-body">
+                    <div>
+                        <h3 style="font-family:var(--font-headline);font-size:1.25rem;margin:0 0 .5rem;padding-right:3.5rem;" th:text="${s.name}">Service</h3>
+                        <p style="font-size:.85rem;color:var(--outline);min-height:40px;" th:text="${s.description}">Desc</p>
                     </div>
-                    <a th:href="@{/booking(select='SVC_' + ${s.id})}" class="btn-sakura btn-sakura-outline w-100 text-center" style="display:block;text-decoration:none;">Book Service</a>
+                    <div style="margin-top:1.5rem;">
+                        <div style="font-size:1.5rem;font-weight:700;color:var(--primary);margin-bottom:.5rem;" th:text="'Rs. ' + ${#numbers.formatDecimal(s.price,1,2)}">Rs.</div>
+                        <div style="display:flex;align-items:center;gap:1rem;font-size:.8rem;color:var(--outline);margin-bottom:1.5rem;">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">schedule</span> <span th:text="${s.durationMinutes} + ' mins'">30 min</span>
+                        </div>
+                        <a th:href="@{/booking(select='SVC_' + ${s.id})}" class="btn-sakura btn-sakura-outline w-100 text-center" style="display:block;text-decoration:none;">Book Service</a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 </main>
 
-<footer class="admin-footer" style="background:var(--surface-container-low);margin-top:auto;text-align:center;padding:2rem;">
-    <span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span>
-</footer>
+<footer th:replace="~{layout/fragments :: site-footer}"></footer>
 
 <script th:src="@{/js/sakura-petals.js}"></script>
 </body>

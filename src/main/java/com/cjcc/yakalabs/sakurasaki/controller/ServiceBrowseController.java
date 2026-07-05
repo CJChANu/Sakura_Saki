@@ -27,6 +27,27 @@ public class ServiceBrowseController {
         this.reviewRepo = reviewRepo;
     }
 
+    private boolean isRealUser(Authentication auth) {
+        return auth != null && auth.isAuthenticated()
+                && auth.getAuthorities().stream()
+                .noneMatch(a -> a.getAuthority().equals("ROLE_ANONYMOUS"));
+    }
+
+    private void addAuthState(Authentication auth, Model model) {
+        boolean loggedIn = isRealUser(auth);
+        model.addAttribute("isLoggedIn", loggedIn);
+        model.addAttribute("isAdmin", false);
+        model.addAttribute("isStaff", false);
+
+        if (loggedIn) {
+            model.addAttribute("username", auth.getName());
+            model.addAttribute("isAdmin", auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
+            model.addAttribute("isStaff", auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_STAFF")));
+        }
+    }
+
     @GetMapping("/services")
     public String browseServices(@RequestParam(required = false) String search,
                                   @RequestParam(required = false) String q,
@@ -64,16 +85,7 @@ public class ServiceBrowseController {
                 .toList();
         model.addAttribute("categories", categories);
 
-        // Auth state for nav
-        boolean loggedIn = (auth != null && auth.isAuthenticated());
-        model.addAttribute("isLoggedIn", loggedIn);
-        if (loggedIn) {
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", auth.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
-            model.addAttribute("isStaff", auth.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_STAFF")));
-        }
+        addAuthState(auth, model);
 
         return "public/services";
     }
@@ -91,17 +103,7 @@ public class ServiceBrowseController {
         // Load staff for inline booking
         model.addAttribute("staffList", staffService.findActive());
 
-        // Auth state
-        boolean loggedIn = (auth != null && auth.isAuthenticated());
-        model.addAttribute("isLoggedIn", loggedIn);
-        if (loggedIn) {
-            model.addAttribute("username", auth.getName());
-            boolean isStaff = auth.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_STAFF"));
-            model.addAttribute("isStaff", isStaff);
-        } else {
-            model.addAttribute("isStaff", false);
-        }
+        addAuthState(auth, model);
 
         return "public/service-detail";
     }
@@ -112,9 +114,7 @@ public class ServiceBrowseController {
                 .orElseThrow(() -> new RuntimeException("Package not found"));
         model.addAttribute("pkg", pkg);
 
-        boolean loggedIn = (auth != null && auth.isAuthenticated());
-        model.addAttribute("isLoggedIn", loggedIn);
-        if (loggedIn) model.addAttribute("username", auth.getName());
+        addAuthState(auth, model);
 
         return "public/package-detail";
     }

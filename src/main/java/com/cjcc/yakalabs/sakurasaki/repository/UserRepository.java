@@ -1,6 +1,8 @@
 package com.cjcc.yakalabs.sakurasaki.repository;
 
 import com.cjcc.yakalabs.sakurasaki.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,8 +32,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // ---- Search / filter ----
     List<User> findByRole(String role);
+    Page<User> findByRole(String role, Pageable pageable);
 
     List<User> findByUsernameContainingIgnoreCase(String keyword);
+    Page<User> findByUsernameContainingIgnoreCase(String keyword, Pageable pageable);
 
     // ---- Reports: registrations per day ----
     @Query("SELECT CAST(u.createdAt AS date) AS regDate, COUNT(u) AS cnt " +

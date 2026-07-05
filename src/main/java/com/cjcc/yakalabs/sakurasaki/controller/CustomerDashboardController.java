@@ -63,8 +63,17 @@ public class CustomerDashboardController {
         model.addAttribute("username", auth.getName());
         Customer customer = getCustomer(auth);
         model.addAttribute("customer", customer);
+        model.addAttribute("nextAppointment", null);
+        model.addAttribute("recentHistory", List.of());
+        model.addAttribute("completedCount", 0L);
+        model.addAttribute("loyaltyPoints", 0);
+        model.addAttribute("loyaltyProgress", 0);
 
         if (customer != null) {
+            int loyaltyPoints = customer.getLoyaltyPoints() != null ? customer.getLoyaltyPoints() : 0;
+            model.addAttribute("loyaltyPoints", loyaltyPoints);
+            model.addAttribute("loyaltyProgress", (loyaltyPoints % 1000) / 10);
+
             // Next upcoming appointment
             Optional<Appointment> nextAppt = appointmentService.getNextAppointmentForCustomer(customer.getId());
             model.addAttribute("nextAppointment", nextAppt.orElse(null));
@@ -82,17 +91,20 @@ public class CustomerDashboardController {
     }
 
     @GetMapping("/bookings")
-    public String bookings(Authentication auth, Model model) {
+    public String bookings(@RequestParam(defaultValue = "0") int page,
+                           @RequestParam(defaultValue = "10") int size,
+                           Authentication auth, Model model) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
         model.addAttribute("username", auth.getName());
         Customer customer = getCustomer(auth);
         model.addAttribute("customer", customer);
 
         if (customer != null) {
-            List<Appointment> appointments = appointmentService.findByCustomer(customer.getId());
+            org.springframework.data.domain.Page<Appointment> appointments = appointmentService.findByCustomer(customer.getId(), pageable);
             model.addAttribute("appointments", appointments);
 
             // Collect IDs of appointments that already have a review
-            Set<Long> reviewedIds = appointments.stream()
+            Set<Long> reviewedIds = appointments.getContent().stream()
                     .filter(a -> "COMPLETED".equals(a.getStatus()))
                     .filter(a -> reviewRepo.existsByAppointmentId(a.getId()))
                     .map(Appointment::getId)
@@ -176,12 +188,17 @@ public class CustomerDashboardController {
     public String deleteAccount(Authentication auth, jakarta.servlet.http.HttpServletRequest request) throws jakarta.servlet.ServletException {
         User user = userRepo.findByUsername(auth.getName()).orElse(null);
         if (user != null) {
-            // Hard delete: delete related appointments and reviews first
-            appointmentRepo.deleteAll(appointmentRepo.findByCustomerId(user.getId()));
-            reviewRepo.deleteAll(reviewRepo.findByCustomerId(user.getId()));
-            
-            // Now safe to hard delete the user
-            userRepo.delete(user);
+            // Soft delete: disable account and anonymize personal data
+            // This preserves historical appointments and reviews for reporting
+            user.setEnabled(false);
+            user.setFirstName("Deleted");
+            user.setLastName("User");
+            user.setPhone(null);
+            // Scramble username and email to free up uniqueness constraints
+            String anonymizedSuffix = "_deleted_" + user.getId();
+            user.setUsername("deleted_user" + anonymizedSuffix);
+            user.setEmail("deleted" + anonymizedSuffix + "@removed.local");
+            userRepo.save(user);
         }
         request.logout();
         return "redirect:/?deleted=true";

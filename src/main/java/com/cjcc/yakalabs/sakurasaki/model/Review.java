@@ -20,7 +20,7 @@ public class Review {
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "service_id", nullable = false)
+    @JoinColumn(name = "service_id")
     private SalonService service;
 
     @ManyToOne

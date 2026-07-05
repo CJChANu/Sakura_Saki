@@ -3,6 +3,8 @@ package com.cjcc.yakalabs.sakurasaki.service;
 import com.cjcc.yakalabs.sakurasaki.model.Admin;
 import com.cjcc.yakalabs.sakurasaki.model.User;
 import com.cjcc.yakalabs.sakurasaki.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -52,8 +54,8 @@ public class AdminService {
     }
 
     // READ — list all admin users
-    public List<User> listAdmins() {
-        return userRepo.findByRole("ROLE_ADMIN");
+    public Page<User> listAdmins(Pageable pageable) {
+        return userRepo.findByRole("ROLE_ADMIN", pageable);
     }
 
     // READ — find admin by ID
@@ -62,13 +64,13 @@ public class AdminService {
     }
 
     // READ — list all users
-    public List<User> listAllUsers() {
-        return userRepo.findAll();
+    public Page<User> listAllUsers(Pageable pageable) {
+        return userRepo.findAll(pageable);
     }
 
     // READ — search users by username
-    public List<User> searchUsers(String keyword) {
-        return userRepo.findByUsernameContainingIgnoreCase(keyword);
+    public Page<User> searchUsers(String keyword, Pageable pageable) {
+        return userRepo.findByUsernameContainingIgnoreCase(keyword, pageable);
     }
 
     // READ — list staff
@@ -128,13 +130,19 @@ public class AdminService {
 
     /**
      * Check if the requesting admin (by username) has higher or equal level than target admin.
+     * Safely handles users with ROLE_ADMIN who are not Admin entities (role-promoted users).
      */
     public boolean canManage(String currentUsername, Long targetAdminId) {
         User current = userRepo.findByUsername(currentUsername).orElse(null);
         User target = userRepo.findById(targetAdminId).orElse(null);
         if (current == null || target == null) return false;
-        if (!(current instanceof Admin currentAdmin)) return false;
-        if (!(target instanceof Admin targetAdmin)) return true; // non-admin can always be managed
+        if (!(target instanceof Admin targetAdmin)) return true; // non-Admin entity can always be managed
+
+        // If current user is not an Admin entity, treat them as basic-level ADMIN
+        if (!(current instanceof Admin currentAdmin)) {
+            // Role-promoted user can only manage basic-level admins
+            return "ADMIN".equals(targetAdmin.getAdminLevel());
+        }
 
         return currentAdmin.hasLevelOrHigher(targetAdmin.getAdminLevel());
     }

@@ -36,11 +36,25 @@ public class PackageManagementController {
                                 @RequestParam double discountPercent,
                                 @RequestParam List<Long> serviceIds,
                                 RedirectAttributes redirectAttributes) {
+        if (discountPercent <= 0) {
+            redirectAttributes.addFlashAttribute("error", "Discount cannot be a negative or 0%.");
+            redirectAttributes.addFlashAttribute("prevName", name);
+            redirectAttributes.addFlashAttribute("prevDescription", description);
+            redirectAttributes.addFlashAttribute("prevDiscountPercent", discountPercent);
+            redirectAttributes.addFlashAttribute("prevServiceIds", serviceIds);
+            redirectAttributes.addFlashAttribute("openModal", "createPackageModal");
+            return "redirect:/admin/packages";
+        }
         try {
             packageService.create(name, description, discountPercent, serviceIds);
             redirectAttributes.addFlashAttribute("success", "Package created successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("prevName", name);
+            redirectAttributes.addFlashAttribute("prevDescription", description);
+            redirectAttributes.addFlashAttribute("prevDiscountPercent", discountPercent);
+            redirectAttributes.addFlashAttribute("prevServiceIds", serviceIds);
+            redirectAttributes.addFlashAttribute("openModal", "createPackageModal");
         }
         return "redirect:/admin/packages";
     }
@@ -50,7 +64,12 @@ public class PackageManagementController {
                                 @RequestParam String name,
                                 @RequestParam String description,
                                 @RequestParam double discountPercent,
-                                @RequestParam List<Long> serviceIds) {
+                                @RequestParam List<Long> serviceIds,
+                                RedirectAttributes redirectAttributes) {
+        if (discountPercent <= 0) {
+            redirectAttributes.addFlashAttribute("error", "Discount cannot be a negative or 0%.");
+            return "redirect:/admin/packages";
+        }
         packageService.update(id, name, description, discountPercent, serviceIds);
         return "redirect:/admin/packages";
     }

@@ -26,8 +26,6 @@
         .team-role{font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--primary);margin-bottom:.75rem;display:block;}
         .team-detail{font-size:.85rem;color:var(--outline);line-height:1.6;display:flex;align-items:center;gap:.5rem;justify-content:center;margin:.25rem 0;}
         .team-detail .material-symbols-outlined{font-size:1rem;color:var(--primary);}
-        .site-footer{text-align:center;padding:2rem;background:var(--surface-container-low);}
-        .site-footer span{font-family:var(--font-label);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;}
         .empty-state{text-align:center;padding:4rem 2rem;color:var(--outline);}
         .empty-state .material-symbols-outlined{font-size:4rem;opacity:.3;margin-bottom:1rem;}
         @media(max-width:768px){.public-topnav{padding:.75rem 1.5rem;}.public-topnav .nav-links{gap:1rem;}.page-hero h1{font-size:1.75rem;}.team-grid{grid-template-columns:1fr;padding:2rem 1rem;}}
@@ -84,9 +82,7 @@
     </div>
 </main>
 
-<footer class="site-footer">
-    <span>© 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS</span>
-</footer>
+<footer th:replace="~{layout/fragments :: site-footer}"></footer>
 
 <script th:src="@{/js/sakura-petals.js}"></script>
 </body>

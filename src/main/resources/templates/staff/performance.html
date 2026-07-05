@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head th:replace="~{layout/fragments :: head('Performance — Sakura Saki')}"></head>
-<body class="bg-background text-on-surface font-body overflow-x-hidden">
+<body class="bg-background text-on-surface font-body">
 <th:block th:replace="~{layout/fragments :: sakura-canvas}" />
 
-<div class="flex h-screen w-full relative z-10">
+<div class="flex min-h-screen w-full relative z-10 md:pl-72">
     <aside th:replace="~{layout/fragments :: staff-sidebar('performance')}"></aside>
 
-    <main class="flex-1 ml-0 md:ml-72 p-6 md:p-10 lg:p-14 overflow-y-auto min-h-screen pb-24 md:pb-14 relative flex flex-col">
+    <main class="flex-1 p-6 md:p-10 lg:p-14 relative flex flex-col">
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <div>
                 <h2 class="font-headline text-3xl md:text-4xl text-tertiary tracking-tight font-bold">Performance</h2>
@@ -64,9 +64,11 @@
                 </div>
             </div>
         </section>
-        <footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
+        
     </main>
 </div>
+
+<footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
 
 <th:block th:replace="~{layout/fragments :: sakura-js}" />
 </body>

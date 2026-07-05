@@ -10,9 +10,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 public class StaffService {
@@ -29,6 +32,9 @@ public class StaffService {
         this.appointmentRepo = appointmentRepo;
         this.reviewRepo = reviewRepo;
     }
+
+    // Consistent phone validation pattern (matches UserService)
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{10}$");
 
     /**
      * Create staff — uses polymorphism: creates Stylist or Therapist
@@ -52,7 +58,14 @@ public class StaffService {
         staff.setFirstName(firstName);
         staff.setLastName(lastName);
         staff.setEmail(email);
-        staff.setPhone(phone);
+        // Validate phone format
+        if (phone != null && !phone.isBlank()) {
+            String cleanPhone = phone.replaceAll("[\\s-]", "");
+            if (!PHONE_PATTERN.matcher(cleanPhone).matches()) {
+                throw new RuntimeException("Please enter a valid 10-digit phone number.");
+            }
+            staff.setPhone(cleanPhone);
+        }
         staff.setSpecialization(specialization);
         staff.setRole("ROLE_STAFF");
         staff.setEnabled(true);
@@ -68,12 +81,19 @@ public class StaffService {
         return staffRepo.save(staff);
     }
 
+
     public List<Staff> findAll() {
         return staffRepo.findAll();
+    }
+    public Page<Staff> findAll(Pageable pageable) {
+        return staffRepo.findAll(pageable);
     }
 
     public List<Staff> findActive() {
         return staffRepo.findByActive(true);
+    }
+    public Page<Staff> findActive(Pageable pageable) {
+        return staffRepo.findByActive(true, pageable);
     }
 
     public Optional<Staff> findById(Long id) {
@@ -83,9 +103,21 @@ public class StaffService {
     public List<Staff> searchByName(String keyword) {
         return staffRepo.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(keyword, keyword);
     }
+    public Page<Staff> searchByName(String keyword, Pageable pageable) {
+        return staffRepo.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(keyword, keyword, pageable);
+    }
 
     public List<Staff> searchBySpecialty(String keyword) {
         return staffRepo.findBySpecializationContainingIgnoreCase(keyword);
+    }
+    public Page<Staff> searchBySpecialty(String keyword, Pageable pageable) {
+        return staffRepo.findBySpecializationContainingIgnoreCase(keyword, pageable);
+    }
+
+    public Page<Staff> findByNameAndSpecialization(String name, String spec, Pageable pageable) {
+        String nameFilter = (name != null && !name.isBlank()) ? name : null;
+        String specFilter = (spec != null && !spec.isBlank()) ? spec : null;
+        return staffRepo.findByNameAndSpecialization(nameFilter, specFilter, pageable);
     }
 
     public Staff updateStaff(Long id, String firstName, String lastName, String email, String phone,
@@ -95,7 +127,14 @@ public class StaffService {
         if (firstName != null && !firstName.isBlank()) s.setFirstName(firstName);
         if (lastName != null && !lastName.isBlank()) s.setLastName(lastName);
         if (email != null && !email.isBlank()) s.setEmail(email);
-        if (phone != null) s.setPhone(phone);
+        // Validate phone format
+        if (phone != null && !phone.isBlank()) {
+            String cleanPhone = phone.replaceAll("[\\s-]", "");
+            if (!PHONE_PATTERN.matcher(cleanPhone).matches()) {
+                throw new RuntimeException("Please enter a valid 10-digit phone number.");
+            }
+            s.setPhone(cleanPhone);
+        }
         if (specialization != null) s.setSpecialization(specialization);
         if (workingDays != null) s.setWorkingDays(workingDays);
         if (startTime != null) s.setStartTime(startTime);
@@ -106,6 +145,9 @@ public class StaffService {
     public void toggleActive(Long id) {
         Staff s = staffRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Staff not found with id: " + id));
+        if (s.isActive() && !appointmentRepo.findByStaffId(id).isEmpty()) {
+            throw new RuntimeException("Cannot disable staff member: they have existing appointments.");
+        }
         s.setActive(!s.isActive());
         staffRepo.save(s);
     }
@@ -115,13 +157,18 @@ public class StaffService {
         Staff staff = staffRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Staff not found with id: " + id));
 
-        // 1. Delete all reviews referencing this staff
-        reviewRepo.deleteAll(reviewRepo.findByStaffId(id));
+        if (!appointmentRepo.findByStaffId(id).isEmpty()) {
+            throw new RuntimeException("Cannot delete staff member: they have existing appointments.");
+        }
 
-        // 2. Delete all appointments referencing this staff
-        appointmentRepo.deleteAll(appointmentRepo.findByStaffId(id));
+        // Nullify staff reference in reviews instead of deleting them
+        // This preserves historical review data and ratings
+        reviewRepo.findByStaffId(id).forEach(review -> {
+            review.setStaff(null);
+            reviewRepo.save(review);
+        });
 
-        // 3. Delete the staff itself
+        // Delete the staff itself
         staffRepo.delete(staff);
     }
 }

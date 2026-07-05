@@ -17,7 +17,11 @@
         <a th:href="@{/staff}"><span class="material-symbols-outlined">badge</span> Our Team</a>
         <a th:href="@{/booking}"><span class="material-symbols-outlined">calendar_add_on</span> Book Now</a>
         <a th:href="@{/my-appointments}" class="active"><span class="material-symbols-outlined">event_note</span> My Bookings</a>
-        <a th:href="@{/logout}"><span class="material-symbols-outlined">logout</span> Logout</a>
+        <form th:action="@{/logout}" method="post" style="margin:0;">
+            <button type="submit" style="display:flex;align-items:center;gap:.75rem;background:none;border:none;color:inherit;font:inherit;cursor:pointer;padding:.75rem 1rem;width:100%;text-align:left;">
+                <span class="material-symbols-outlined">logout</span> Logout
+            </button>
+        </form>
     </nav>
     <div class="sidebar-footer">
         <div class="sidebar-profile">
@@ -50,8 +54,9 @@
                     </td>
                     <td style="text-align:right;">
                         <div style="display:flex;gap:.5rem;justify-content:flex-end;">
-                            <form th:if="${a.status == 'SCHEDULED'}" th:action="@{'/my-appointments/' + ${a.id} + '/cancel'}" method="post" style="display:inline;">
-                                <button type="submit" class="btn-sakura btn-sakura-danger btn-sakura-sm" onclick="return confirm('Cancel this appointment?');">Cancel</button>
+                            <form th:if="${a.status == 'SCHEDULED'}" th:action="@{'/my-appointments/' + ${a.id} + '/cancel'}" method="post" style="display:flex; flex-direction:column; gap:0.5rem; align-items:flex-end;" onsubmit="return confirm('Cancel this appointment?');">
+                                <input type="text" name="reason" placeholder="Reason for cancellation (optional)" class="sakura-input" style="font-size:0.8rem; padding:0.3rem 0.5rem; border-radius:0.5rem; max-width:200px;">
+                                <button type="submit" class="btn-sakura btn-sakura-danger btn-sakura-sm">Cancel</button>
                             </form>
                             <a th:if="${a.status == 'COMPLETED'}" th:href="@{'/reviews/submit/' + ${a.id}}" class="btn-sakura btn-sakura-outline btn-sakura-sm">
                                 <span class="material-symbols-outlined" style="font-size:.9rem;">rate_review</span> Review
@@ -62,7 +67,7 @@
             </tbody>
         </table>
     </div>
-    <footer class="admin-footer"><span>© 2024 SAKURA SAKI BEAUTY & WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC & YAKA LABS</span></footer>
+    
 </main>
 <script th:src="@{/js/sakura-petals.js}"></script>
 </body>

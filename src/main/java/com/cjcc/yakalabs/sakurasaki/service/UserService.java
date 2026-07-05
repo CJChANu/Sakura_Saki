@@ -1,8 +1,13 @@
 package com.cjcc.yakalabs.sakurasaki.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.cjcc.yakalabs.sakurasaki.model.Customer;
+import com.cjcc.yakalabs.sakurasaki.model.Staff;
 import com.cjcc.yakalabs.sakurasaki.model.User;
 import com.cjcc.yakalabs.sakurasaki.repository.UserRepository;
+import com.cjcc.yakalabs.sakurasaki.repository.AppointmentRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +18,7 @@ import java.util.regex.Pattern;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AppointmentRepository appointmentRepository;
     private final PasswordEncoder passwordEncoder;
 
     // Validation patterns
@@ -21,8 +27,9 @@ public class UserService {
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{10}$");
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, AppointmentRepository appointmentRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.appointmentRepository = appointmentRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -95,15 +102,28 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public Page<User> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
+    /**
+     * Promote a user to admin role.
+     * Note: This changes the security role but the discriminator remains unchanged.
+     * For full Admin entity features (e.g., adminLevel), use AdminService.createAdmin instead.
+     */
     public void makeAdmin(Long userId) {
-        userRepository.findById(userId).ifPresent(user -> {
-            user.setRole("ROLE_ADMIN");
-            userRepository.save(user);
-        });
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                
+        if (user instanceof Customer) {
+            throw new RuntimeException("Cannot promote a Customer to Admin directly due to data integrity constraints. Please create a separate Admin account.");
+        }
+        if (user instanceof Staff) {
+            throw new RuntimeException("Cannot promote a Staff member to Admin directly. Staff entity type is incompatible. Please create a separate Admin account.");
+        }
+        
+        user.setRole("ROLE_ADMIN");
+        userRepository.save(user);
     }
 
     // ---- Customer-specific methods (Member 1 — Customer & Authentication Module) ----
@@ -130,12 +150,18 @@ public class UserService {
     public List<User> findAllCustomers() {
         return userRepository.findByRole("ROLE_USER");
     }
+    public Page<User> findAllCustomers(Pageable pageable) {
+        return userRepository.findByRole("ROLE_USER", pageable);
+    }
 
     /**
      * Search customers by username keyword.
      */
     public List<User> searchCustomers(String keyword) {
         return userRepository.findByUsernameContainingIgnoreCase(keyword);
+    }
+    public Page<User> searchCustomers(String keyword, Pageable pageable) {
+        return userRepository.findByUsernameContainingIgnoreCase(keyword, pageable);
     }
 
     /**
@@ -204,12 +230,20 @@ public class UserService {
     }
 
     /**
-     * Permanently delete a user account.
+     * Deletes a user account (Soft Delete & Anonymization).
      */
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found with ID: " + id);
-        }
-        userRepository.deleteById(id);
+        User user = findById(id);
+        // Soft delete: disable account and anonymize personal data
+        // This preserves historical appointments and reviews for reporting
+        user.setEnabled(false);
+        user.setFirstName("Deleted");
+        user.setLastName("User");
+        user.setPhone(null);
+        // Scramble username and email to free up uniqueness constraints
+        String anonymizedSuffix = "_deleted_" + user.getId();
+        user.setUsername("deleted_user" + anonymizedSuffix);
+        user.setEmail("deleted" + anonymizedSuffix + "@removed.local");
+        userRepository.save(user);
     }
 }

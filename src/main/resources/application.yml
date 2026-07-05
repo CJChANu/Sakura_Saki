@@ -9,7 +9,6 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://sakura-saki-sakura-saki-8f40.h.aivencloud.com:26530/defaultdb?sslMode=REQUIRED}
     username: ${SPRING_DATASOURCE_USERNAME:avnadmin}
     password: ${SPRING_DATASOURCE_PASSWORD:AVNS_dDB2Ptw4NTfc_MUy5CZ}
-    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
@@ -18,3 +17,8 @@ spring:
 
   thymeleaf:
     cache: false
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB

@@ -48,16 +48,39 @@ public class BookingController {
 
     @GetMapping("/booking")
     public String bookingForm(@RequestParam(required = false) Long serviceId,
+                              @RequestParam(required = false) String select,
                               Authentication auth, Model model) {
         model.addAttribute("username", auth.getName());
         model.addAttribute("isLoggedIn", true);
         model.addAttribute("services", salonServiceService.findActive());
         model.addAttribute("packages", packageService.findActive());
         model.addAttribute("staffList", staffService.findActive());
-        if (serviceId != null) {
-            model.addAttribute("selectedServiceId", serviceId);
+        Long selectedServiceId = resolveSelectedServiceId(serviceId, select);
+        if (selectedServiceId != null) {
+            model.addAttribute("selectedServiceId", selectedServiceId);
         }
         return "booking/form";
+    }
+
+    private Long resolveSelectedServiceId(Long serviceId, String select) {
+        if (select == null || select.isBlank()) {
+            return serviceId;
+        }
+        try {
+            if (select.startsWith("SVC_")) {
+                return Long.parseLong(select.substring(4));
+            }
+            if (select.startsWith("PKG_")) {
+                Long packageId = Long.parseLong(select.substring(4));
+                return packageService.findById(packageId)
+                        .flatMap(pkg -> pkg.getServices().stream().findFirst())
+                        .map(com.cjcc.yakalabs.sakurasaki.model.SalonService::getId)
+                        .orElse(serviceId);
+            }
+        } catch (NumberFormatException ignored) {
+            return serviceId;
+        }
+        return serviceId;
     }
 
     /**
@@ -146,9 +169,9 @@ public class BookingController {
     }
 
     @PostMapping("/my-appointments/{id}/cancel")
-    public String cancelAppointment(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String cancelAppointment(@PathVariable Long id, @RequestParam(required = false) String reason, RedirectAttributes redirectAttributes) {
         try {
-            appointmentService.cancelAppointment(id);
+            appointmentService.cancelAppointment(id, reason);
             redirectAttributes.addFlashAttribute("success", "Appointment cancelled.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

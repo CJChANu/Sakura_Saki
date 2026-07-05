@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 
 @Repository
@@ -19,18 +21,22 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     // Find all appointments on a specific date
     List<Appointment> findByAppointmentDate(LocalDate date);
+    Page<Appointment> findByAppointmentDate(LocalDate date, Pageable pageable);
 
     // Find appointments by status
     List<Appointment> findByStatus(String status);
+    Page<Appointment> findByStatus(String status, Pageable pageable);
 
     // Find appointments for a specific customer (ordered by date desc)
     List<Appointment> findByCustomerIdOrderByAppointmentDateDesc(Long customerId);
+    Page<Appointment> findByCustomerIdOrderByAppointmentDateDesc(Long customerId, Pageable pageable);
 
     // Find appointments for a specific customer
     List<Appointment> findByCustomerId(Long customerId);
 
     // Find appointments for a specific staff member
     List<Appointment> findByStaffId(Long staffId);
+    Page<Appointment> findByStaffId(Long staffId, Pageable pageable);
 
     // Find appointments for a staff member on a specific date
     List<Appointment> findByStaffIdAndAppointmentDate(Long staffId, LocalDate date);

@@ -38,17 +38,7 @@
 <canvas id="sakura-canvas"></canvas>
 
 <main style="flex:1;">
-<nav class="public-topnav">
-    <a th:href="@{/}" class="brand">🌸 Sakura Saki</a>
-    <div class="nav-links">
-        <a th:href="@{/services}">Services</a>
-        <a th:href="@{/staff}">Our Team</a>
-        <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn-sakura btn-sakura-primary" style="padding:.5rem 1.25rem;">Sign In</a>
-        <a th:if="${isLoggedIn}" th:href="@{/profile}" class="btn-sakura btn-sakura-outline" style="padding:.5rem 1.25rem;display:flex;align-items:center;gap:.25rem;">
-            <span class="material-symbols-outlined" style="font-size:1.1rem;">person</span> <span th:text="${username}">Profile</span>
-        </a>
-    </div>
-</nav>
+<div th:replace="~{layout/fragments :: topnav('services')}"></div>
 
 <div class="container">
     <a th:href="@{/services}" class="back-link"><span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span> Back to Services</a>
@@ -131,9 +121,7 @@
 </div>
 </main>
 
-<footer class="site-footer">
-    <span>© 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS</span>
-</footer>
+<footer th:replace="~{layout/fragments :: site-footer}"></footer>
 
 <script th:src="@{/js/sakura-petals.js}"></script>
 <script>
