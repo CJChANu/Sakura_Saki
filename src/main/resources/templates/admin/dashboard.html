@@ -11,7 +11,7 @@
     <aside th:replace="~{layout/fragments :: admin-sidebar('dashboard')}"></aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-6 md:p-12 relative z-10 w-full flex flex-col">
+    <main class="flex-1 px-6 pt-6 md:px-12 pt-12 relative z-10 w-full flex flex-col pb-2">
         <!-- Mobile TopAppBar -->
         <header class="md:hidden flex justify-between items-center w-full bg-surface-container-lowest/60 backdrop-blur-xl shadow-sm sticky top-0 z-30 -mt-12 mb-8 -mx-12 px-12 py-4" style="width: calc(100% + 6rem);">
             <div class="flex items-center gap-3">
@@ -184,9 +184,9 @@
             </div>
         </div>
         
+<footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
     </main>
 </div>
-<footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

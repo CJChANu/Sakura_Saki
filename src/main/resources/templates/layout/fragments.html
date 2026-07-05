@@ -274,8 +274,8 @@
                 <a th:if="${isAdmin}" th:href="@{/admin/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Admin Dashboard">dashboard</a>
                 <a th:if="${isStaff}" th:href="@{/staff/dashboard}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="Staff Dashboard">dashboard</a>
                 <a th:if="${isLoggedIn}" th:href="@{/profile}" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer" style="text-decoration:none;" title="My Dashboard">account_circle</a>
-                <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post" class="inline m-0 p-0">
-                   <button type="submit" class="material-symbols-outlined text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer bg-transparent border-none p-0" title="Logout">logout</button>
+                <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post" class="flex items-center justify-center m-0 p-0">
+                   <button type="submit" class="material-symbols-outlined flex items-center justify-center text-rose-400 transition-all duration-400 ease-out hover:scale-105 cursor-pointer bg-transparent border-none p-0" title="Logout">logout</button>
                </form>
             </div>
         </div>
@@ -379,8 +379,24 @@
 </aside>
 
 <!-- ===== FOOTER (Public) ===== -->
-<footer th:fragment="site-footer" class="sakura-site-footer w-full py-3 border-t border-rose-100/50 dark:border-zinc-800/50 mt-auto"
-        style="background:rgba(250,250,249,.92);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);border-top:1px solid rgba(255,183,197,.35);box-shadow:0 -8px 32px rgba(0,0,0,.06);padding:.7rem 0;">
+<footer th:fragment="site-footer" class="sakura-site-footer w-full py-3 border-t border-rose-100/50 dark:border-zinc-800/50 mt-auto relative z-50"
+        style="background:rgba(250,250,249,.92);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);border-top:1px solid rgba(255,183,197,.35);box-shadow:0 -8px 32px rgba(0,0,0,.06);padding:.7rem 0;"
+        x-data="{
+            legalModal: false,
+            legalTab: 'privacy',
+            share() {
+                if (navigator.share) {
+                    navigator.share({ title: 'Sakura Saki | Digital Serenity', url: window.location.href });
+                } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Link copied to clipboard!');
+                }
+            },
+            openLocation() {
+                window.open('https://maps.google.com/?q=Sakura+Saki+Spa+Kyoto+Japan', '_blank');
+            }
+        }">
+    
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-8 gap-4"
          style="max-width:80rem;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
         <div class="flex flex-col items-center md:items-start gap-1" style="display:flex;flex-direction:column;gap:.25rem;">
@@ -388,23 +404,175 @@
             <p class="font-sans text-[10px] uppercase tracking-[0.1em] text-slate-400" style="margin:0;font-family:'Manrope',sans-serif;font-size:.625rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;">© 2024 Sakura Saki Beauty. All rights reserved.</p>
         </div>
         <div class="flex gap-6" style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;">
-            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Privacy</a>
-            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Terms</a>
-            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Contact</a>
-            <a class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100" href="#" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Careers</a>
+            <a @click.prevent="legalModal = true; legalTab = 'privacy'" class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100 cursor-pointer" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Privacy</a>
+            <a @click.prevent="legalModal = true; legalTab = 'terms'" class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100 cursor-pointer" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Terms</a>
+            <a @click.prevent="legalModal = true; legalTab = 'contact'" class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100 cursor-pointer" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Contact</a>
+            <a @click.prevent="legalModal = true; legalTab = 'careers'" class="font-sans text-xs uppercase tracking-[0.1em] text-slate-400 hover:text-rose-500 transition-opacity duration-300 opacity-80 hover:opacity-100 cursor-pointer" style="font-family:'Manrope',sans-serif;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;text-decoration:none;">Careers</a>
         </div>
         <div class="flex gap-4" style="display:flex;gap:1rem;color:#f9a8d4;">
-            <span class="material-symbols-outlined text-rose-300 cursor-pointer hover:text-rose-500 transition-colors" data-icon="share" style="color:#f9a8d4;">share</span>
-            <span class="material-symbols-outlined text-rose-300 cursor-pointer hover:text-rose-500 transition-colors" data-icon="location_on" style="color:#f9a8d4;">location_on</span>
+            <span @click="share()" class="material-symbols-outlined text-rose-300 cursor-pointer hover:text-rose-500 transition-colors" data-icon="share" style="color:#f9a8d4;">share</span>
+            <span @click="openLocation()" class="material-symbols-outlined text-rose-300 cursor-pointer hover:text-rose-500 transition-colors" data-icon="location_on" style="color:#f9a8d4;">location_on</span>
         </div>
     </div>
+
+    <!-- Legal/Info Modal -->
+    <template x-teleport="body">
+        <div x-show="legalModal" class="fixed inset-0 flex items-center justify-center bg-stone-900/40 backdrop-blur-md" style="display: none; z-index: 999999;" x-transition.opacity>
+            <div @click.away="legalModal = false" class="bg-white/90 backdrop-blur-2xl rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-2xl relative border border-rose-100/50 flex flex-col max-h-[80vh]"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-8 scale-95">
+                
+                <button @click="legalModal = false" class="absolute top-4 right-4 material-symbols-outlined text-slate-400 hover:text-rose-600 transition-colors bg-transparent border-none cursor-pointer">close</button>
+                
+                <div class="flex gap-6 border-b border-rose-100/50 pb-4 mb-6 mt-2 overflow-x-auto">
+                    <button @click="legalTab = 'privacy'" :class="legalTab == 'privacy' ? 'text-rose-600 border-b-2 border-rose-600' : 'text-slate-400 border-b-2 border-transparent'" class="uppercase tracking-widest text-xs font-label pb-1 hover:text-rose-600 transition-colors bg-transparent border-t-0 border-l-0 border-r-0 cursor-pointer whitespace-nowrap">Privacy</button>
+                    <button @click="legalTab = 'terms'" :class="legalTab == 'terms' ? 'text-rose-600 border-b-2 border-rose-600' : 'text-slate-400 border-b-2 border-transparent'" class="uppercase tracking-widest text-xs font-label pb-1 hover:text-rose-600 transition-colors bg-transparent border-t-0 border-l-0 border-r-0 cursor-pointer whitespace-nowrap">Terms</button>
+                    <button @click="legalTab = 'contact'" :class="legalTab == 'contact' ? 'text-rose-600 border-b-2 border-rose-600' : 'text-slate-400 border-b-2 border-transparent'" class="uppercase tracking-widest text-xs font-label pb-1 hover:text-rose-600 transition-colors bg-transparent border-t-0 border-l-0 border-r-0 cursor-pointer whitespace-nowrap">Contact</button>
+                    <button @click="legalTab = 'careers'" :class="legalTab == 'careers' ? 'text-rose-600 border-b-2 border-rose-600' : 'text-slate-400 border-b-2 border-transparent'" class="uppercase tracking-widest text-xs font-label pb-1 hover:text-rose-600 transition-colors bg-transparent border-t-0 border-l-0 border-r-0 cursor-pointer whitespace-nowrap">Careers</button>
+                </div>
+                
+                <div class="overflow-y-auto flex-1 pr-4 text-sm text-slate-600 leading-relaxed font-sans text-left pb-4 custom-scrollbar">
+                    
+                    <!-- PRIVACY -->
+                    <div x-show="legalTab == 'privacy'" x-transition.opacity class="space-y-6">
+                        <div class="text-center mb-8">
+                            <span class="material-symbols-outlined text-4xl text-rose-300 mb-2">shield_lock</span>
+                            <h3 class="text-2xl font-headline font-bold text-rose-900">Privacy Policy</h3>
+                            <p class="text-xs font-label uppercase tracking-widest text-slate-400 mt-1">Your Serenity, Protected</p>
+                        </div>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="bg-surface-container-lowest p-5 rounded-2xl border border-rose-50 hover:-translate-y-1 transition-transform">
+                                <h4 class="font-bold text-rose-800 mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-rose-400 text-sm">visibility_off</span> Data Collection</h4>
+                                <p class="text-xs">We collect basic contact and wellness information to personalize your spa experience. Your data is securely stored and never shared with third parties.</p>
+                            </div>
+                            <div class="bg-surface-container-lowest p-5 rounded-2xl border border-rose-50 hover:-translate-y-1 transition-transform">
+                                <h4 class="font-bold text-rose-800 mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-rose-400 text-sm">mail</span> Communications</h4>
+                                <p class="text-xs">We use your email exclusively to send appointment confirmations and curated wellness tips. You can opt out at any time.</p>
+                            </div>
+                            <div class="md:col-span-2 bg-rose-50/50 p-5 rounded-2xl border border-rose-100 flex items-start gap-4">
+                                <span class="material-symbols-outlined text-rose-400">help</span>
+                                <div>
+                                    <h4 class="font-bold text-rose-900 mb-1">Your Rights</h4>
+                                    <p class="text-xs">If you wish to view, update, or delete your personal information, please reach out to our support team directly. We are fully compliant with standard data protection protocols.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TERMS -->
+                    <div x-show="legalTab == 'terms'" x-transition.opacity class="space-y-6">
+                        <div class="text-center mb-8">
+                            <span class="material-symbols-outlined text-4xl text-rose-300 mb-2">gavel</span>
+                            <h3 class="text-2xl font-headline font-bold text-rose-900">Terms of Service</h3>
+                            <p class="text-xs font-label uppercase tracking-widest text-slate-400 mt-1">Guidelines for Tranquility</p>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-4 p-4 rounded-2xl bg-white border border-rose-50 shadow-sm">
+                                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0 text-rose-500 font-bold font-serif">1</div>
+                                <div>
+                                    <h4 class="font-bold text-rose-900 mb-1">Cancellation Policy</h4>
+                                    <p class="text-xs">By booking an appointment, you agree to our 24-hour cancellation policy. Late cancellations may incur a fee equivalent to 50% of the service cost.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4 p-4 rounded-2xl bg-white border border-rose-50 shadow-sm">
+                                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0 text-rose-500 font-bold font-serif">2</div>
+                                <div>
+                                    <h4 class="font-bold text-rose-900 mb-1">Spa Etiquette</h4>
+                                    <p class="text-xs">We strive to provide a tranquil environment. We kindly ask guests to arrive 10 minutes prior to their appointment and to silence their mobile devices upon entering.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4 p-4 rounded-2xl bg-white border border-rose-50 shadow-sm">
+                                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0 text-rose-500 font-bold font-serif">3</div>
+                                <div>
+                                    <h4 class="font-bold text-rose-900 mb-1">Refunds & Transfers</h4>
+                                    <p class="text-xs">All service purchases and gift cards are non-refundable but can be transferred to another individual with prior notice.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONTACT -->
+                    <div x-show="legalTab == 'contact'" x-transition.opacity class="space-y-6">
+                        <div class="text-center mb-8">
+                            <span class="material-symbols-outlined text-4xl text-rose-300 mb-2">location_on</span>
+                            <h3 class="text-2xl font-headline font-bold text-rose-900">Contact Us</h3>
+                            <p class="text-xs font-label uppercase tracking-widest text-slate-400 mt-1">We'd love to hear from you</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-surface-container-lowest p-6 rounded-3xl border border-rose-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                                <span class="material-symbols-outlined text-rose-400 text-3xl mb-3">map</span>
+                                <p class="text-xs uppercase tracking-widest font-label text-slate-400 mb-2">Sanctuary Address</p>
+                                <p class="text-rose-900 font-medium text-sm">123 Blossom Avenue<br>Serenity District<br>Kyoto, Japan</p>
+                            </div>
+                            <div class="bg-surface-container-lowest p-6 rounded-3xl border border-rose-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                                <span class="material-symbols-outlined text-rose-400 text-3xl mb-3">call</span>
+                                <p class="text-xs uppercase tracking-widest font-label text-slate-400 mb-2">Get in Touch</p>
+                                <p class="text-rose-900 font-medium text-sm mb-1">+81 75-123-4567</p>
+                                <p class="text-rose-900 font-medium text-sm">hello@sakurasaki.com</p>
+                            </div>
+                            <div class="md:col-span-2 bg-gradient-to-r from-rose-50 to-primary-container/30 p-6 rounded-3xl border border-rose-100 flex flex-col items-center text-center">
+                                <span class="material-symbols-outlined text-primary text-3xl mb-3">schedule</span>
+                                <p class="text-xs uppercase tracking-widest font-label text-primary mb-2">Hours of Operation</p>
+                                <p class="text-rose-900 font-medium">Monday – Sunday: 9:00 AM - 8:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CAREERS -->
+                    <div x-show="legalTab == 'careers'" x-transition.opacity class="space-y-6">
+                        <div class="text-center mb-8">
+                            <span class="material-symbols-outlined text-4xl text-rose-300 mb-2">spa</span>
+                            <h3 class="text-2xl font-headline font-bold text-rose-900">Careers</h3>
+                            <p class="text-xs font-label uppercase tracking-widest text-slate-400 mt-1">Join Our Wellness Family</p>
+                        </div>
+                        <div class="bg-white border border-rose-100 rounded-3xl overflow-hidden shadow-sm">
+                            <div class="bg-rose-50 p-6 border-b border-rose-100">
+                                <p class="text-sm font-medium text-rose-900 leading-relaxed text-center">We are currently looking for experienced massage therapists, estheticians, and front desk concierges who are passionate about holistic health.</p>
+                            </div>
+                            <div class="p-6 grid gap-4 md:grid-cols-2 bg-surface-container-lowest">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-rose-400">payments</span>
+                                    <span class="text-xs font-medium text-rose-900">Competitive Pay</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-rose-400">school</span>
+                                    <span class="text-xs font-medium text-rose-900">Education Fund</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-rose-400">self_improvement</span>
+                                    <span class="text-xs font-medium text-rose-900">Peaceful Space</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-rose-400">favorite</span>
+                                    <span class="text-xs font-medium text-rose-900">Health Benefits</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-6 pb-2">
+                            <a href="mailto:careers@sakurasaki.com" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-label text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-md" style="text-decoration:none;">
+                                <span class="material-symbols-outlined text-sm">send</span> Apply Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
 </footer>
 
 <!-- ===== DASHBOARD FOOTER ===== -->
-<footer th:fragment="dashboard-footer" class="w-full py-5 px-8 md:pl-[calc(18rem+2rem)] text-center border-t border-rose-100/20 relative z-10 shrink-0"
-        style="background:rgba(255,255,255,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">
-    <span class="font-sans text-[0.65rem] uppercase tracking-[0.12em] text-slate-400">© 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS</span>
-</footer>
+<div th:fragment="dashboard-footer" class="mt-auto pt-8 pb-4 w-full px-4">
+    <footer class="w-full py-5 px-8 text-center border border-rose-100/20 rounded-2xl relative z-10 shrink-0"
+            style="background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px);">
+        <p class="font-label text-xs tracking-widest uppercase text-slate-400 font-medium">
+            © 2024 SAKURA SAKI BEAUTY &amp; WELLNESS. ALL RIGHTS RESERVED. · DEVELOPED BY CJCC &amp; YAKA LABS
+        </p>
+    </footer>
+</div>
 
 <!-- ===== MINIMAL FOOTER (NO SIDEBAR) ===== -->
 <footer th:fragment="minimal-footer" class="w-full py-5 px-8 text-center border-t border-rose-100/20 relative z-10 shrink-0"

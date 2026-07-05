@@ -11,7 +11,7 @@
 <div class="flex min-h-screen w-full relative z-10 md:pl-72">
     <aside th:replace="~{layout/fragments :: staff-sidebar('calendar')}"></aside>
 
-    <main class="flex-1 p-6 md:p-10 lg:p-14 relative flex flex-col">
+    <main class="flex-1 px-6 pt-6 md:px-10 pt-10 lg:px-14 pt-14 relative flex flex-col pb-2">
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <div>
                 <h2 class="font-headline text-3xl md:text-4xl text-tertiary tracking-tight font-bold">My Calendar</h2>
@@ -61,10 +61,10 @@
         </div>
 
         
+<footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
     </main>
 </div>
 
-<footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
 
 <th:block th:replace="~{layout/fragments :: sakura-js}" />
 

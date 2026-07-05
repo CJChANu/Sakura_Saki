@@ -20,15 +20,18 @@ public class AppointmentService {
     private final CustomerRepository customerRepo;
     private final SalonServiceRepository serviceRepo;
     private final StaffRepository staffRepo;
+    private final CustomerService customerService;
 
     public AppointmentService(AppointmentRepository appointmentRepo,
                               CustomerRepository customerRepo,
                               SalonServiceRepository serviceRepo,
-                              StaffRepository staffRepo) {
+                              StaffRepository staffRepo,
+                              CustomerService customerService) {
         this.appointmentRepo = appointmentRepo;
         this.customerRepo = customerRepo;
         this.serviceRepo = serviceRepo;
         this.staffRepo = staffRepo;
+        this.customerService = customerService;
     }
 
     /**
@@ -192,7 +195,15 @@ public class AppointmentService {
     public Appointment changeStatus(Long id, String newStatus) {
         Appointment a = appointmentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        
+        String oldStatus = a.getStatus();
         a.setStatus(newStatus);
+        
+        if ("COMPLETED".equals(newStatus) && !"COMPLETED".equals(oldStatus)) {
+            int pointsEarned = (int) (a.getService().getPrice() / 10.0);
+            customerService.addLoyaltyPoints(a.getCustomer(), pointsEarned);
+        }
+        
         return appointmentRepo.save(a);
     }
 

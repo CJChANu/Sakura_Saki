@@ -7,7 +7,7 @@
 <div class="flex min-h-screen w-full relative z-10 md:pl-72">
     <aside th:replace="~{layout/fragments :: customer-sidebar('settings')}"></aside>
 
-    <main class="flex-1 pt-12 px-12 relative flex flex-col">
+    <main class="flex-1 pt-12 px-12 relative flex flex-col pb-2">
         <!-- Header -->
         <header class="mb-12">
             <span class="text-primary font-label text-xs font-extrabold tracking-[0.2em] uppercase block mb-2">Account</span>
@@ -108,10 +108,10 @@
         </div>
 
         
+<footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
     </main>
 </div>
 
-<footer th:replace="~{layout/fragments :: dashboard-footer}"></footer>
 
 <th:block th:replace="~{layout/fragments :: sakura-js}" />
 </body>

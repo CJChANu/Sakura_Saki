@@ -35,6 +35,7 @@ public class CustomerDashboardController {
     private final PasswordEncoder passwordEncoder;
     private final AppointmentRepository appointmentRepo;
     private final ReviewRepository reviewRepo;
+    private final com.cjcc.yakalabs.sakurasaki.repository.RedeemedRewardRepository rewardRepo;
 
     public CustomerDashboardController(UserRepository userRepo,
                                         CustomerRepository customerRepo,
@@ -42,7 +43,8 @@ public class CustomerDashboardController {
                                         CustomerService customerService,
                                         PasswordEncoder passwordEncoder,
                                         AppointmentRepository appointmentRepo,
-                                        ReviewRepository reviewRepo) {
+                                        ReviewRepository reviewRepo,
+                                        com.cjcc.yakalabs.sakurasaki.repository.RedeemedRewardRepository rewardRepo) {
         this.userRepo = userRepo;
         this.customerRepo = customerRepo;
         this.appointmentService = appointmentService;
@@ -50,6 +52,7 @@ public class CustomerDashboardController {
         this.passwordEncoder = passwordEncoder;
         this.appointmentRepo = appointmentRepo;
         this.reviewRepo = reviewRepo;
+        this.rewardRepo = rewardRepo;
     }
 
     private Customer getCustomer(Authentication auth) {
@@ -103,6 +106,14 @@ public class CustomerDashboardController {
             org.springframework.data.domain.Page<Appointment> appointments = appointmentService.findByCustomer(customer.getId(), pageable);
             model.addAttribute("appointments", appointments);
 
+            // Get ALL scheduled appointments for the calendar, regardless of pagination
+            List<Appointment> allAppointments = appointmentService.findByCustomer(customer.getId());
+            List<String> upcomingDates = allAppointments.stream()
+                    .filter(a -> "SCHEDULED".equals(a.getStatus()))
+                    .map(a -> a.getAppointmentDate().toString())
+                    .toList();
+            model.addAttribute("allUpcomingAppointments", upcomingDates);
+
             // Collect IDs of appointments that already have a review
             Set<Long> reviewedIds = appointments.getContent().stream()
                     .filter(a -> "COMPLETED".equals(a.getStatus()))
@@ -124,9 +135,50 @@ public class CustomerDashboardController {
         if (customer != null) {
             long completedCount = appointmentService.countCompletedForCustomer(customer.getId());
             model.addAttribute("completedCount", completedCount);
+
+            List<com.cjcc.yakalabs.sakurasaki.model.RedeemedReward> vouchers = 
+                rewardRepo.findByCustomerIdOrderByRedeemedDateDesc(customer.getId()).stream()
+                .filter(v -> !v.isUsed())
+                .collect(Collectors.toList());
+            model.addAttribute("vouchers", vouchers);
         }
 
         return "customer/loyalty";
+    }
+
+    @PostMapping("/loyalty/redeem")
+    public String redeemLoyaltyPoints(@RequestParam("reward") String reward, 
+                                      @RequestParam("points") int points, 
+                                      Authentication auth, 
+                                      RedirectAttributes redirectAttributes) {
+        Customer customer = getCustomer(auth);
+        if (customer != null) {
+            try {
+                customerService.redeemPoints(customer, points, reward);
+                redirectAttributes.addFlashAttribute("success", "Reward redeemed successfully: " + reward + ". Your voucher is now active.");
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("error", e.getMessage());
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Customer profile not found.");
+        }
+        return "redirect:/customer/loyalty";
+    }
+
+    @PostMapping("/loyalty/use-voucher")
+    public String useVoucher(@RequestParam("voucherId") Long voucherId, 
+                             @RequestParam("staffCode") String staffCode,
+                             Authentication auth, RedirectAttributes redirectAttributes) {
+        try {
+            if (!"8888".equals(staffCode)) {
+                throw new RuntimeException("Invalid Staff PIN.");
+            }
+            customerService.markRewardAsUsed(voucherId);
+            redirectAttributes.addFlashAttribute("success", "Voucher marked as used successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/customer/loyalty";
     }
 
     @GetMapping("/rituals")
