@@ -54,3 +54,25 @@ scratch_stitch
 *.log
 run.log
 run_error.log
+### Local environment / secrets ###
+.env
+.env.*
+*.env
+src/main/resources/application-local.yml
+
+### Runtime uploads / generated media ###
+/uploads/
+/src/main/resources/static/videos/
+
+### Legacy sample exports / scratch UI ###
+calendar_stitch.html
+stitch_admin.html
+services_page.html
+scratch_stitch/
+src/main/resources/UI/
+
+### Legacy file-based data stores ###
+src/main/resources/data/*.txt
+
+### Local cookies ###
+cookies.txt
