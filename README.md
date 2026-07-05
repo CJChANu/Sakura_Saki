@@ -19,7 +19,7 @@ Sakura Saki is a comprehensive and elegantly designed Salon & Spa Management Sys
 
 ## 🛠️ Tech Stack
 
-- **Backend Framework**: Java 21, Spring Boot 3
+- **Backend Framework**: Java 21, Spring Boot 4
 - **Web Layer**: Spring Web MVC
 - **Security**: Spring Security
 - **Templating**: Thymeleaf (with Spring Security integration)
@@ -94,8 +94,7 @@ A `Dockerfile` is provided for easy containerization.
 ## 🧪 API & Testing
 
 - Postman collections are included in the repository for API testing:
-  - `Sakura_Saki_Postman_Collection.json`
-  - `sakura_saki_admin_api.postman_collection.json`
+  - `docs/postman/Sakura_Saki_Postman_Collection.json`
 - Import these into Postman to explore and test the available REST endpoints.
 
 ## 🤝 Contributing
