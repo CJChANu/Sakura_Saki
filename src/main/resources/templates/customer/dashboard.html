@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head th:replace="~{layout/fragments :: head('Sakura Saki - Customer Portal')}"></head>
-<body class="bg-surface text-on-surface ">
+<body class="bg-surface text-on-surface" x-data="actionSystem">
 <th:block th:replace="~{layout/fragments :: sakura-canvas}" />
 
 <div class="flex min-h-screen w-full relative z-10 md:pl-72">
@@ -109,11 +109,8 @@
                         <span class="font-label text-xs uppercase tracking-widest text-primary mb-2 block">Routine Progress</span>
                         <h3 class="text-2xl font-headline text-on-surface font-bold">Hydration Consistency</h3>
                     </div>
-                    <div class="flex gap-2">
-                        <span class="px-4 py-2 rounded-full bg-surface-container text-xs font-bold text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">Weekly</span>
-                        <span class="px-4 py-2 rounded-full bg-primary text-white text-xs font-bold cursor-pointer hover:opacity-90 transition-opacity">Monthly</span>
-                    </div>
                 </div>
+                
                 <div class="flex items-end justify-between h-48 gap-4 px-1">
                     <div class="flex flex-col items-center gap-3 w-full">
                         <div class="w-full max-w-[40px] mx-auto bg-primary-container/40 rounded-full h-24 relative overflow-hidden"><div class="absolute bottom-0 w-full bg-primary h-12 rounded-b-full"></div></div>
@@ -144,6 +141,7 @@
                         <span class="text-[10px] text-outline font-bold uppercase tracking-tighter">S</span>
                     </div>
                 </div>
+                
                 <p class="text-sm text-on-surface-variant mt-10 text-center">You're on a 3-day streak. Keep glowing!</p>
             </section>
 
@@ -160,9 +158,13 @@
                         </div>
                         <div class="flex-grow min-w-0">
                             <h4 class="font-medium text-tertiary text-sm truncate" th:text="${appt.service != null ? appt.service.name : 'Service'}">Deep Tissue Massage</h4>
-                            <p class="text-xs text-on-surface-variant" th:text="${appt.appointmentDate}">Oct 12, 2023</p>
+                            <p class="text-xs text-on-surface-variant mt-1" th:text="${appt.appointmentDate}">Oct 12, 2023</p>
                         </div>
-                        <span class="text-sm font-medium text-tertiary" th:text="${appt.status}">Completed</span>
+                        
+                        <div class="shrink-0 flex items-center">
+                            <span th:if="${appt.status == 'COMPLETED'}" class="text-[10px] uppercase font-bold text-tertiary bg-surface-container px-2 py-0.5 rounded-full">Completed</span>
+                            <span th:if="${appt.status != 'COMPLETED'}" class="text-[10px] uppercase font-bold text-tertiary bg-surface-container px-2 py-0.5 rounded-full" th:text="${appt.status}">Completed</span>
+                        </div>
                     </div>
                     <div th:if="${#lists.isEmpty(recentHistory)}" class="text-center py-8 text-on-surface-variant text-sm">
                         No appointment history yet.
@@ -185,7 +187,7 @@
                     <p class="text-xs text-on-surface-variant">Treatments matched to your routine.</p>
                 </div>
             </a>
-            <a th:href="@{/booking}" class="md:col-span-4 self-start min-h-[120px] bg-white rounded-lg p-6 clay-lift flex items-center gap-5 hover:-translate-y-1 transition-all" style="text-decoration:none;">
+            <a th:href="${recentHistory != null && !recentHistory.isEmpty() && recentHistory[0].service != null ? ((recentHistory[0].status == 'CANCELLED' || recentHistory[0].status == 'EXPIRED') ? '/booking?serviceId=' + recentHistory[0].service.id + '&amp;rescheduleId=' + recentHistory[0].id : '/booking?serviceId=' + recentHistory[0].service.id) : '/booking'}" class="md:col-span-4 self-start min-h-[120px] bg-white rounded-lg p-6 clay-lift flex items-center gap-5 hover:-translate-y-1 transition-all" style="text-decoration:none;">
                 <span class="w-12 h-12 rounded-full bg-primary-container/40 flex items-center justify-center material-symbols-outlined text-primary">event_available</span>
                 <div>
                     <p class="font-headline text-lg font-bold text-on-surface">Book Again</p>
@@ -200,5 +202,9 @@
 
 
 <th:block th:replace="~{layout/fragments :: sakura-js}" />
+
+<div th:replace="~{layout/fragments :: review-modal}"></div>
+<div th:replace="~{layout/fragments :: cancel-modal}"></div>
+
 </body>
 </html>

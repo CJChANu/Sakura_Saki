@@ -3,7 +3,7 @@
 <head th:replace="~{layout/fragments :: head('My Bookings — Sakura Saki')}">
     <!-- Required styling injected in the layout but we can ensure clay-card exists in a style block -->
 </head>
-<body class="antialiased min-h-screen bg-gradient-to-br from-surface to-secondary-container/30 flex text-on-surface">
+<body class="antialiased min-h-screen bg-gradient-to-br from-surface to-secondary-container/30 flex text-on-surface" x-data="actionSystem">
 
 <th:block th:replace="~{layout/fragments :: sakura-canvas}" />
 <div id="sidebar-overlay" class="fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-40 hidden md:hidden"></div>
@@ -46,6 +46,9 @@
                 <span class="font-label text-primary uppercase tracking-widest text-sm font-semibold">Your Journey</span>
                 <h2 class="font-headline text-4xl md:text-5xl font-bold text-tertiary tracking-tight">My Bookings</h2>
             </section>
+            
+            <div th:if="${success}" class="mb-8 p-4 bg-green-100 text-green-800 rounded-xl text-center font-medium font-body" th:text="${success}"></div>
+            <div th:if="${error}" class="mb-8 p-4 bg-red-100 text-red-800 rounded-xl text-center font-medium font-body" th:text="${error}"></div>
 
             <!-- Bento Grid Layout -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -56,7 +59,7 @@
                         <h3 class="font-headline text-2xl text-on-surface">Upcoming Rituals</h3>
                     </div>
                     
-                    <div th:if="${#lists.isEmpty(appointments.content.?[status == 'SCHEDULED'])}" class="clay-card p-12 text-center flex flex-col items-center">
+                    <div th:if="${upcomingAppointments.empty}" class="clay-card p-12 text-center flex flex-col items-center">
                         <span class="material-symbols-outlined text-5xl text-outline-variant mb-4">event_busy</span>
                         <h4 class="font-headline text-xl font-bold text-tertiary mb-2">No upcoming rituals</h4>
                         <p class="text-sm text-on-surface-variant mb-6">Schedule your next wellness session today.</p>
@@ -64,7 +67,7 @@
                     </div>
 
                     <!-- Dynamic Upcoming Cards -->
-                    <th:block th:each="appt : ${appointments.content}" th:if="${appt.status == 'SCHEDULED'}">
+                    <th:block th:each="appt : ${upcomingAppointments.content}">
                         <div class="clay-card p-6 flex flex-col sm:flex-row gap-6 relative group overflow-hidden">
                             <!-- Decorative background glow -->
                             <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary-container/30 rounded-full blur-3xl group-hover:bg-primary-container/50 transition-colors duration-700"></div>
@@ -99,18 +102,19 @@
                                 
                                 <!-- Actions -->
                                 <div class="flex items-center gap-6 mt-6 pt-4 border-t border-outline-variant/20">
-                                    <a th:href="@{/booking(serviceId=${appt.service != null ? appt.service.id : ''})}" class="font-label uppercase text-xs tracking-wider text-primary hover:text-primary-fixed transition-colors duration-400 flex items-center" style="text-decoration:none;">
+                                    <a th:href="@{/booking(serviceId=${appt.service != null ? appt.service.id : ''}, rescheduleId=${appt.id})}" class="font-label uppercase text-xs tracking-wider text-primary hover:text-primary-fixed transition-colors duration-400 flex items-center" style="text-decoration:none;">
                                         Reschedule
                                     </a>
-                                    <form th:action="@{/my-appointments/{id}/cancel(id=${appt.id})}" method="post" class="flex items-center m-0" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
-                                        <button type="submit" class="font-label uppercase text-xs tracking-wider text-outline hover:text-error transition-colors duration-400 bg-transparent border-none cursor-pointer p-0 m-0">
-                                            Cancel
-                                        </button>
-                                    </form>
+                                    <button th:data-appt-id="${appt.id}" @click="openCancelModal($el.dataset.apptId)" class="font-label uppercase text-xs tracking-wider text-outline hover:text-error transition-colors duration-400 bg-transparent border-none cursor-pointer p-0 m-0">
+                                        Cancel
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </th:block>
+                    
+                    <!-- Upcoming Pagination -->
+                    <th:block th:replace="~{layout/fragments :: multi-pagination(page=${upcomingAppointments}, url='/customer/bookings', prefix='upcoming', otherPrefix='past', otherPage=${pastAppointments.number}, otherSize=${pastAppointments.size})}" />
                 </div>
                 
                 <!-- Side Column: Calendar & Past -->
@@ -159,48 +163,63 @@
                         <h3 class="font-headline text-lg text-on-surface mb-4">Past Rituals</h3>
                         <div class="flex flex-col gap-3">
                             
-                            <div th:if="${#lists.isEmpty(appointments.content.?[status != 'SCHEDULED'])}" class="text-center py-6">
+                            <div th:if="${pastAppointments.empty}" class="text-center py-6">
                                 <p class="text-sm text-on-surface-variant">No past history yet.</p>
                             </div>
 
-                            <th:block th:each="appt, iterStat : ${appointments.content}" th:if="${appt.status != 'SCHEDULED'}">
+                            <th:block th:each="appt : ${pastAppointments.content}">
                                 <div class="bg-surface-container-lowest/80 rounded-2xl p-4 flex gap-4 items-center shadow-sm">
                                     <div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0">
                                         <span class="material-symbols-outlined" th:text="${appt.status == 'CANCELLED' ? 'cancel' : 'self_care'}">self_care</span>
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <h4 class="font-headline text-sm font-semibold text-on-surface truncate" th:text="${appt.service != null ? appt.service.name : 'Service'}">Deep Tissue Harmony</h4>
-                                        <p class="font-body text-xs text-outline mb-1" th:text="${appt.appointmentDate}">Sept 12, 2023</p>
-                                        
+                                        <div class="flex flex-col gap-1 mt-1 items-start">
+                                            <p class="font-body text-xs text-outline" th:text="${appt.appointmentDate}">Sept 12, 2023</p>
+                                            <span th:if="${appt.status == 'CANCELLED'}" class="text-[10px] uppercase font-bold text-error bg-error/10 px-2 py-0.5 rounded-full inline-block mt-0.5">Cancelled</span>
+                                            <span th:if="${appt.status == 'EXPIRED'}" class="text-[10px] uppercase font-bold text-error bg-error/10 px-2 py-0.5 rounded-full inline-block mt-0.5">Expired</span>
+                                            <span th:if="${appt.status == 'COMPLETED'}" class="text-[10px] uppercase font-bold text-tertiary bg-surface-container px-2 py-0.5 rounded-full inline-block mt-0.5">Completed</span>
+                                            <span th:if="${appt.status != 'CANCELLED' && appt.status != 'COMPLETED' && appt.status != 'EXPIRED'}" class="text-[10px] uppercase font-bold text-tertiary bg-surface-container px-2 py-0.5 rounded-full inline-block mt-0.5" th:text="${appt.status}">Completed</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="shrink-0 flex items-center gap-2">
                                         <!-- Review state -->
-                                        <div class="flex text-primary" th:if="${appt.status == 'COMPLETED' && reviewedIds != null && reviewedIds.contains(appt.id)}">
+                                        <div class="flex text-primary cursor-pointer hover:opacity-80 transition-opacity" 
+                                             th:if="${appt.status == 'COMPLETED' && reviewedIds != null && #sets.contains(reviewedIds, appt.id)}"
+                                             th:data-appt-id="${appt.id}"
+                                             th:data-rating="${reviewsMap.get(appt.id).rating}"
+                                             th:data-comment="${reviewsMap.get(appt.id).comment != null ? reviewsMap.get(appt.id).comment : ''}"
+                                             @click="openReviewModal($el.dataset.apptId, $el.dataset.rating, $el.dataset.comment)"
+                                             title="Edit Review">
                                             <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
                                             <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
                                             <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
                                             <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
                                             <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
                                         </div>
-                                        <span th:if="${appt.status == 'CANCELLED'}" class="text-[10px] uppercase font-bold text-error">Cancelled</span>
+                                        
+                                        <button th:if="${appt.status == 'COMPLETED' && reviewedIds != null && !#sets.contains(reviewedIds, appt.id)}"
+                                           th:data-appt-id="${appt.id}"
+                                           @click="openReviewModal($el.dataset.apptId, 0, '')"
+                                           title="Leave Review"
+                                           class="text-amber-600 hover:bg-amber-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-400">
+                                            <span class="material-symbols-outlined text-sm">rate_review</span>
+                                        </button>
+                                        
+                                        <a th:if="${appt.service != null}" th:href="${(appt.status == 'CANCELLED' || appt.status == 'EXPIRED') ? '/booking?serviceId=' + appt.service.id + '&rescheduleId=' + appt.id : '/booking?serviceId=' + appt.service.id}" title="Book Again" class="text-primary hover:bg-primary-container w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-400">
+                                            <span class="material-symbols-outlined text-sm">refresh</span>
+                                        </a>
                                     </div>
-                                    
-                                    <a th:if="${appt.status == 'COMPLETED' && reviewedIds != null && !reviewedIds.contains(appt.id)}"
-                                       th:href="@{/reviews/submit/{id}(id=${appt.id})}"
-                                       title="Leave Review"
-                                       class="text-amber-600 hover:bg-amber-100 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-400">
-                                        <span class="material-symbols-outlined text-sm">rate_review</span>
-                                    </a>
-                                    
-                                    <a th:href="@{/booking}" title="Book Again" class="text-primary hover:bg-primary-container w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-400">
-                                        <span class="material-symbols-outlined text-sm">refresh</span>
-                                    </a>
                                 </div>
                             </th:block>
+                            
+                            <!-- Past Pagination -->
+                            <th:block th:replace="~{layout/fragments :: multi-pagination(page=${pastAppointments}, url='/customer/bookings', prefix='past', otherPrefix='upcoming', otherPage=${upcomingAppointments.number}, otherSize=${upcomingAppointments.size})}" />
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <th:block th:replace="~{layout/fragments :: pagination-controls(page=${appointments}, url='/customer/bookings')}" />
             
             <div class="h-12 md:hidden"></div>
         </div>
@@ -212,6 +231,9 @@
 
 
 <th:block th:replace="~{layout/fragments :: sakura-js}" />
+
+<div th:replace="~{layout/fragments :: review-modal}"></div>
+<div th:replace="~{layout/fragments :: cancel-modal}"></div>
 
 <script th:inline="javascript">
     /*<![CDATA[*/

@@ -49,6 +49,7 @@ public class BookingController {
     @GetMapping("/booking")
     public String bookingForm(@RequestParam(required = false) Long serviceId,
                               @RequestParam(required = false) String select,
+                              @RequestParam(required = false) Long rescheduleId,
                               Authentication auth, Model model) {
         model.addAttribute("username", auth.getName());
         model.addAttribute("isLoggedIn", true);
@@ -58,6 +59,9 @@ public class BookingController {
         Long selectedServiceId = resolveSelectedServiceId(serviceId, select);
         if (selectedServiceId != null) {
             model.addAttribute("selectedServiceId", selectedServiceId);
+        }
+        if (rescheduleId != null) {
+            model.addAttribute("rescheduleId", rescheduleId);
         }
         return "booking/form";
     }
@@ -91,13 +95,14 @@ public class BookingController {
     public ResponseEntity<List<Map<String, Object>>> getAvailableStaff(
             @RequestParam String date,
             @RequestParam String time,
-            @RequestParam(required = false, defaultValue = "60") int durationMinutes) {
+            @RequestParam(required = false, defaultValue = "60") int durationMinutes,
+            @RequestParam(required = false) Long excludeAppointmentId) {
         LocalDate d = LocalDate.parse(date);
         LocalTime t = LocalTime.parse(time);
 
         List<Staff> allStaff = staffService.findActive();
         List<Map<String, Object>> available = allStaff.stream()
-                .filter(s -> appointmentService.isStaffAvailable(s.getId(), d, t, durationMinutes))
+                .filter(s -> appointmentService.isStaffAvailable(s.getId(), d, t, durationMinutes, excludeAppointmentId))
                 .map(s -> {
                     Map<String, Object> m = new HashMap<>();
                     m.put("id", s.getId());
@@ -117,6 +122,7 @@ public class BookingController {
                                 @RequestParam String date,
                                 @RequestParam String time,
                                 @RequestParam(required = false) String notes,
+                                @RequestParam(required = false) Long rescheduleId,
                                 @RequestParam(required = false) String returnTo,
                                 Authentication auth,
                                 RedirectAttributes redirectAttributes) {
@@ -135,9 +141,14 @@ public class BookingController {
             LocalDate appointmentDate = LocalDate.parse(date);
             LocalTime appointmentTime = LocalTime.parse(time);
 
-            appointmentService.createAppointment(customer.getId(), serviceId, staffId,
-                    appointmentDate, appointmentTime, notes);
-            redirectAttributes.addFlashAttribute("success", "Appointment booked successfully!");
+            if (rescheduleId != null) {
+                appointmentService.reschedule(rescheduleId, staffId, appointmentDate, appointmentTime, notes);
+                redirectAttributes.addFlashAttribute("success", "Appointment rescheduled successfully!");
+            } else {
+                appointmentService.createAppointment(customer.getId(), serviceId, staffId,
+                        appointmentDate, appointmentTime, notes);
+                redirectAttributes.addFlashAttribute("success", "Appointment booked successfully!");
+            }
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             if (returnTo != null && !returnTo.isBlank()) {
@@ -176,6 +187,6 @@ public class BookingController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/my-appointments";
+        return "redirect:/customer/bookings";
     }
 }
