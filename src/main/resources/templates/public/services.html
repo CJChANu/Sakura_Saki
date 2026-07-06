@@ -147,7 +147,7 @@
                     
                     <div>
                         <div class="flex items-center justify-between mb-6">
-                            <span th:classappend="${stat.index % 5 == 0} ? 'text-2xl font-serif text-primary' : 'text-lg font-serif text-primary'" th:text="'Rs.' + ${#numbers.formatDecimal(s.price,1,2)}">Price</span>
+                            <span th:classappend="${stat.index % 5 == 0} ? 'text-2xl font-serif text-primary' : 'text-lg font-serif text-primary'" th:text="'$' + ${#numbers.formatDecimal(s.price,1,2)}">Price</span>
                             <span class="text-xs text-tertiary uppercase" th:text="${s.durationMinutes} + ' min'">Duration</span>
                         </div>
                         
@@ -174,8 +174,8 @@
                 <h2 class="font-headline text-4xl md:text-5xl text-on-surface font-bold mb-6 leading-tight" th:text="${pkg.name}">The Blooming Autumn Retreat</h2>
                 <p class="text-on-primary-container/80 text-lg mb-10 leading-relaxed" th:text="${pkg.description}">Description</p>
                 <div class="flex gap-4 items-center">
-                    <span class="font-headline text-3xl text-primary font-bold" th:text="'Rs.' + ${#numbers.formatDecimal(pkg.getDiscountedPrice(),1,2)}">Price</span>
-                    <span class="text-outline line-through text-sm" th:text="'Rs.' + ${#numbers.formatDecimal(pkg.getTotalPrice(),1,2)}">Orig Price</span>
+                    <span class="font-headline text-3xl text-primary font-bold" th:text="'$' + ${#numbers.formatDecimal(pkg.getDiscountedPrice(),1,2)}">Price</span>
+                    <span class="text-outline line-through text-sm" th:text="'$' + ${#numbers.formatDecimal(pkg.getTotalPrice(),1,2)}">Orig Price</span>
                 </div>
                 <div class="flex gap-4 mt-8">
                     <a th:href="@{'/services/package/' + ${pkg.id}}" class="px-10 py-4 rounded-full bg-primary text-white font-label text-sm uppercase tracking-widest clay-shadow hover:scale-105 transition-all duration-400 text-center inline-block" style="text-decoration:none;">Learn More</a>

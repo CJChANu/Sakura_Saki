@@ -55,12 +55,12 @@
                             <td class="py-4 max-w-xs truncate">
                                 <span class="font-body text-xs text-on-surface-variant" th:each="s,it : ${p.services}" th:text="${s.name + (it.last ? '' : ', ')}">svc</span>
                             </td>
-                            <td class="py-4 text-right font-body text-sm text-outline line-through decoration-outline/50" th:text="'Rs. ' + ${#numbers.formatDecimal(p.totalPrice,1,2)}">Rs.</td>
+                            <td class="py-4 text-right font-body text-sm text-outline line-through decoration-outline/50" th:text="'$' + ${#numbers.formatDecimal(p.totalPrice,1,2)}">$</td>
                             <td class="py-4 text-right">
                                 <span class="px-2 py-1 bg-primary-container/50 text-primary-fixed-variant rounded font-label text-[10px] font-bold" th:text="${p.discountPercent} + '%'">10%</span>
                             </td>
                             <td class="py-4 text-right">
-                                <p class="font-body font-bold text-sm text-primary" th:text="'Rs. ' + ${#numbers.formatDecimal(p.discountedPrice,1,2)}">Rs.</p>
+                                <p class="font-body font-bold text-sm text-primary" th:text="'$' + ${#numbers.formatDecimal(p.discountedPrice,1,2)}">$</p>
                             </td>
                             <td class="py-4 font-body text-sm text-on-surface-variant" th:text="${p.totalDuration} + ' min'">min</td>
                             <td class="py-4">
@@ -128,7 +128,7 @@
                     <div class="h-48 overflow-y-auto bg-surface-container-high rounded-xl p-4 shadow-inner space-y-2 border border-outline-variant/10">
                         <label th:each="s : ${allServices}" class="flex items-center gap-3 p-2 hover:bg-surface-container-highest rounded-lg cursor-pointer transition-colors">
                             <input type="checkbox" name="serviceIds" th:value="${s.id}" th:checked="${prevServiceIds != null and #lists.contains(prevServiceIds, s.id)}" class="text-primary focus:ring-primary border-outline-variant rounded">
-                            <span class="font-body text-sm text-on-surface" th:text="${s.name + ' (Rs. ' + #numbers.formatDecimal(s.price,1,2) + ')'}">Service</span>
+                            <span class="font-body text-sm text-on-surface" th:text="${s.name + ' ($' + #numbers.formatDecimal(s.price,1,2) + ')'}">Service</span>
                         </label>
                     </div>
                 </div>
@@ -168,7 +168,7 @@
                     <div>
                         <label class="block font-label text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Select Services</label>
                         <select name="serviceIds" class="w-full px-4 py-3 rounded-xl bg-surface-container-high border-none font-body text-sm text-on-surface focus:ring-2 focus:ring-primary/30 shadow-inner" multiple style="min-height:120px;">
-                            <option th:each="s : ${allServices}" th:value="${s.id}" th:text="${s.name + ' — Rs.' + s.price}" th:selected="${#lists.contains(p.services, s)}">svc</option>
+                            <option th:each="s : ${allServices}" th:value="${s.id}" th:text="${s.name + ' — $' + s.price}" th:selected="${#lists.contains(p.services, s)}">svc</option>
                         </select>
                         <p class="text-[10px] text-outline mt-1 font-body text-right">Hold Cmd/Ctrl to select multiple.</p>
                     </div>
