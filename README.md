@@ -9,6 +9,8 @@ The project is designed as a full-stack Java MVC application using Spring Securi
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [Live Demo](#live-demo)
+- [Screenshots](#screenshots)
 - [Main Features](#main-features)
 - [User Roles](#user-roles)
 - [Website Pages and Functions](#website-pages-and-functions)
@@ -41,6 +43,50 @@ Sakura Saki is built for a beauty salon/spa business that needs to manage custom
 The application follows a server-side rendered MVC pattern using Spring Boot controllers, service classes, repositories, JPA entities, and Thymeleaf pages.
 
 ---
+
+## Live Demo
+
+🔗 [View Sakura Saki Live](https://sakura-saki.onrender.com)
+
+---
+
+## Screenshots
+
+### Home Page
+
+![Home Page](docs/screenshots/01-home-hero.png)
+
+### Public Landing Page
+
+![Public Landing Page](docs/screenshots/02-public-landing-page.png)
+
+### Service Catalog
+
+![Service Catalog](docs/screenshots/03-service-catalog.png)
+
+### Appointment Booking
+
+![Appointment Booking](docs/screenshots/04-appointment-booking.png)
+
+### Customer Dashboard
+
+![Customer Dashboard](docs/screenshots/05-customer-dashboard.png)
+
+### Staff Dashboard
+
+![Staff Dashboard](docs/screenshots/06-staff-dashboard.png)
+
+### Admin Dashboard
+
+![Admin Dashboard](docs/screenshots/07-admin-dashboard.png)
+
+### Login Page
+
+![Login Page](docs/screenshots/08-login-page.png)
+
+### Registration Page
+
+![Registration Page](docs/screenshots/09-register-page.png)
 
 ## Main Features
 
@@ -749,8 +795,6 @@ Potential improvements:
 - Add better role-specific profile management.
 - Add API documentation with Swagger/OpenAPI.
 - Add production-ready database migration tool such as Flyway or Liquibase.
-- Add screenshots to README after final UI confirmation.
-- Add deployment URL after production deployment is stable.
 
 ---
 
