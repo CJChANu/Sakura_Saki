@@ -66,7 +66,7 @@
             <!-- Step Navigation -->
             <aside class="w-full md:w-72 bg-surface-container-low/50 p-8 flex flex-row md:flex-col justify-between md:justify-start gap-6 border-r border-white/20">
                 <div class="flex flex-col gap-8 w-full">
-                    <div id="nav-step1" class="flex items-center gap-4 opacity-100 transition-opacity">
+                    <div id="nav-step1" class="flex items-center gap-4 opacity-100 transition-opacity" th:style="${selectedServiceId != null ? 'display:none!important;' : ''}">
                         <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20 transition-colors">1</div>
                         <div class="hidden md:block">
                             <p class="text-[10px] font-label uppercase tracking-widest text-primary font-bold">Step 01</p>
@@ -99,9 +99,10 @@
                     <input type="hidden" name="serviceId" id="input-serviceId" th:value="${selectedServiceId}">
                     <input type="hidden" name="staffId" id="input-staffId">
                     <input type="hidden" id="input-serviceDuration" value="60">
+                    <input type="hidden" name="rescheduleId" id="input-rescheduleId" th:if="${rescheduleId != null}" th:value="${rescheduleId}">
 
                     <!-- STEP 1: SELECT SERVICE (Packages + Individual) -->
-                    <div id="step1" class="space-y-10">
+                    <div id="step1" class="space-y-10" th:style="${selectedServiceId != null ? 'display:none!important;' : ''}">
                         <div class="flex justify-between items-end">
                             <div>
                                 <h2 class="font-headline text-2xl font-bold text-on-surface">Select Service</h2>
@@ -197,8 +198,8 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-between pt-8">
-                            <button type="button" onclick="goToStep(1)" class="text-primary font-label uppercase text-sm tracking-widest flex items-center gap-3 transition-all duration-300 hover:opacity-70">
+                        <div class="flex pt-8" th:classappend="${selectedServiceId != null ? 'justify-end' : 'justify-between'}">
+                            <button th:if="${selectedServiceId == null}" type="button" onclick="goToStep(1)" class="text-primary font-label uppercase text-sm tracking-widest flex items-center gap-3 transition-all duration-300 hover:opacity-70">
                                 <span class="material-symbols-outlined text-lg">arrow_back</span> Back
                             </button>
                             <button type="button" onclick="goToStep(3)" class="bg-primary text-white px-10 py-4 rounded-full font-label uppercase text-sm tracking-widest flex items-center gap-3 clay-lift transition-all duration-300 hover:scale-105">
@@ -413,7 +414,12 @@
             noStaff.classList.add('hidden');
 
             try {
-                const resp = await fetch(`/booking/available-staff?date=${date}&time=${time}&durationMinutes=${duration}`);
+                let url = `/booking/available-staff?date=${date}&time=${time}&durationMinutes=${duration}`;
+                const rescheduleEl = document.getElementById('input-rescheduleId');
+                if (rescheduleEl) {
+                    url += `&excludeAppointmentId=${rescheduleEl.value}`;
+                }
+                const resp = await fetch(url);
                 const staffList = await resp.json();
 
                 loading.classList.add('hidden');
@@ -464,8 +470,8 @@
                 const el = document.querySelector(`.service-card[data-id="${initialService}"]`);
                 if (el) {
                     selectService(el);
-                    setTimeout(() => nextStep(2), 300);
                 }
+                setTimeout(() => goToStep(2), 300);
             }
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('dateInput').setAttribute('min', today);

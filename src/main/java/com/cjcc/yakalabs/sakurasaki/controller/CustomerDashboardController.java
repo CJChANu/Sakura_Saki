@@ -2,6 +2,7 @@ package com.cjcc.yakalabs.sakurasaki.controller;
 
 import com.cjcc.yakalabs.sakurasaki.model.Appointment;
 import com.cjcc.yakalabs.sakurasaki.model.Customer;
+import com.cjcc.yakalabs.sakurasaki.model.Review;
 import com.cjcc.yakalabs.sakurasaki.model.User;
 import com.cjcc.yakalabs.sakurasaki.repository.AppointmentRepository;
 import com.cjcc.yakalabs.sakurasaki.repository.ReviewRepository;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.cjcc.yakalabs.sakurasaki.service.CustomerService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,6 +65,7 @@ public class CustomerDashboardController {
 
     @GetMapping("/dashboard")
     public String dashboard(Authentication auth, Model model) {
+        appointmentService.updateExpiredAppointments();
         model.addAttribute("username", auth.getName());
         Customer customer = getCustomer(auth);
         model.addAttribute("customer", customer);
@@ -83,28 +86,42 @@ public class CustomerDashboardController {
 
             // Recent appointment history
             List<Appointment> allAppointments = appointmentService.findByCustomer(customer.getId());
-            model.addAttribute("recentHistory", allAppointments.stream().limit(3).toList());
+            model.addAttribute("recentHistory", allAppointments.stream().limit(5).toList());
 
             // Completed count for display
             long completedCount = appointmentService.countCompletedForCustomer(customer.getId());
             model.addAttribute("completedCount", completedCount);
+
+            // Collect map of appointment ID to Review object for this customer
+            Map<Long, Review> reviewsMap = reviewRepo.findByCustomerId(customer.getId()).stream()
+                    .collect(Collectors.toMap(r -> r.getAppointment().getId(), r -> r));
+            model.addAttribute("reviewsMap", reviewsMap);
+            
+            // For backwards compatibility in the template while transitioning
+            model.addAttribute("reviewedIds", reviewsMap.keySet());
         }
 
         return "customer/dashboard";
     }
 
     @GetMapping("/bookings")
-    public String bookings(@RequestParam(defaultValue = "0") int page,
-                           @RequestParam(defaultValue = "10") int size,
+    public String bookings(@RequestParam(defaultValue = "0") int upcomingPage,
+                           @RequestParam(defaultValue = "10") int upcomingSize,
+                           @RequestParam(defaultValue = "0") int pastPage,
+                           @RequestParam(defaultValue = "10") int pastSize,
                            Authentication auth, Model model) {
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        appointmentService.updateExpiredAppointments();
+        org.springframework.data.domain.Pageable upcomingPageable = org.springframework.data.domain.PageRequest.of(upcomingPage, upcomingSize);
+        org.springframework.data.domain.Pageable pastPageable = org.springframework.data.domain.PageRequest.of(pastPage, pastSize);
         model.addAttribute("username", auth.getName());
         Customer customer = getCustomer(auth);
         model.addAttribute("customer", customer);
 
         if (customer != null) {
-            org.springframework.data.domain.Page<Appointment> appointments = appointmentService.findByCustomer(customer.getId(), pageable);
-            model.addAttribute("appointments", appointments);
+            org.springframework.data.domain.Page<Appointment> upcomingAppointments = appointmentService.findUpcomingByCustomer(customer.getId(), upcomingPageable);
+            org.springframework.data.domain.Page<Appointment> pastAppointments = appointmentService.findPastByCustomer(customer.getId(), pastPageable);
+            model.addAttribute("upcomingAppointments", upcomingAppointments);
+            model.addAttribute("pastAppointments", pastAppointments);
 
             // Get ALL scheduled appointments for the calendar, regardless of pagination
             List<Appointment> allAppointments = appointmentService.findByCustomer(customer.getId());
@@ -114,13 +131,13 @@ public class CustomerDashboardController {
                     .toList();
             model.addAttribute("allUpcomingAppointments", upcomingDates);
 
-            // Collect IDs of appointments that already have a review
-            Set<Long> reviewedIds = appointments.getContent().stream()
-                    .filter(a -> "COMPLETED".equals(a.getStatus()))
-                    .filter(a -> reviewRepo.existsByAppointmentId(a.getId()))
-                    .map(Appointment::getId)
-                    .collect(Collectors.toSet());
-            model.addAttribute("reviewedIds", reviewedIds);
+            // Collect map of appointment ID to Review object for this customer
+            Map<Long, Review> reviewsMap = reviewRepo.findByCustomerId(customer.getId()).stream()
+                    .collect(Collectors.toMap(r -> r.getAppointment().getId(), r -> r));
+            model.addAttribute("reviewsMap", reviewsMap);
+            
+            // For backwards compatibility in the template while transitioning
+            model.addAttribute("reviewedIds", reviewsMap.keySet());
         }
 
         return "customer/bookings";

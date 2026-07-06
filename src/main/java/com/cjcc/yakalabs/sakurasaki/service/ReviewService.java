@@ -33,12 +33,16 @@ public class ReviewService {
             throw new RuntimeException("You can only review completed appointments.");
         }
 
-        if (reviewRepo.existsByAppointmentId(appointmentId)) {
-            throw new RuntimeException("A review has already been submitted for this appointment.");
-        }
-
         if (rating < 1 || rating > 5) {
             throw new RuntimeException("Rating must be between 1 and 5.");
+        }
+
+        Optional<Review> existingOpt = reviewRepo.findByAppointmentId(appointmentId);
+        if (existingOpt.isPresent()) {
+            Review existing = existingOpt.get();
+            existing.setRating(rating);
+            existing.setComment(comment);
+            return reviewRepo.save(existing);
         }
 
         Review review = new Review(

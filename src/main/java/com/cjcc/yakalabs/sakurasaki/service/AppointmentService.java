@@ -5,6 +5,7 @@ import com.cjcc.yakalabs.sakurasaki.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -80,7 +81,7 @@ public class AppointmentService {
         }
 
         // Double-booking prevention: check for time overlap
-        if (!isStaffAvailable(staffId, date, time, service.getDurationMinutes())) {
+        if (!isStaffAvailable(staffId, date, time, service.getDurationMinutes(), null)) {
             throw new RuntimeException("This staff member is already booked during that time slot. Please choose a different time or staff member.");
         }
 
@@ -94,7 +95,7 @@ public class AppointmentService {
      * Uses overlap detection: new appointment [startTime, endTime) must not overlap
      * with any existing appointment's [existingStart, existingEnd).
      */
-    public boolean isStaffAvailable(Long staffId, LocalDate date, LocalTime startTime, int durationMinutes) {
+    public boolean isStaffAvailable(Long staffId, LocalDate date, LocalTime startTime, int durationMinutes, Long excludeAppointmentId) {
         LocalTime endTime = startTime.plusMinutes(durationMinutes);
         
         Staff staff = staffRepo.findById(staffId).orElse(null);
@@ -121,6 +122,7 @@ public class AppointmentService {
 
         for (Appointment a : existing) {
             if ("CANCELLED".equals(a.getStatus())) continue;
+            if (excludeAppointmentId != null && a.getId().equals(excludeAppointmentId)) continue;
 
             LocalTime existingStart = a.getAppointmentTime();
             LocalTime existingEnd = existingStart.plusMinutes(a.getService().getDurationMinutes());
@@ -151,6 +153,14 @@ public class AppointmentService {
     public Page<Appointment> findByCustomer(Long customerId, Pageable pageable) {
         return appointmentRepo.findByCustomerIdOrderByAppointmentDateDesc(customerId, pageable);
     }
+    
+    public Page<Appointment> findUpcomingByCustomer(Long customerId, Pageable pageable) {
+        return appointmentRepo.findByCustomerIdAndStatusOrderByAppointmentDateDesc(customerId, "SCHEDULED", pageable);
+    }
+    
+    public Page<Appointment> findPastByCustomer(Long customerId, Pageable pageable) {
+        return appointmentRepo.findByCustomerIdAndStatusNotOrderByAppointmentDateDesc(customerId, "SCHEDULED", pageable);
+    }
 
     public List<Appointment> findByStaff(Long staffId) {
         return appointmentRepo.findByStaffId(staffId);
@@ -174,18 +184,35 @@ public class AppointmentService {
     }
 
     /**
-     * Reschedule an appointment with conflict checking.
+     * Reschedule an appointment keeping the same staff and notes.
      */
     public Appointment reschedule(Long id, LocalDate newDate, LocalTime newTime) {
         Appointment a = appointmentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        return reschedule(id, a.getStaff().getId(), newDate, newTime, a.getNotes());
+    }
 
-        if (!isStaffAvailable(a.getStaff().getId(), newDate, newTime, a.getService().getDurationMinutes())) {
+    /**
+     * Reschedule an appointment with conflict checking.
+     */
+    public Appointment reschedule(Long id, Long staffId, LocalDate newDate, LocalTime newTime, String notes) {
+        Appointment a = appointmentRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        
+        Staff newStaff = staffRepo.findById(staffId)
+                .orElseThrow(() -> new RuntimeException("Staff not found"));
+
+        if (!isStaffAvailable(staffId, newDate, newTime, a.getService().getDurationMinutes(), id)) {
             throw new RuntimeException("Staff member is not available at the new time. Please choose another time.");
         }
 
+        a.setStaff(newStaff);
         a.setAppointmentDate(newDate);
         a.setAppointmentTime(newTime);
+        a.setStatus("SCHEDULED");
+        if (notes != null && !notes.isBlank()) {
+            a.setNotes(notes);
+        }
         return appointmentRepo.save(a);
     }
 
@@ -249,6 +276,17 @@ public class AppointmentService {
 
     public long countCompletedForCustomer(Long customerId) {
         return appointmentRepo.countByCustomerIdAndStatus(customerId, "COMPLETED");
+    }
+
+    @Transactional
+    public void updateExpiredAppointments() {
+        List<Appointment> scheduled = appointmentRepo.findByStatus("SCHEDULED");
+        for (Appointment a : scheduled) {
+            if (a.getAppointmentDate().isBefore(LocalDate.now())) {
+                a.setStatus("EXPIRED");
+                appointmentRepo.save(a);
+            }
+        }
     }
 
     /**

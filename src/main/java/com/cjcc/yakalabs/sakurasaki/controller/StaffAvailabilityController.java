@@ -37,7 +37,7 @@ public class StaffAvailabilityController {
         LocalTime t = LocalTime.parse(time);
 
         return staffService.findActive().stream()
-                .filter(s -> appointmentService.isStaffAvailable(s.getId(), d, t, duration))
+                .filter(s -> appointmentService.isStaffAvailable(s.getId(), d, t, duration, null))
                 .map(s -> Map.<String, Object>of(
                         "id", s.getId(),
                         "name", s.getFirstName() + " " + s.getLastName(),

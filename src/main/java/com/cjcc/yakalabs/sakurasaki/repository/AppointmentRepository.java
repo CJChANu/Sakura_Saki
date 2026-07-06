@@ -31,6 +31,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByCustomerIdOrderByAppointmentDateDesc(Long customerId);
     Page<Appointment> findByCustomerIdOrderByAppointmentDateDesc(Long customerId, Pageable pageable);
 
+    // Find appointments by status for a specific customer (ordered by date desc)
+    Page<Appointment> findByCustomerIdAndStatusOrderByAppointmentDateDesc(Long customerId, String status, Pageable pageable);
+    Page<Appointment> findByCustomerIdAndStatusNotOrderByAppointmentDateDesc(Long customerId, String status, Pageable pageable);
+
     // Find appointments for a specific customer
     List<Appointment> findByCustomerId(Long customerId);
 
