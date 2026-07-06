@@ -76,7 +76,7 @@
         <h1 th:text="${service.name}">Service Name</h1>
         <p class="desc" th:text="${service.description}">Description of the service.</p>
         <div class="detail-meta">
-            <div class="item"><div class="val" th:text="'Rs.' + ${#numbers.formatDecimal(service.price,1,0)}">Rs.1500</div><div class="lbl">Price</div></div>
+            <div class="item"><div class="val" th:text="'$' + ${#numbers.formatDecimal(service.price,1,0)}">$1500</div><div class="lbl">Price</div></div>
             <div class="item"><div class="val" th:text="${service.durationMinutes}">30</div><div class="lbl">Minutes</div></div>
             <div class="item" th:if="${avgRating != null and avgRating > 0}"><div class="val" style="color:#f59e0b;" th:text="${#numbers.formatDecimal(avgRating,1,1)}">4.5</div><div class="lbl">Rating</div></div>
         </div>
